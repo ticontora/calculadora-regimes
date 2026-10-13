@@ -215,8 +215,14 @@ tr.current td{font-weight:700}
       <select id="atividade">
         <option value="comercio" selected>Comércio (venda de produtos)</option>
         <option value="industria">Indústria (fabricação)</option>
-        <option value="servicos">Serviços</option>
+        <option value="servicos">Serviços em geral (Anexo III)</option>
+        <option value="servicos4">Serviços de limpeza, vigilância e obras (Anexo IV)</option>
+        <option value="servicos5">Serviços intelectuais, com Fator R (Anexo V)</option>
       </select>
+
+      <label for="folha">Folha de pagamento mensal (salários, pró-labore e encargos)</label>
+      <input id="folha" type="text" inputmode="numeric" autocomplete="off" value="R$ 0,00">
+      <p class="hint">Usada no Fator R (serviços do Anexo V) e na CPP de 20%, que é paga à parte no Anexo IV, no Presumido e no Real. Com zero, Presumido e Real ficam subestimados.</p>
 
       <label for="margem">Margem antes de impostos (%)</label>
       <input id="margem" type="number" min="0" max="100" step="0.5" value="0">
@@ -270,12 +276,13 @@ tr.current td{font-weight:700}
       <h2 id="h-lim">Premissas e limites</h2>
       <ul class="limits">
         <li>Regras de 2026. A partir de 2027, PIS e COFINS saem e entra a CBS, e esta tela não modela essa transição.</li>
-        <li>Simples Nacional: faixa pelo faturamento dos últimos 12 meses, com a tabela do Anexo I (comércio), II (indústria) ou III (serviços). ICMS dentro do DAS, sem crédito.</li>
+        <li>Simples Nacional: faixa pelo faturamento dos últimos 12 meses, com a tabela do Anexo I (comércio), II (indústria), III, IV ou V (serviços). ICMS dentro do DAS, sem crédito. CPP dentro do DAS nos Anexos III e V.</li>
         <li>Simples híbrido (comércio e indústria): ICMS fora do DAS, com a partilha do Anexo I (34% nas faixas 1 e 2, 33,5% nas faixas 3 a 5, zero na faixa 6). ICMS pelo regime normal.</li>
         <li>Lucro Presumido: presunção de 8% (comércio) ou 32% (serviços), IRPJ de 15% com adicional de 10% acima de R$ 20 mil no mês, CSLL de 9%, PIS de 0,65% e COFINS de 3%.</li>
         <li>Lucro Real: IRPJ de 15% com adicional de 10%, CSLL de 9%, PIS de 1,65% e COFINS de 7,6%, com crédito sobre as compras. Não considera prejuízo fiscal.</li>
-        <li>Simplificações: não considera Fator R, substituição tributária, DIFAL nem regimes específicos de ICMS do estado.</li>
-        <li>Serviços: calculado com o Anexo III. Serviços dos Anexos IV e V e casos com Fator R não são modelados, e o resultado não serve para esses clientes.</li>
+        <li>Fator R: folha dos últimos 12 meses ÷ receita dos últimos 12 meses, com 28% como limite. A tela usa a folha do mês como aproximação.</li>
+        <li>CPP de 20% sobre a folha: no Anexo IV, e nos regimes sem DAS (Presumido e Real), é custo à parte. RAT e terceiros não são considerados.</li>
+        <li>Simplificações: não considera substituição tributária, DIFAL, RAT, regimes específicos de ICMS do estado nem presunções de serviços abaixo de 32%.</li>
         <li>Estimativa. Confirme com o contador responsável antes de decidir a troca de regime.</li>
       </ul>
     </section>

@@ -154,8 +154,23 @@ function zerarEntradas(){
 }
 
 /* ===== Consulta de CNPJ (extensão tem permissão para publica.cnpj.ws) ===== */
-// Tenta a publica.cnpj.ws e, se o navegador bloquear a chamada, a BrasilAPI
+// Endereço do Cloudflare Worker (proxy). Troque pela URL que o Cloudflare gerar.
+const PROXY_CNPJ = 'SUBSTITUA-PELA-URL-DO-WORKER';
+async function consultarProxy(d){
+  const r = await fetch(PROXY_CNPJ + '/cnpj/' + d);
+  if (r.status === 404) throw new Error('CNPJ não encontrado na base pública.');
+  if (!r.ok) throw new Error('Não foi possível consultar agora. Tente de novo em instantes.');
+  return await r.json();
+}
+// Tenta o proxy; se não estiver configurado ou não responder, tenta a publica.cnpj.ws e a BrasilAPI
 async function consultarCnpj(d){
+  if (!PROXY_CNPJ.startsWith('SUBSTITUA')){
+    try {
+      return await consultarProxy(d);
+    } catch (e){
+      if (!(e instanceof TypeError)) throw e;
+    }
+  }
   try {
     return await consultarPublica(d);
   } catch (e){

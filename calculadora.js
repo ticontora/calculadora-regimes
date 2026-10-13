@@ -154,13 +154,21 @@ function zerarEntradas(){
 }
 
 /* ===== Consulta de CNPJ (extensão tem permissão para publica.cnpj.ws) ===== */
+// Tenta a publica.cnpj.ws e, se o navegador bloquear a chamada, a BrasilAPI
 async function consultarCnpj(d){
-  let r;
   try {
-    r = await fetch('https://publica.cnpj.ws/cnpj/' + d);
-  } catch (e) {
+    return await consultarPublica(d);
+  } catch (e){
+    if (!(e instanceof TypeError)) throw e;
+  }
+  try {
+    return await consultarBrasilApi(d);
+  } catch (e){
     throw new Error('Este navegador não conseguiu consultar a base de CNPJ. Digite a razão social manualmente.');
   }
+}
+async function consultarPublica(d){
+  const r = await fetch('https://publica.cnpj.ws/cnpj/' + d);
   if (r.status === 404) throw new Error('CNPJ não encontrado na base pública.');
   if (r.status === 429) throw new Error('Muitas consultas seguidas. Aguarde um minuto e tente de novo.');
   if (!r.ok) throw new Error('Não foi possível consultar agora. Tente de novo em instantes.');
@@ -168,6 +176,15 @@ async function consultarCnpj(d){
   return {
     razao: j.razao_social || '',
     situacao: (j.estabelecimento && j.estabelecimento.situacao_cadastral) || 'Não informada'
+  };
+}
+async function consultarBrasilApi(d){
+  const r = await fetch('https://brasilapi.com.br/api/cnpj/v1/' + d);
+  if (!r.ok) throw new Error('BrasilAPI indisponível');
+  const j = await r.json();
+  return {
+    razao: j.razao_social || '',
+    situacao: j.descricao_situacao_cadastral ? j.descricao_situacao_cadastral.charAt(0) + j.descricao_situacao_cadastral.slice(1).toLowerCase() : 'Não informada'
   };
 }
 let cnpjTimer = null;

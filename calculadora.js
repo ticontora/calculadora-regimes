@@ -106,7 +106,8 @@ function calcRegimes(p){
 
   const baseP = R * (isCom ? 0.08 : 0.32);
   const irpjP = 0.15*baseP + 0.10*Math.max(0, baseP - 20000);
-  const csllP = 0.09*baseP;
+  const baseCsllP = R * (isCom ? 0.12 : 0.32);
+  const csllP = 0.09*baseCsllP;
   const baseTrib = R - icmsDebito;
   const pisCofinsP = (0.0065 + 0.03) * baseTrib;
   const impP = irpjP + csllP + pisCofinsP + issR + icmsNormal + cpp;
@@ -474,7 +475,7 @@ function gerarPdfCore(p, dados, h){
 
   titulo('Premissas e limites');
   texto('Regras de 2026. Simples Nacional: tabela do Anexo I (comércio), II (indústria) ou III (serviços), pela faixa de faturamento dos últimos 12 meses. Simples híbrido: ICMS fora do DAS, com a partilha do Anexo I (34% nas faixas 1 e 2, 33,5% nas faixas 3 a 5, zero na faixa 6). Lucro Presumido e Lucro Real: IRPJ, CSLL, PIS, COFINS e ICMS. Simples híbrido aplicável a comércio e indústria, até R$ 4,8 milhões por ano.');
-  texto('Simplificações: o ICMS é calculado sobre o faturamento como se já estivesse no preço, e a base de PIS e COFINS desconta esse ICMS. Não considera substituição tributária, DIFAL, compensação de prejuízo fiscal, RAT, contribuições a terceiros nem regimes específicos de ICMS. Serviços usam presunção de 32%; algumas atividades têm presunção menor e não estão modeladas.');
+  texto('Simplificações: o ICMS é calculado sobre o faturamento como se já estivesse no preço, e a base de PIS e COFINS desconta esse ICMS. Não considera substituição tributária, DIFAL, compensação de prejuízo fiscal, RAT, contribuições a terceiros nem regimes específicos de ICMS. Presunção: comércio e indústria, 8% para IRPJ e 12% para CSLL; serviços, 32% para ambos. Algumas atividades têm presunção diferente e não estão modeladas. PIS e COFINS no Lucro Real são uma apuração simplificada, com crédito sobre as compras informadas.');
   texto('Fator R: só se aplica a atividades da lista do Anexo V, marcadas na tela. Folha dos últimos 12 meses dividida pela receita dos últimos 12 meses, com 28% como limite. Esta análise usa a folha do mês como aproximação da média de 12 meses.');
   texto('CPP patronal de 20% sobre a folha: no Anexo IV, e nos regimes sem DAS (Presumido e Real), é custo à parte. No Simples (Anexos I, II, III e V) já está dentro do DAS. RAT e contribuições a terceiros não são considerados.');
   texto('Legislação considerada: ICMS do estado de São Paulo e ISS de Guarulhos, com as alíquotas informadas acima. A regra de crédito do ICMS fora do DAS em São Paulo não foi confirmada por fonte oficial.');

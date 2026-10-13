@@ -232,6 +232,7 @@ tr.current td{font-weight:700}
 
       <label for="compras">Compras com crédito de imposto (% do faturamento)</label>
       <input id="compras" type="number" min="0" max="100" step="1" value="0">
+      <p class="hint"><label for="semcompras" style="display:inline;margin:0"><input id="semcompras" type="checkbox" style="width:auto"> Não há compras com crédito neste caso</label></p>
       <p class="hint">Mercadoria comprada de atacado ou indústria, com nota que destaca ICMS.</p>
 
       <label for="icms">ICMS de São Paulo (%)</label>
@@ -259,8 +260,10 @@ tr.current td{font-weight:700}
           <tbody id="tbl-regimes"></tbody>
         </table>
       </div>
+      <p class="status bad" id="alerta-compras" hidden>Em comércio e indústria, informe as compras com crédito ou marque que não há. Sem elas, Presumido e Real ficam subestimados e o PDF não é gerado.</p>
       <div class="acoes"><button id="btn-pdf" class="btn" type="button">Baixar análise em PDF</button><button id="btn-limpar" class="btn-secundario" type="button">Limpar Consulta</button></div>
       <p class="status" id="pdf-msg"></p>
+      <p class="hint" id="aviso-contador">Estimativa para apoio à decisão. Revise com o contador antes de usar com o cliente.</p>
     </section>
 
     <section class="card full" aria-labelledby="h-faixa">

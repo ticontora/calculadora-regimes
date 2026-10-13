@@ -230,6 +230,7 @@ function entradas(){
     atividade: $('atividade').value,
     folha: parseBRL($('folha').value),
     fatorR: $('fatorr').checked,
+    semCompras: $('semcompras').checked,
     margem: num('margem') / 100,
     compras: num('compras') / 100,
     icms: num('icms') / 100,
@@ -245,10 +246,15 @@ $('folha').addEventListener('input', () => {
 });
 
 /* ===== Telas ===== */
+// Comércio e indústria precisam de compras com crédito (ou confirmação de que não há)
+function faltaCompras(p){
+  return (p.atividade === 'comercio' || p.atividade === 'industria') && p.receita > 0 && p.compras === 0 && !p.semCompras;
+}
 function renderRegimes(){
   const p = entradas();
   const res = calcRegimes(p);
   const rank = ranking(res);
+  $('alerta-compras').hidden = !faltaCompras(p);
   const banner = $('banner');
   if (rank.length === 0 || p.receita === 0){
     banner.className = 'banner none';
@@ -289,7 +295,7 @@ function renderFaixas(){
 }
 function atualizar(){ renderRegimes(); renderFaixas(); }
 ['receita','folha','margem','compras','icms','iss'].forEach(id => $(id).addEventListener('input', atualizar));
-['atividade','credhib','fatorr'].forEach(id => $(id).addEventListener('change', atualizar));
+['atividade','credhib','fatorr','semcompras'].forEach(id => $(id).addEventListener('change', atualizar));
 
 /* ===== PDF ===== */
 function gerarPdfCore(p, dados, h){
@@ -460,6 +466,11 @@ $('btn-pdf').addEventListener('click', () => {
   const msg = $('pdf-msg');
   msg.className = 'status';
   msg.textContent = '';
+  if (faltaCompras(entradas())){
+    msg.className = 'status bad';
+    msg.textContent = 'Informe as compras com crédito, ou marque que não há, antes de gerar o PDF.';
+    return;
+  }
   try {
     const bytes = gerarPdfBytes(entradas(), {nome: $('nome').value.trim(), cnpj: $('cnpj').value.trim()});
     const blob = new Blob([bytes], {type: 'application/pdf'});
@@ -487,6 +498,7 @@ function limparConsulta(){
   zerarEntradas();
   $('atividade').value = 'comercio';
   $('fatorr').checked = false;
+  $('semcompras').checked = false;
   $('credhib').value = 'sim';
   atualizar();
 }

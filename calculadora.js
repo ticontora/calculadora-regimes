@@ -65,7 +65,8 @@ function calcRegimes(p){
   // Fator R: serviços do Anexo V passam ao Anexo III se folha/receita >= 28%
   let ativ = p.atividade;
   let fatorR = null;
-  if (ativ === 'servicos5'){
+  // Fator R só vale para atividades da lista do Anexo V (marcadas pelo usuário)
+  if (ativ === 'servicos5' && p.fatorR){
     fatorR = R > 0 ? (p.folha || 0) / R : 0;
     ativ = fatorR >= FATOR_R_MINIMO ? 'servicos' : 'servicos5';
   }
@@ -228,6 +229,7 @@ function entradas(){
     receita: parseBRL($('receita').value),
     atividade: $('atividade').value,
     folha: parseBRL($('folha').value),
+    fatorR: $('fatorr').checked,
     margem: num('margem') / 100,
     compras: num('compras') / 100,
     icms: num('icms') / 100,
@@ -287,7 +289,7 @@ function renderFaixas(){
 }
 function atualizar(){ renderRegimes(); renderFaixas(); }
 ['receita','folha','margem','compras','icms','iss'].forEach(id => $(id).addEventListener('input', atualizar));
-['atividade','credhib'].forEach(id => $(id).addEventListener('change', atualizar));
+['atividade','credhib','fatorr'].forEach(id => $(id).addEventListener('change', atualizar));
 
 /* ===== PDF ===== */
 function gerarPdfCore(p, dados, h){
@@ -392,9 +394,10 @@ function gerarPdfCore(p, dados, h){
   titulo('Dados informados');
   pares([
     ['Faturamento mensal', fmtBRL.format(p.receita)],
-    ['Atividade', ({comercio:'Comércio', industria:'Indústria', servicos:'Serviços em geral', servicos4:'Limpeza, vigilância e obras', servicos5:'Serviços intelectuais'})[p.atividade]],
+    ['Atividade', ({comercio:'Comércio', industria:'Indústria', servicos:'Serviços (Anexo III)', servicos4:'Limpeza, vigilância, obras e paisagismo (Anexo IV)', servicos5:'Serviços do Anexo V'})[p.atividade]],
     ['Anexo do Simples', res.anexo],
     ['Folha de pagamento mensal', fmtBRL.format(p.folha || 0)],
+    ['Fator R aplicável (lista do Anexo V)', p.atividade === 'servicos5' ? (p.fatorR ? 'Sim' : 'Não') : '—'],
     ['Margem antes de impostos', fmtPct(p.margem)],
     ['Compras com crédito', fmtPct(p.compras) + ' do faturamento'],
     ['ICMS (São Paulo)', fmtPct(p.icms)],
@@ -434,7 +437,7 @@ function gerarPdfCore(p, dados, h){
   titulo('Premissas e limites');
   texto('Regras de 2026. Simples Nacional: tabela do Anexo I (comércio), II (indústria) ou III (serviços), pela faixa de faturamento dos últimos 12 meses. Simples híbrido: ICMS fora do DAS, com a partilha do Anexo I (34% nas faixas 1 e 2, 33,5% nas faixas 3 a 5, zero na faixa 6). Lucro Presumido e Lucro Real: IRPJ, CSLL, PIS, COFINS e ICMS. Simples híbrido aplicável a comércio e indústria, até R$ 4,8 milhões por ano.');
   texto('Simplificações: o ICMS é calculado sobre o faturamento como se já estivesse no preço, e a base de PIS e COFINS desconta esse ICMS. Não considera substituição tributária, DIFAL, compensação de prejuízo fiscal, RAT, contribuições a terceiros nem regimes específicos de ICMS. Serviços usam presunção de 32%; algumas atividades têm presunção menor e não estão modeladas.');
-  texto('Fator R: folha dos últimos 12 meses dividida pela receita dos últimos 12 meses, com 28% como limite. Esta análise usa a folha do mês como aproximação da média de 12 meses.');
+  texto('Fator R: só se aplica a atividades da lista do Anexo V, marcadas na tela. Folha dos últimos 12 meses dividida pela receita dos últimos 12 meses, com 28% como limite. Esta análise usa a folha do mês como aproximação da média de 12 meses.');
   texto('CPP patronal de 20% sobre a folha: no Anexo IV, e nos regimes sem DAS (Presumido e Real), é custo à parte. No Simples (Anexos I, II, III e V) já está dentro do DAS. RAT e contribuições a terceiros não são considerados.');
   texto('Legislação considerada: ICMS do estado de São Paulo e ISS de Guarulhos, com as alíquotas informadas acima. A regra de crédito do ICMS fora do DAS em São Paulo não foi confirmada por fonte oficial.');
   texto('Documento de estimativa. Confirme as premissas e a apuração com o contador responsável antes de decidir a troca de regime.');
@@ -483,6 +486,7 @@ function limparConsulta(){
   $('cnpj-msg').textContent = 'Digite os 14 números do CNPJ.';
   zerarEntradas();
   $('atividade').value = 'comercio';
+  $('fatorr').checked = false;
   $('credhib').value = 'sim';
   atualizar();
 }

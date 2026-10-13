@@ -215,10 +215,12 @@ tr.current td{font-weight:700}
       <select id="atividade">
         <option value="comercio" selected>Comércio (venda de produtos)</option>
         <option value="industria">Indústria (fabricação)</option>
-        <option value="servicos">Serviços em geral (Anexo III)</option>
-        <option value="servicos4">Serviços de limpeza, vigilância e obras (Anexo IV)</option>
-        <option value="servicos5">Serviços intelectuais, com Fator R (Anexo V)</option>
+        <option value="servicos">Serviços (Anexo III)</option>
+        <option value="servicos4">Serviços de limpeza, vigilância, obras e paisagismo (Anexo IV)</option>
+        <option value="servicos5">Serviços do Anexo V (intelectuais e técnicos)</option>
       </select>
+      <p class="hint">Anexo IV: ex. construção civil, vigilância, limpeza e conservação, paisagismo, advocacia. Anexo V: só entra com Fator R se a atividade estiver na lista do Anexo V.</p>
+      <p class="hint"><label for="fatorr" style="display:inline;margin:0"><input id="fatorr" type="checkbox" style="width:auto"> Esta atividade está na lista do Fator R (Anexo V)?</label></p>
 
       <label for="folha">Folha de pagamento mensal (salários, pró-labore e encargos)</label>
       <input id="folha" type="text" inputmode="numeric" autocomplete="off" value="R$ 0,00">
@@ -280,7 +282,7 @@ tr.current td{font-weight:700}
         <li>Simples híbrido (comércio e indústria): ICMS fora do DAS, com a partilha do Anexo I (34% nas faixas 1 e 2, 33,5% nas faixas 3 a 5, zero na faixa 6). ICMS pelo regime normal.</li>
         <li>Lucro Presumido: presunção de 8% (comércio) ou 32% (serviços), IRPJ de 15% com adicional de 10% acima de R$ 20 mil no mês, CSLL de 9%, PIS de 0,65% e COFINS de 3%.</li>
         <li>Lucro Real: IRPJ de 15% com adicional de 10%, CSLL de 9%, PIS de 1,65% e COFINS de 7,6%, com crédito sobre as compras. Não considera prejuízo fiscal.</li>
-        <li>Fator R: folha dos últimos 12 meses ÷ receita dos últimos 12 meses, com 28% como limite. A tela usa a folha do mês como aproximação.</li>
+        <li>Fator R: só para atividades da lista do Anexo V, marcadas na tela. Folha dos últimos 12 meses ÷ receita dos últimos 12 meses, com 28% como limite. A tela usa a folha do mês como aproximação.</li>
         <li>CPP de 20% sobre a folha: no Anexo IV, e nos regimes sem DAS (Presumido e Real), é custo à parte. RAT e terceiros não são considerados.</li>
         <li>Simplificações: não considera substituição tributária, DIFAL, RAT, regimes específicos de ICMS do estado nem presunções de serviços abaixo de 32%.</li>
         <li>Estimativa. Confirme com o contador responsável antes de decidir a troca de regime.</li>

@@ -122,6 +122,35 @@ function calcRegimes(p){
   const csllR = lucroTrib > 0 ? 0.09*lucroTrib : 0;
   const impR = pisCofinsR + issR + irpjR + csllR + icmsNormal + cpp;
   out.real = {elegivel:true, imposto: impR, efetiva: R>0 ? impR/R : 0, liquido: antes - impR};
+  // Memória de cálculo mensal, linha a linha (Presumido e Real)
+  const pctTxt = v => (v*100).toLocaleString('pt-BR', {maximumFractionDigits:2}) + '%';
+  const brl = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+  const lin = (t, base, aliq, valor, nota) => ({t, base, aliq, valor, nota});
+  const baseRealPC = Math.max(0, baseTrib - comprasCred);
+  const linhasP = [
+    lin('Margem antes de impostos', antes, '', null, 'Entrada da tela'),
+    lin('IRPJ (parcela de 15%)', baseP, '15%', 0.15*baseP, 'Base = receita × presunção de ' + (isCom ? '8%' : '32%')),
+    lin('IRPJ adicional', Math.max(0, baseP-20000), '10%', 0.10*Math.max(0, baseP-20000), 'Só sobre a parte da base acima de R$ 20.000 no mês'),
+    lin('CSLL', baseCsllP, '9%', csllP, 'Base = receita × presunção de ' + (isCom ? '12%' : '32%')),
+    lin('PIS', baseTrib, '0,65%', 0.0065*baseTrib, 'Base = receita − ICMS destacado'),
+    lin('COFINS', baseTrib, '3%', 0.03*baseTrib, 'Base = receita − ICMS destacado'),
+  ];
+  if (!isCom) linhasP.push(lin('ISS', R, pctTxt(p.iss), issR, 'Alíquota municipal × receita'));
+  if (isCom) linhasP.push(lin('ICMS a recolher', icmsDebito, pctTxt(icmsRate), icmsNormal, 'Débito ' + brl(icmsDebito) + ' − crédito ' + brl(icmsCredito)));
+  linhasP.push(lin('CPP patronal 20%', p.folha || 0, '20%', cpp, 'Custo sobre a folha, fora do DAS'));
+  const linhasR = [
+    lin('Margem antes de impostos', antes, '', null, 'Entrada da tela'),
+    lin('PIS', baseRealPC, '1,65%', 0.0165*baseRealPC, 'Base = receita − ICMS − compras com crédito'),
+    lin('COFINS', baseRealPC, '7,6%', 0.076*baseRealPC, 'Mesma base do PIS'),
+  ];
+  if (!isCom) linhasR.push(lin('ISS', R, pctTxt(p.iss), issR, 'Alíquota municipal × receita'));
+  linhasR.push(lin('CPP patronal 20%', p.folha || 0, '20%', cpp, 'Custo sobre a folha, dedutível no lucro real'));
+  linhasR.push(lin('Lucro tributável (base de IRPJ e CSLL)', lucroTrib, '', null, 'Margem − CPP − PIS − COFINS − ISS'));
+  linhasR.push(lin('IRPJ (parcela de 15%)', Math.max(0, lucroTrib), '15%', lucroTrib > 0 ? 0.15*lucroTrib : 0, 'Sobre o lucro tributável positivo'));
+  linhasR.push(lin('IRPJ adicional', Math.max(0, lucroTrib-20000), '10%', lucroTrib > 0 ? 0.10*Math.max(0, lucroTrib-20000) : 0, 'Acima de R$ 20.000 no mês'));
+  linhasR.push(lin('CSLL', Math.max(0, lucroTrib), '9%', csllR, 'Sobre o lucro tributável positivo'));
+  if (isCom) linhasR.push(lin('ICMS a recolher', icmsDebito, pctTxt(icmsRate), icmsNormal, 'Débito ' + brl(icmsDebito) + ' − crédito ' + brl(icmsCredito)));
+  out.memoria = {presumido: {linhas: linhasP, total: impP}, real: {linhas: linhasR, total: impR}};
   out.anexo = anexo;
   // Escala impostos e sobra para o período (a alíquota efetiva continua mensal)
   const meses = p.periodo || 1;
@@ -292,9 +321,21 @@ $('folha').addEventListener('input', () => {
 function faltaCompras(p){
   return (p.atividade === 'comercio' || p.atividade === 'industria') && p.receita > 0 && p.compras === 0 && !p.semCompras;
 }
+function renderMemoria(res){
+  const box = $('memoria');
+  const bloco = (nome, k) => {
+    if (!res[k].elegivel) return '';
+    const m = res.memoria[k];
+    const val = v => (v === null || v === undefined) ? '—' : fmtBRL.format(v);
+    const linhas = m.linhas.map(l => `<tr><td>${l.t}</td><td>${val(l.base)}</td><td>${l.aliq || '—'}</td><td>${val(l.valor)}</td><td class="nota">${l.nota || ''}</td></tr>`).join('');
+    return `<h3>${nome} (mensal)</h3><div class="tablewrap"><table><thead><tr><th>Tributo</th><th>Base</th><th>Alíquota</th><th>Valor</th><th>Como foi calculado</th></tr></thead><tbody>${linhas}<tr class="total"><td>Total</td><td></td><td></td><td>${fmtBRL.format(m.total)}</td><td></td></tr></tbody></table></div>`;
+  };
+  box.innerHTML = bloco('Lucro Presumido', 'presumido') + bloco('Lucro Real', 'real');
+}
 function renderRegimes(){
   const p = entradas();
   const res = calcRegimes(p);
+  renderMemoria(res);
   const rank = ranking(res);
   $('alerta-compras').hidden = !faltaCompras(p);
   const banner = $('banner');

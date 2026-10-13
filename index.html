@@ -252,7 +252,15 @@ tr.current td{font-weight:700}
     </section>
 
     <section class="card" aria-labelledby="h-out" aria-live="polite">
-      <h2 id="h-out">Resultado do mês</h2>
+      <h2 id="h-out">Resultado</h2>
+      <label for="periodo">Ver o resultado em</label>
+      <select id="periodo">
+        <option value="1" selected>Mensal</option>
+        <option value="2">Bimestral</option>
+        <option value="6">Semestral</option>
+        <option value="12">Anual</option>
+      </select>
+      <p class="hint">O período multiplica o resultado mensal, supondo o mesmo faturamento, margem e compras em todos os meses.</p>
       <div class="banner" id="banner"></div>
       <div class="tablewrap">
         <table>
@@ -288,6 +296,7 @@ tr.current td{font-weight:700}
         <li>Fator R: só para atividades da lista do Anexo V, marcadas na tela. Folha dos últimos 12 meses ÷ receita dos últimos 12 meses, com 28% como limite. A tela usa a folha do mês como aproximação.</li>
         <li>CPP de 20% sobre a folha: no Anexo IV, e nos regimes sem DAS (Presumido e Real), é custo à parte. RAT e terceiros não são considerados.</li>
         <li>Simplificações: não considera substituição tributária, DIFAL, RAT, regimes específicos de ICMS do estado nem presunções de serviços abaixo de 32%.</li>
+        <li>Períodos: bimestral, semestral e anual multiplicam o resultado mensal, supondo o mesmo faturamento e margem em todos os meses.</li>
         <li>Estimativa. Confirme com o contador responsável antes de decidir a troca de regime.</li>
       </ul>
     </section>

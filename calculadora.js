@@ -42,6 +42,9 @@ const SIMPLES = {
   ]
 };
 const CPP_PATRONAL = 0.20;
+// Períodos: o resultado mensal é multiplicado pelo número de meses
+const PERIODOS = {1:{nome:'Mensal', sufixo:'por mês'}, 2:{nome:'Bimestral', sufixo:'por bimestre'}, 6:{nome:'Semestral', sufixo:'por semestre'}, 12:{nome:'Anual', sufixo:'por ano'}};
+function periodoInfo(n){ return PERIODOS[n] || PERIODOS[1]; }
 const FATOR_R_MINIMO = 0.28;
 const LIMITE_SIMPLES = 4800000;
 const NOMES = {simples:'Simples Nacional', hibrido:'Simples híbrido', presumido:'Lucro Presumido', real:'Lucro Real'};
@@ -120,6 +123,11 @@ function calcRegimes(p){
   const impR = pisCofinsR + issR + irpjR + csllR + icmsNormal + cpp;
   out.real = {elegivel:true, imposto: impR, efetiva: R>0 ? impR/R : 0, liquido: antes - impR};
   out.anexo = anexo;
+  // Escala impostos e sobra para o período (a alíquota efetiva continua mensal)
+  const meses = p.periodo || 1;
+  for (const k of ['simples','hibrido','presumido','real']){
+    if (out[k] && out[k].elegivel){ out[k].imposto *= meses; out[k].liquido *= meses; }
+  }
   return out;
 }
 function ranking(res){
@@ -262,6 +270,7 @@ function entradas(){
     receita: parseBRL($('receita').value),
     atividade: $('atividade').value,
     folha: parseBRL($('folha').value),
+    periodo: parseInt($('periodo').value, 10) || 1,
     fatorR: $('fatorr').checked,
     semCompras: $('semcompras').checked,
     margem: num('margem') / 100,
@@ -296,7 +305,7 @@ function renderRegimes(){
     let txt = '';
     if (rank.length > 1){
       const dif = res[rank[0]].liquido - res[rank[1]].liquido;
-      txt = `Sobra ${fmtBRL.format(dif)} por mês a mais do que o ${NOMES[rank[1]]}.`;
+      txt = `Sobra ${fmtBRL.format(dif)} ${periodoInfo(p.periodo).sufixo} a mais do que o ${NOMES[rank[1]]}.`;
     }
     banner.className = 'banner';
     banner.innerHTML = `<span>Melhor regime para este faturamento</span><strong>${NOMES[rank[0]]}</strong><span>${txt}</span>`;
@@ -328,7 +337,7 @@ function renderFaixas(){
 }
 function atualizar(){ renderRegimes(); renderFaixas(); }
 ['receita','folha','margem','compras','icms','iss'].forEach(id => $(id).addEventListener('input', atualizar));
-['atividade','credhib','fatorr','semcompras'].forEach(id => $(id).addEventListener('change', atualizar));
+['atividade','credhib','fatorr','semcompras','periodo'].forEach(id => $(id).addEventListener('change', atualizar));
 
 /* ===== PDF ===== */
 function gerarPdfCore(p, dados, h){
@@ -433,6 +442,7 @@ function gerarPdfCore(p, dados, h){
   titulo('Dados informados');
   pares([
     ['Faturamento mensal', fmtBRL.format(p.receita)],
+    ['Período do resultado', periodoInfo(p.periodo).nome],
     ['Atividade', ({comercio:'Comércio', industria:'Indústria', servicos:'Serviços (Anexo III)', servicos4:'Limpeza, vigilância, obras e paisagismo (Anexo IV)', servicos5:'Serviços do Anexo V'})[p.atividade]],
     ['Anexo do Simples', res.anexo],
     ['Folha de pagamento mensal', fmtBRL.format(p.folha || 0)],
@@ -444,7 +454,7 @@ function gerarPdfCore(p, dados, h){
     ['Crédito de ICMS no híbrido', p.credHibrido ? 'Sim' : 'Não'],
   ]);
 
-  titulo('Resultado mensal');
+  titulo('Resultado: ' + periodoInfo(p.periodo).nome);
   const chaves = ['simples','hibrido','presumido','real'];
   const linhasR = chaves.map(k => {
     const r = res[k];
@@ -459,7 +469,7 @@ function gerarPdfCore(p, dados, h){
     const linhasBox = ['Melhor regime para este faturamento: ' + NOMES[rank[0]] + '.'];
     if (rank.length > 1){
       const dif = res[rank[0]].liquido - res[rank[1]].liquido;
-      linhasBox.push('Sobra ' + fmtBRL.format(dif) + ' por mês a mais do que o ' + NOMES[rank[1]] + '.');
+      linhasBox.push('Sobra ' + fmtBRL.format(dif) + ' ' + periodoInfo(p.periodo).sufixo + ' a mais do que o ' + NOMES[rank[1]] + '.');
     }
     caixa(linhasBox, C.soft, C.acc);
   }
@@ -476,6 +486,7 @@ function gerarPdfCore(p, dados, h){
   titulo('Premissas e limites');
   texto('Regras de 2026. Simples Nacional: tabela do Anexo I (comércio), II (indústria) ou III (serviços), pela faixa de faturamento dos últimos 12 meses. Simples híbrido: ICMS fora do DAS, com a partilha do Anexo I (34% nas faixas 1 e 2, 33,5% nas faixas 3 a 5, zero na faixa 6). Lucro Presumido e Lucro Real: IRPJ, CSLL, PIS, COFINS e ICMS. Simples híbrido aplicável a comércio e indústria, até R$ 4,8 milhões por ano.');
   texto('Simplificações: o ICMS é calculado sobre o faturamento como se já estivesse no preço, e a base de PIS e COFINS desconta esse ICMS. Não considera substituição tributária, DIFAL, compensação de prejuízo fiscal, RAT, contribuições a terceiros nem regimes específicos de ICMS. Presunção: comércio e indústria, 8% para IRPJ e 12% para CSLL; serviços, 32% para ambos. Algumas atividades têm presunção diferente e não estão modeladas. PIS e COFINS no Lucro Real são uma apuração simplificada, com crédito sobre as compras informadas.');
+  texto('Períodos: impostos e sobra são o resultado mensal multiplicado pelos meses do período, supondo faturamento, margem e compras iguais em todos os meses. A alíquota efetiva é a do mês.');
   texto('Fator R: só se aplica a atividades da lista do Anexo V, marcadas na tela. Folha dos últimos 12 meses dividida pela receita dos últimos 12 meses, com 28% como limite. Esta análise usa a folha do mês como aproximação da média de 12 meses.');
   texto('CPP patronal de 20% sobre a folha: no Anexo IV, e nos regimes sem DAS (Presumido e Real), é custo à parte. No Simples (Anexos I, II, III e V) já está dentro do DAS. RAT e contribuições a terceiros não são considerados.');
   texto('Legislação considerada: ICMS do estado de São Paulo e ISS de Guarulhos, com as alíquotas informadas acima. A regra de crédito do ICMS fora do DAS em São Paulo não foi confirmada por fonte oficial.');
@@ -532,6 +543,7 @@ function limparConsulta(){
   $('atividade').value = 'comercio';
   $('fatorr').checked = false;
   $('semcompras').checked = false;
+  $('periodo').value = '1';
   $('credhib').value = 'sim';
   atualizar();
 }

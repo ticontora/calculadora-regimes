@@ -395,6 +395,7 @@ function gerarPdfCore(p, dados, h){
   titulo('Premissas e limites');
   texto('Regras de 2026. Simples Nacional: tabela do Anexo I (comércio), II (indústria) ou III (serviços), pela faixa de faturamento dos últimos 12 meses. Simples híbrido: ICMS fora do DAS, com a partilha do Anexo I (34% nas faixas 1 e 2, 33,5% nas faixas 3 a 5, zero na faixa 6). Lucro Presumido e Lucro Real: IRPJ, CSLL, PIS, COFINS e ICMS. Simples híbrido aplicável a comércio e indústria, até R$ 4,8 milhões por ano.');
   texto('Simplificações: o ICMS é calculado sobre o faturamento como se já estivesse no preço, e a base de PIS e COFINS desconta esse ICMS. Não considera Fator R, substituição tributária, DIFAL, compensação de prejuízo fiscal nem regimes específicos de ICMS.');
+  if (p.atividade === 'servicos') texto('Serviços: calculado com o Anexo III. Serviços dos Anexos IV e V e casos com Fator R não são modelados, e o resultado não serve para esses clientes.');
   texto('Legislação considerada: ICMS do estado de São Paulo e ISS de Guarulhos, com as alíquotas informadas acima. A regra de crédito do ICMS fora do DAS em São Paulo não foi confirmada por fonte oficial.');
   texto('Documento de estimativa. Confirme as premissas e a apuração com o contador responsável antes de decidir a troca de regime.');
 

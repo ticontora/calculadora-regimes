@@ -1,0 +1,6 @@
+# Nunca versionar dados de clientes ou saídas geradas
+*.pdf
+*.xlsx
+*.xls
+*.csv
+*.zip

@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%230E1320%22/><rect x=%2212%22 y=%2232%22 width=%2210%22 height=%2220%22 rx=%223%22 fill=%22%239AAEFF%22/><rect x=%2227%22 y=%2218%22 width=%2210%22 height=%2234%22 rx=%223%22 fill=%22%23B5F5D4%22/><rect x=%2242%22 y=%2226%22 width=%2210%22 height=%2226%22 rx=%223%22 fill=%22%239AAEFF%22/></svg>">
+<title>Calculadora de Regimes Tributários | Web</title>
+<style>
+:root{--bg:#FAFAFA;--surface:#fff;--ink:#12141A;--muted:#5B6270;--line:#E4E6EC;--accent:#2F4BFF;--accent-soft:#E8ECFF;--ok:#1B8A5A;--ok-bg:#E7F5EE;--warn:#C48A00;--warn-bg:#FCF2DC;--bad:#C4362F;--bad-bg:#FBE9E7}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 18px}
+h1{font-size:22px;font-weight:600;margin:0 0 4px}
+.sub{margin:0 0 20px;color:var(--muted)}
+.grid{display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:820px){.grid{grid-template-columns:330px 1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;min-width:0}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 12px;font-weight:600}
+.full{grid-column:1 / -1}
+label{display:block;font-size:13px;color:var(--muted);margin:12px 0 4px}
+label:first-of-type{margin-top:0}
+input,select{width:100%;font:inherit;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 10px}
+input.mono{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.hint{font-size:12px;color:var(--muted);margin:4px 0 0}
+.status{font-size:12px;margin:6px 0 0;color:var(--muted)}
+.status.ok{color:var(--ok)} .status.bad{color:var(--bad)}
+.situacao{display:inline-block;margin-top:6px;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--ok-bg);color:var(--ok)}
+.situacao.warn{background:var(--warn-bg);color:var(--warn)}
+.situacao.bad{background:var(--bad-bg);color:var(--bad)}
+.row{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+.banner{padding:14px 16px;border-radius:10px;background:var(--accent-soft);color:var(--accent)}
+.banner strong{display:block;font-size:20px;letter-spacing:-.01em}
+.banner span{font-size:13px}
+.banner.none{background:var(--warn-bg);color:var(--warn)}
+.tablewrap{overflow-x:auto;margin-top:14px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:12px;color:var(--muted);font-weight:600}
+tr.best td{background:var(--accent-soft)}
+tr.current td{font-weight:650}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:99px;background:var(--accent);color:#fff;margin-left:6px;vertical-align:middle}
+.na{color:var(--muted);font-style:italic;text-align:left;white-space:normal}
+.btn{margin-top:14px;font:inherit;font-weight:600;padding:11px 16px;border-radius:8px;border:0;background:var(--accent);color:#fff;cursor:pointer}
+.btn:disabled{background:#B7C0FF;cursor:default}
+.limits{font-size:13px;color:var(--muted);padding-left:18px}
+.limits li{margin-bottom:6px}
+
+[hidden]{display:none!important}
+/* Fundo da calculadora */
+body{background:radial-gradient(1100px 480px at 88% -12%,#E3E9FF,transparent 60%),radial-gradient(900px 420px at -8% 112%,#E2F3EB,transparent 60%),var(--bg);min-height:100%}
+/* Tela de introdução */
+.intro{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px 56px;color:#F3F5FA;overflow:hidden;background:radial-gradient(circle at 18% 12%,rgba(47,75,255,.38),transparent 55%),radial-gradient(circle at 88% 88%,rgba(27,138,90,.28),transparent 50%),#0E1320;transition:opacity .45s ease}
+.intro::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(circle at 50% 42%,#000 25%,transparent 72%);mask-image:radial-gradient(circle at 50% 42%,#000 25%,transparent 72%)}
+.intro.saindo{opacity:0;pointer-events:none}
+.intro-inner{position:relative;width:100%;max-width:440px;text-align:center}
+.grafico{display:flex;align-items:flex-end;justify-content:center;gap:18px;height:200px;margin-bottom:30px}
+.barra{flex:0 0 56px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.barra i{display:block;width:100%;height:var(--h);border-radius:10px 10px 3px 3px;background:linear-gradient(180deg,#9AAEFF,#2F4BFF);transform-origin:50% 100%;animation:crescer .9s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d)}
+.barra.melhor i{background:linear-gradient(180deg,#B5F5D4,#1B8A5A);box-shadow:0 0 28px rgba(27,138,90,.45)}
+.barra span{margin-top:10px;font-size:12px;color:#AEB7CC;white-space:nowrap;animation:surgir .5s ease both;animation-delay:calc(var(--d) + .45s)}
+.barra.melhor span{color:#B5F5D4}
+.intro h1{font-size:26px;line-height:1.2;margin:0 0 10px;letter-spacing:-.02em;text-wrap:balance;animation:subir .6s ease .15s both}
+.intro-sub{margin:0 0 30px;color:#AEB7CC;font-size:15px;text-wrap:balance;animation:subir .6s ease .3s both}
+.btn-entrar{font:inherit;font-weight:600;font-size:16px;padding:13px 48px;border-radius:999px;border:0;background:#2F4BFF;color:#fff;cursor:pointer;box-shadow:0 10px 30px rgba(47,75,255,.35);transition:background .2s ease;animation:subir .6s ease 1.5s both}
+.btn-entrar:hover{background:#4A64FF}
+.btn-entrar:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.rodape-intro{position:absolute;left:0;right:0;bottom:18px;text-align:center;font-size:12px;color:#7D87A3;letter-spacing:.03em}
+.rodape-app{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
+@keyframes crescer{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes surgir{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes subir{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* Área da calculadora: faixa escura no topo com grade e fundo claro abaixo */
+body{position:relative;background:#F4F6FB;min-height:100%}
+body::before{content:"";position:absolute;left:0;right:0;top:0;height:400px;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(700px 300px at 92% -20%,rgba(47,75,255,.55),transparent 70%),
+    radial-gradient(520px 240px at -4% 118%,rgba(27,138,90,.32),transparent 70%),
+    linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px) 0 0/34px 34px,
+    linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px) 0 0/34px 34px,
+    linear-gradient(180deg,#0E1320,#18245E);
+  -webkit-mask-image:linear-gradient(#000 72%,transparent);mask-image:linear-gradient(#000 72%,transparent)}
+.wrap{position:relative;z-index:1}
+.cabecalho{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.marca{flex:0 0 auto;display:block;width:46px;height:46px;border-radius:14px;box-shadow:0 8px 22px rgba(0,0,0,.35)}
+.marca svg{display:block;width:100%;height:100%}
+.cabecalho h1{color:#F3F5FA;margin:0}
+.cabecalho .sub{color:#B9C2DA;margin:2px 0 0}
+.card{box-shadow:0 14px 36px -16px rgba(14,19,32,.28)}
+.btn{box-shadow:0 8px 20px -8px rgba(47,75,255,.6)}
+
+/* Celular: tabelas cabem na largura da tela sem rolagem */
+@media (max-width:520px){
+  th,td{padding:8px 3px;font-size:12px}
+  th{white-space:normal;line-height:1.25}
+  td:first-child{white-space:normal}
+  td:not(:first-child),th:not(:first-child){white-space:nowrap}
+  .tag{margin-left:4px;font-size:10px;padding:0 5px}
+  table:has(#tbl-regimes) th:nth-child(3),table:has(#tbl-regimes) td:nth-child(3){display:none}
+}
+
+/* ===== Redesign da área da calculadora ===== */
+:root{
+  --bg:#EEF2F5; --surface:#FFFFFF; --ink:#0E1320; --muted:#5A6B7D; --line:#C9D3DD;
+  --accent:#2F4BFF; --accent-soft:#E7EBFF; --ok:#1B8A5A; --ok-bg:#E3F4EC;
+  --warn:#8A5A00; --warn-bg:#FBF1DC; --bad:#C4362F; --bad-bg:#FBE9E7;
+}
+body{
+  position:relative; min-height:100%; background-color:#EEF2F5;
+  background-image:linear-gradient(rgba(14,19,32,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(14,19,32,.05) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+/* Faixa de título sólida, sem degradê */
+body::before{
+  content:""; position:absolute; left:0; right:0; top:0; height:136px; z-index:0; pointer-events:none;
+  background:#0E1320; border-bottom:3px solid #2F4BFF;
+  -webkit-mask-image:none; mask-image:none;
+}
+.wrap{position:relative; z-index:1; max-width:1040px; padding-top:26px}
+.cabecalho{align-items:flex-start; margin-bottom:22px}
+.marca{width:52px; height:52px; border-radius:0; box-shadow:none}
+.cabecalho h1{
+  font-family:Georgia,"Times New Roman",serif; font-weight:700; font-size:30px;
+  letter-spacing:-.01em; color:#F4F7FA; line-height:1.1;
+}
+.cabecalho .sub{color:#A9B8C6; font-size:14px; margin-top:6px}
+/* Cartões: sóbrios, com filete escuro no topo */
+.card{
+  border-radius:4px; border:1px solid var(--line); border-top:3px solid var(--ink);
+  box-shadow:0 1px 0 rgba(14,19,32,.04); padding:20px;
+}
+.card h2{color:var(--ink); font-size:11px; font-weight:700; letter-spacing:.14em}
+label{color:var(--muted); font-size:12px; font-weight:600; letter-spacing:.02em}
+input,select{border-radius:4px; border-color:#B8C4D0; background:#FBFCFD}
+input:focus,select:focus{outline:2px solid var(--accent); outline-offset:0; border-color:var(--accent)}
+.hint{color:var(--muted)}
+/* Destaque do resultado */
+.banner{
+  border-radius:4px; background:var(--accent); color:#fff; padding:18px 20px;
+  border-left:0; box-shadow:0 10px 24px -14px rgba(47,75,255,.7);
+}
+.banner strong{font-family:Georgia,"Times New Roman",serif; font-size:28px; font-weight:700; color:#fff; margin:4px 0}
+.banner span{color:rgba(255,255,255,.88); font-size:13px}
+.banner.none{background:var(--warn-bg); color:var(--warn); box-shadow:none}
+.banner.none strong{color:var(--warn); font-size:20px}
+.banner.none span{color:var(--warn)}
+/* Tabelas */
+th{text-transform:uppercase; letter-spacing:.07em; font-size:10.5px; color:var(--muted); border-bottom:1px solid var(--ink)}
+td{border-bottom:1px solid #E1E7ED}
+tbody tr:last-child td{border-bottom:0}
+tr.best td{background:var(--ok-bg)}
+tr.current td{font-weight:700}
+.tag{background:var(--ok); border-radius:2px; letter-spacing:.04em; text-transform:uppercase; font-size:10px; padding:2px 6px}
+.situacao{border-radius:2px; text-transform:uppercase; letter-spacing:.06em; font-size:11px}
+/* Botão principal */
+.btn{background:var(--ink); color:#fff; border-radius:4px; box-shadow:none; letter-spacing:.02em; padding:12px 18px}
+.btn:hover{background:#1C2B45}
+.btn:disabled{background:#9AA7B6}
+.limits{color:var(--muted)}
+.rodape-app{color:var(--muted); letter-spacing:.04em; font-size:11px; border-top:1px solid var(--line); margin-top:8px; padding-top:16px}
+@media (max-width:520px){
+  .wrap{padding-top:22px}
+  .cabecalho h1{font-size:24px}
+  .card{padding:16px}
+}
+
+.acoes{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.acoes .btn{margin-top:0}
+.btn-secundario{font:inherit;font-weight:600;padding:12px 18px;border-radius:4px;border:1px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer}
+.btn-secundario:hover{background:#F1F4F8}
+.btn-secundario:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<section id="intro" class="intro" aria-labelledby="intro-title">
+  <div class="intro-inner">
+    <div class="grafico" aria-hidden="true">
+      <div class="barra melhor" style="--h:150px;--d:.2s"><i></i><span>Simples</span></div>
+      <div class="barra" style="--h:92px;--d:.34s"><i></i><span>Híbrido</span></div>
+      <div class="barra" style="--h:118px;--d:.48s"><i></i><span>Presumido</span></div>
+      <div class="barra" style="--h:64px;--d:.62s"><i></i><span>Real</span></div>
+    </div>
+    <h1 id="intro-title">Calculadora de Regimes Tributários</h1>
+    <p class="intro-sub">Compare Simples, híbrido, Presumido e Real e veja qual deixa mais sobra.</p>
+    <button id="btn-entrar" class="btn-entrar" type="button">Entrar</button>
+  </div>
+  <div class="rodape-intro">By Italo Govêa</div>
+</section>
+<div id="app" hidden>
+<div class="wrap">
+  <div class="cabecalho"><span class="marca" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#0E1320"/><rect x="12" y="32" width="10" height="20" rx="3" fill="#9AAEFF"/><rect x="27" y="18" width="10" height="34" rx="3" fill="#B5F5D4"/><rect x="42" y="26" width="10" height="26" rx="3" fill="#9AAEFF"/></svg></span><div><h1>Calculadora de Regimes Tributários</h1>
+  <p class="sub">Informe o CNPJ e o faturamento. Veja qual regime deixa mais sobra e gere o PDF para o cliente.</p></div></div>
+
+  <div class="grid">
+    <section class="card" aria-labelledby="h-in">
+      <h2 id="h-in">Cliente</h2>
+
+      <label for="cnpj">CNPJ</label>
+      <input id="cnpj" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="00.000.000/0000-00">
+      <p class="status" id="cnpj-msg">Digite os 14 números do CNPJ.</p>
+
+      <label for="nome">Razão social</label>
+      <input id="nome" type="text" autocomplete="off" placeholder="Preenchida ao consultar o CNPJ">
+      <span class="situacao" id="situacao" hidden></span>
+
+      <h2 style="margin-top:22px">Entradas</h2>
+
+      <label for="receita">Faturamento mensal</label>
+      <input id="receita" type="text" inputmode="numeric" autocomplete="off" value="R$ 0,00">
+
+      <label for="atividade">Atividade</label>
+      <select id="atividade">
+        <option value="comercio" selected>Comércio (venda de produtos)</option>
+        <option value="industria">Indústria (fabricação)</option>
+        <option value="servicos">Serviços</option>
+      </select>
+
+      <label for="margem">Margem antes de impostos (%)</label>
+      <input id="margem" type="number" min="0" max="100" step="0.5" value="0">
+      <p class="hint">Resultado do mês antes de todos os impostos: sobra depois de custos e despesas.</p>
+
+      <label for="compras">Compras com crédito de imposto (% do faturamento)</label>
+      <input id="compras" type="number" min="0" max="100" step="1" value="0">
+      <p class="hint">Mercadoria comprada de atacado ou indústria, com nota que destaca ICMS.</p>
+
+      <label for="icms">ICMS de São Paulo (%)</label>
+      <input id="icms" type="number" min="0" max="30" step="0.5" value="0">
+      <p class="hint">Alíquota geral de SP. Alguns alimentos têm 7% ou 12%.</p>
+
+      <label for="credhib">No híbrido, as compras geram crédito de ICMS?</label>
+      <select id="credhib">
+        <option value="sim" selected>Sim</option>
+        <option value="nao">Não</option>
+      </select>
+      <p class="hint">Confirme a regra com a legislação paulista antes de usar com cliente.</p>
+
+      <label for="iss">ISS de Guarulhos (%)</label>
+      <input id="iss" type="number" min="0" max="5" step="0.1" value="0">
+      <p class="hint">Só se aplica a serviços. Maioria dos serviços em 5%.</p>
+    </section>
+
+    <section class="card" aria-labelledby="h-out" aria-live="polite">
+      <h2 id="h-out">Resultado do mês</h2>
+      <div class="banner" id="banner"></div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Regime</th><th>Impostos</th><th>Alíquota efetiva</th><th>Sobra após impostos</th></tr></thead>
+          <tbody id="tbl-regimes"></tbody>
+        </table>
+      </div>
+      <div class="acoes"><button id="btn-pdf" class="btn" type="button">Baixar análise em PDF</button><button id="btn-limpar" class="btn-secundario" type="button">Limpar Consulta</button></div>
+      <p class="status" id="pdf-msg"></p>
+    </section>
+
+    <section class="card full" aria-labelledby="h-faixa">
+      <h2 id="h-faixa">Qual regime ganha em cada faturamento</h2>
+      <p class="hint">Mantém a atividade, a margem e as compras informadas. A linha destacada é o valor atual.</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Faturamento mensal</th><th>Melhor regime</th><th>Sobra no melhor</th></tr></thead>
+          <tbody id="tbl-faixa"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card full" aria-labelledby="h-lim">
+      <h2 id="h-lim">Premissas e limites</h2>
+      <ul class="limits">
+        <li>Regras de 2026. A partir de 2027, PIS e COFINS saem e entra a CBS, e esta tela não modela essa transição.</li>
+        <li>Simples Nacional: faixa pelo faturamento dos últimos 12 meses, com a tabela do Anexo I (comércio), II (indústria) ou III (serviços). ICMS dentro do DAS, sem crédito.</li>
+        <li>Simples híbrido (comércio e indústria): ICMS fora do DAS, com a partilha do Anexo I (34% nas faixas 1 e 2, 33,5% nas faixas 3 a 5, zero na faixa 6). ICMS pelo regime normal.</li>
+        <li>Lucro Presumido: presunção de 8% (comércio) ou 32% (serviços), IRPJ de 15% com adicional de 10% acima de R$ 20 mil no mês, CSLL de 9%, PIS de 0,65% e COFINS de 3%.</li>
+        <li>Lucro Real: IRPJ de 15% com adicional de 10%, CSLL de 9%, PIS de 1,65% e COFINS de 7,6%, com crédito sobre as compras. Não considera prejuízo fiscal.</li>
+        <li>Simplificações: não considera Fator R, substituição tributária, DIFAL nem regimes específicos de ICMS do estado.</li>
+        <li>Estimativa. Confirme com o contador responsável antes de decidir a troca de regime.</li>
+      </ul>
+    </section>
+  </div>
+</div>
+<footer class="rodape-app">By Italo Govêa</footer>
+</div>
+<script src="lib/jspdf.umd.min.js"></script>
+<script src="calculadora.js"></script>
+<script>
+(function(){
+  var intro = document.getElementById('intro');
+  var app = document.getElementById('app');
+  document.getElementById('btn-entrar').addEventListener('click', function(){
+    intro.classList.add('saindo');
+    setTimeout(function(){
+      intro.hidden = true;
+      app.hidden = false;
+      window.scrollTo(0, 0);
+    }, 450);
+  });
+})();
+</script>
+</body>
+</html>

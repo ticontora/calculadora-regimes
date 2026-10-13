@@ -150,7 +150,30 @@ function calcRegimes(p){
   linhasR.push(lin('IRPJ adicional', Math.max(0, lucroTrib-20000), '10%', lucroTrib > 0 ? 0.10*Math.max(0, lucroTrib-20000) : 0, 'Acima de R$ 20.000 no mês'));
   linhasR.push(lin('CSLL', Math.max(0, lucroTrib), '9%', csllR, 'Sobre o lucro tributável positivo'));
   if (isCom) linhasR.push(lin('ICMS a recolher', icmsDebito, pctTxt(icmsRate), icmsNormal, 'Débito ' + brl(icmsDebito) + ' − crédito ' + brl(icmsCredito)));
-  out.memoria = {presumido: {linhas: linhasP, total: impP}, real: {linhas: linhasR, total: impR}};
+  // Memória de cálculo mensal: Simples Nacional e híbrido
+  let memoS = null, memoH = null;
+  if (aliq !== null){
+    const cppSm = ativ === 'servicos4' ? cpp : 0;
+    const icmsF6 = isCom && faixa.icms === 0 ? icmsNormal : 0;
+    const linhasS = [
+      lin('Receita dos últimos 12 meses (RBT12)', rbt12, '', null, 'Mensal × 12. Define a faixa da tabela'),
+      lin('Alíquota nominal da faixa', rbt12, pctTxt(faixa.aliq), null, 'Parcela a deduzir de ' + brl(faixa.ded)),
+      lin('DAS (alíquota efetiva)', R, pctTxt(aliq), R*aliq, 'Alíquota efetiva = (RBT12 × nominal − parcela) ÷ RBT12. Já inclui os tributos do DAS'),
+    ];
+    if (isCom && faixa.icms === 0) linhasS.push(lin('ICMS fora do DAS (6ª faixa)', icmsDebito, pctTxt(icmsRate), icmsF6, 'Débito − crédito, pelo regime normal de ICMS'));
+    if (cppSm) linhasS.push(lin('CPP patronal 20% (Anexo IV)', p.folha || 0, '20%', cppSm, 'Paga pela folha, fora do DAS'));
+    memoS = {linhas: linhasS, total: R*aliq + icmsF6 + cppSm};
+    if (isCom){
+      const dasSemIcms = R*aliq*(1 - faixa.icms);
+      const icmsH = p.credHibrido ? icmsNormal : icmsDebito;
+      const notaH = p.credHibrido ? 'Débito − crédito: ' + brl(icmsDebito) + ' − ' + brl(icmsCredito) : 'Sem crédito: débito integral de ' + brl(icmsDebito);
+      memoH = {linhas: [
+        lin('DAS sem a parcela do ICMS', R, pctTxt(aliq), dasSemIcms, 'DAS × (1 − partilha do ICMS de ' + pctTxt(faixa.icms) + ')'),
+        lin('ICMS pelo regime normal', icmsDebito, pctTxt(icmsRate), icmsH, notaH),
+      ], total: dasSemIcms + icmsH};
+    }
+  }
+  out.memoria = {simples: memoS, hibrido: memoH, presumido: {linhas: linhasP, total: impP}, real: {linhas: linhasR, total: impR}};
   out.anexo = anexo;
   // Escala impostos e sobra para o período (a alíquota efetiva continua mensal)
   const meses = p.periodo || 1;
@@ -330,7 +353,7 @@ function renderMemoria(res){
     const linhas = m.linhas.map(l => `<tr><td>${l.t}</td><td>${val(l.base)}</td><td>${l.aliq || '—'}</td><td>${val(l.valor)}</td><td class="nota">${l.nota || ''}</td></tr>`).join('');
     return `<h3>${nome} (mensal)</h3><div class="tablewrap"><table><thead><tr><th>Tributo</th><th>Base</th><th>Alíquota</th><th>Valor</th><th>Como foi calculado</th></tr></thead><tbody>${linhas}<tr class="total"><td>Total</td><td></td><td></td><td>${fmtBRL.format(m.total)}</td><td></td></tr></tbody></table></div>`;
   };
-  box.innerHTML = bloco('Lucro Presumido', 'presumido') + bloco('Lucro Real', 'real');
+  box.innerHTML = bloco('Simples Nacional', 'simples') + bloco('Simples híbrido', 'hibrido') + bloco('Lucro Presumido', 'presumido') + bloco('Lucro Real', 'real');
 }
 function renderRegimes(){
   const p = entradas();

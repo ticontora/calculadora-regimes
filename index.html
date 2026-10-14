@@ -216,6 +216,30 @@ details.secao[open] > summary::after{content:"\2212"}
 details.secao[open] > summary{margin-bottom:14px}
 p.hint.so-com{margin-bottom:12px}
 @media (min-width:820px){.grid > .card:has(#tbl-regimes){position:sticky;top:16px;align-self:start}}
+
+/* Fundo: papel quadriculado de livro contábil (linhas finas e linhas-mestras), com brilho suave do tema */
+body{background-color:#EDF1F6; background-image:none}
+body::before{
+  display:block; content:""; position:fixed; top:0; left:0; right:0; bottom:0; height:auto; border:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(820px 380px at 82% -80px, rgba(47,75,255,.16), transparent 70%),
+    radial-gradient(680px 460px at -8% 104%, rgba(27,138,90,.10), transparent 70%);
+  -webkit-mask-image:none; mask-image:none;
+}
+body::after{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(14,19,32,.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14,19,32,.075) 1px, transparent 1px),
+    linear-gradient(rgba(14,19,32,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14,19,32,.035) 1px, transparent 1px);
+  background-size:120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  background-position:-1px -1px;
+  -webkit-mask-image:radial-gradient(ellipse 130% 95% at 50% 0%, #000 35%, rgba(0,0,0,.25) 75%, transparent 100%);
+  mask-image:radial-gradient(ellipse 130% 95% at 50% 0%, #000 35%, rgba(0,0,0,.25) 75%, transparent 100%);
+}
+.rodape-app{position:relative; z-index:1}
+.card{box-shadow:0 1px 0 rgba(14,19,32,.04), 0 18px 40px -22px rgba(14,19,32,.35)}
 </style>
 </head>
 <body>

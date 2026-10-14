@@ -180,6 +180,26 @@ body::before{display:none}
   border-image:conic-gradient(#0E1320 0 0) fill 0 // 0 100vmax}
 .cabecalho::after{content:""; position:absolute; left:0; right:0; bottom:0; height:3px;
   border-image:conic-gradient(#2F4BFF 0 0) fill 0 // 0 100vmax}
+
+/* Quadro de regimes: nada cortado. No computador a tabela cabe inteira; no celular cada regime vira um bloco */
+table:has(#tbl-regimes){table-layout:fixed}
+table:has(#tbl-regimes) th:first-child{width:40%}
+table:has(#tbl-regimes) th{white-space:normal;line-height:1.25}
+table:has(#tbl-regimes) #tbl-regimes td:first-child{white-space:normal;text-align:left}
+.tablewrap:has(#tbl-regimes){overflow-x:visible}
+#memoria td, #memoria th{white-space:normal}
+#memoria td:nth-child(2), #memoria td:nth-child(4){white-space:nowrap}
+.card:has(#tbl-regimes){container-type:inline-size}
+@container (max-width:600px){
+  table:has(#tbl-regimes) thead{display:none}
+  table:has(#tbl-regimes) #tbl-regimes tr{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 10px;padding:12px 6px;border-bottom:1px solid #E1E7ED}
+  table:has(#tbl-regimes) #tbl-regimes td{display:block;border:0;padding:0;text-align:left;white-space:normal}
+  table:has(#tbl-regimes) #tbl-regimes td:first-child{grid-column:1/-1;font-weight:600}
+  table:has(#tbl-regimes) #tbl-regimes td.na{grid-column:1/-1}
+  table:has(#tbl-regimes) #tbl-regimes tr.best{background:var(--ok-bg)}
+  table:has(#tbl-regimes) #tbl-regimes tr.best td{background:transparent}
+  table:has(#tbl-regimes) #tbl-regimes td[data-label]::before{content:attr(data-label);display:block;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+}
 </style>
 </head>
 <body>

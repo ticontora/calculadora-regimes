@@ -439,13 +439,13 @@ function renderRegimes(){
   $('tbl-regimes').innerHTML = ['simples','hibrido','presumido','real','ret'].filter(k => k !== 'ret' || res.ret.elegivel).map(k => {
     const r = res[k];
     if (!r.elegivel) return `<tr><td>${NOMES[k]}</td><td class="na" colspan="3">Não se aplica: ${r.motivo}</td></tr>`;
-    if (p.receita === 0) return `<tr><td>${NOMES[k]}</td><td>—</td><td>—</td><td>—</td></tr>`;
+    if (p.receita === 0) return `<tr><td>${NOMES[k]}</td><td data-label="Impostos">—</td><td data-label="Alíquota efetiva">—</td><td data-label="Sobra após impostos">—</td></tr>`;
     const best = rank[0] === k;
     return `<tr class="${best ? 'best' : ''}">
       <td>${NOMES[k]}${best ? '<span class="tag">melhor</span>' : ''}</td>
-      <td>${fmtBRL.format(r.imposto)}</td>
-      <td>${fmtPct(r.efetiva)}</td>
-      <td>${fmtBRL.format(r.liquido)}</td></tr>`;
+      <td data-label="Impostos">${fmtBRL.format(r.imposto)}</td>
+      <td data-label="Alíquota efetiva">${fmtPct(r.efetiva)}</td>
+      <td data-label="Sobra após impostos">${fmtBRL.format(r.liquido)}</td></tr>`;
   }).join('');
 }
 function renderFaixas(){

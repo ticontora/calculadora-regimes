@@ -15,6 +15,13 @@ Informe o CNPJ (a razão social preenche sozinha quando a consulta funciona), o 
 - Holding de participações (receitas de administração): vedada no Simples (LC 123, art. 3º, § 4º, VII); Presumido com 32%. Dividendos recebidos não entram no cálculo.
 - Incorporação e loteamento: vedados no Simples (LC 123, art. 17, XIV); Presumido com 8% e 12%; RET de 4% (Lei 10.931/2004) para incorporação com patrimônio de afetação.
 
+## Comprador e crédito de IBS/CBS (cenário 2027)
+- Identifica quem compra: pessoa física, PJ no Lucro Real, PJ no Lucro Presumido, PJ no Simples (DAS) ou PJ no Simples com IBS/CBS no regime regular.
+- PF e PJ no DAS não tomam crédito. PJ do regime regular toma crédito integral do IBS/CBS destacado, ou só do IBS/CBS pago no DAS quando o fornecedor recolhe no DAS (LC 214/2025, art. 47, § 9º).
+- Compara, pelo mesmo preço final, fornecedor no DAS, fornecedor no Simples híbrido da reforma (IBS/CBS fora do DAS, LC 214, art. 41, § 3º) e fornecedor no Presumido/Real.
+- A CBS de 2027 ainda não foi fixada; o campo é editável (padrão 9,11%, estimativa). A fatia de IBS/CBS no DAS assume a fatia atual de PIS e COFINS de cada faixa.
+- O "Simples híbrido" da tabela de regimes é outra coisa: deixa o ICMS fora do DAS.
+
 ## Simplificações
 - Fator R usa a folha do mês como aproximação da média de 12 meses.
 - PIS e COFINS no Lucro Real são apuração simplificada, com crédito sobre as compras informadas.

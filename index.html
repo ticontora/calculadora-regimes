@@ -283,6 +283,36 @@ tr.current td{font-weight:700}
       <p class="hint" id="aviso-contador">Estimativa para apoio à decisão. Revise com o contador antes de usar com o cliente.</p>
     </section>
 
+    <section class="card full" aria-labelledby="h-comp" aria-live="polite">
+      <h2 id="h-comp">Comprador e crédito de IBS/CBS (cenário 2027)</h2>
+      <label for="comprador">Quem compra do seu cliente</label>
+      <select id="comprador">
+        <option value="pf" selected>Pessoa física (consumidor final)</option>
+        <option value="pj_real">PJ no Lucro Real</option>
+        <option value="pj_presumido">PJ no Lucro Presumido</option>
+        <option value="pj_simples">PJ no Simples (recolhe no DAS)</option>
+        <option value="pj_simples_regular">PJ no Simples com IBS/CBS no regime regular</option>
+      </select>
+      <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label for="cbs27">CBS 2027 (%)</label>
+          <input id="cbs27" type="number" min="0" max="30" step="0.01" value="9.11">
+        </div>
+        <div>
+          <label for="ibs27">IBS 2027 (%)</label>
+          <input id="ibs27" type="number" min="0" max="30" step="0.01" value="0.1">
+        </div>
+      </div>
+      <p class="hint">A CBS de 2027 ainda não foi fixada (Senado até 15/12/2026). 9,11% é estimativa: 9,21% da Res. CGIBS 14/2026 menos 0,1 ponto (LC 214, art. 347). Mesmo preço final cobrado em todos os casos.</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Fornecedor</th><th>Valor pago</th><th>Crédito do comprador</th><th>Custo líquido</th></tr></thead>
+          <tbody id="tbl-comprador"></tbody>
+        </table>
+      </div>
+      <p class="status" id="comprador-resumo"></p>
+    </section>
+
     <section class="card full" aria-labelledby="h-faixa">
       <h2 id="h-faixa">Qual regime ganha em cada faturamento</h2>
       <p class="hint">Mantém a atividade, a margem e as compras informadas. A linha destacada é o valor atual.</p>
@@ -306,6 +336,7 @@ tr.current td{font-weight:700}
         <li>CPP de 20% sobre a folha: no Anexo IV, e nos regimes sem DAS (Presumido e Real), é custo à parte. RAT e terceiros não são considerados.</li>
         <li>Simplificações: não considera substituição tributária, DIFAL, RAT, regimes específicos de ICMS do estado nem presunções de serviços abaixo de 32%.</li>
         <li>Imobiliário, locação, holding e construção: locação de imóveis próprios, holding de participações e incorporação/loteamento não podem optar pelo Simples. Construção usa o Anexo IV; no Presumido, empreitada total com materiais usa 8% (IRPJ) e 12% (CSLL), e os demais casos 32%. Locação e holding usam 32%; incorporação, 8% e 12%. RET de 4% só para incorporação com patrimônio de afetação. Dividendos da holding não entram no cálculo.</li>
+        <li>Cenário 2027 (comprador): comprador PF ou no Simples recolhendo no DAS não toma crédito de IBS/CBS. Comprador do regime regular toma crédito integral do IBS/CBS destacado, ou só do IBS/CBS pago no DAS quando o fornecedor está no DAS (LC 214/2025, art. 47, § 9º). A fatia de IBS/CBS no DAS assume a fatia atual de PIS e COFINS de cada faixa. Os dois híbridos são diferentes: o da tabela de regimes deixa o ICMS fora do DAS; o da reforma deixa IBS e CBS fora do DAS.</li>
         <li>Períodos: bimestral, semestral e anual multiplicam o resultado mensal, supondo o mesmo faturamento e margem em todos os meses.</li>
         <li>Estimativa. Confirme com o contador responsável antes de decidir a troca de regime.</li>
       </ul>

@@ -47,7 +47,7 @@ const PERIODOS = {1:{nome:'Mensal', sufixo:'por mês'}, 2:{nome:'Bimestral', suf
 function periodoInfo(n){ return PERIODOS[n] || PERIODOS[1]; }
 const FATOR_R_MINIMO = 0.28;
 const LIMITE_SIMPLES = 4800000;
-const NOMES = {simples:'Simples Nacional', hibrido:'Simples híbrido', presumido:'Lucro Presumido', real:'Lucro Real', ret:'RET (incorporação)'};
+const NOMES = {simples:'Simples Nacional', hibrido:'Simples híbrido (ICMS fora do DAS)', presumido:'Lucro Presumido', real:'Lucro Real', ret:'RET (incorporação)'};
 // Regras por atividade: tabela do Simples (null = vedado), ISS e presunção de IRPJ/CSLL no Presumido
 const ATIVIDADES = {
   comercio:         {tabela:'comercio',  iss:false, pIR:0.08, pCS:0.12, anexo:'Anexo I'},
@@ -63,6 +63,16 @@ const ATIVIDADES = {
 };
 // RET da incorporação (Lei 10.931/2004, arts. 4º e 8º): 4% = IRPJ 1,26% + CSLL 0,66% + PIS 0,37% + COFINS 1,71%
 const RET = {irpj:0.0126, csll:0.0066, pis:0.0037, cofins:0.0171};
+// Cenário 2027: fatia de CBS + IBS dentro do DAS, por anexo e faixa (assume a fatia de PIS + COFINS de hoje)
+const CBS_IBS_DAS = {
+  comercio:  [15.50, 15.50, 15.50, 15.50, 15.50, 34.40],
+  industria: [14.00, 14.00, 14.00, 14.00, 14.00, 25.50],
+  servicos:  [15.60, 17.10, 16.60, 16.60, 15.60, 19.50],
+  servicos4: [21.50, 25.00, 24.00, 23.00, 22.00, 25.00],
+  servicos5: [17.15, 17.15, 18.15, 19.15, 17.15, 20.00]
+};
+// Comprador que toma crédito de IBS/CBS: regime regular (Real, Presumido ou Simples que optou pelo regime regular)
+const COMPRADOR_TOMA_CREDITO = ['pj_real', 'pj_presumido', 'pj_simples_regular'];
 const FAIXAS = [5000, 10000, 15000, 20000, 40000, 60000, 100000, 200000, 350000];
 
 function faixaDe(rbt12, atividade){
@@ -144,6 +154,23 @@ function calcRegimes(p){
   out.ret = cfg.ret
     ? {elegivel:true, imposto: impRet, efetiva: R>0 ? impRet/R : 0, liquido: antes - impRet}
     : {elegivel:false, motivo:'Só para incorporação com patrimônio de afetação'};
+  // Comprador e crédito de IBS/CBS (cenário 2027): mesmo preço final cobrado (faturamento informado)
+  const t27 = (p.cbs27 || 0) + (p.ibs27 || 0);
+  const tomaCredito = COMPRADOR_TOMA_CREDITO.includes(p.comprador);
+  const linhasC = [];
+  const destacado = t27 > 0 ? R * t27 / (1 + t27) : 0;
+  if (aliq !== null){
+    const idx = SIMPLES[ativ].indexOf(faixa);
+    const fatia = (CBS_IBS_DAS[ativ] ? CBS_IBS_DAS[ativ][idx] : 0) / 100;
+    const credDas = tomaCredito ? R * aliq * fatia : 0;
+    linhasC.push({nome:'Fornecedor no Simples, IBS/CBS no DAS', curto:'Simples (IBS/CBS no DAS)', pago:R, credito:credDas, liquido:R - credDas,
+      nota:'Crédito limitado ao IBS/CBS pago no DAS: ' + (aliq*fatia*100).toLocaleString('pt-BR', {maximumFractionDigits:2}) + '% do valor'});
+    linhasC.push({nome:'Fornecedor no Simples híbrido da reforma (IBS/CBS fora do DAS)', curto:'Simples híbrido da reforma', pago:R, credito: tomaCredito ? destacado : 0, liquido:R - (tomaCredito ? destacado : 0),
+      nota:'IBS/CBS destacado pelo regime regular'});
+  }
+  linhasC.push({nome:'Fornecedor no Lucro Presumido ou Real', curto:'Lucro Presumido ou Real', pago:R, credito: tomaCredito ? destacado : 0, liquido:R - (tomaCredito ? destacado : 0),
+    nota:'IBS/CBS destacado pelo regime regular'});
+  out.comprador = {linhas: linhasC, tomaCredito, destacado};
   // Memória de cálculo mensal, linha a linha (Presumido e Real)
   const pctTxt = v => (v*100).toLocaleString('pt-BR', {maximumFractionDigits:2}) + '%';
   const brl = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
@@ -209,6 +236,7 @@ function calcRegimes(p){
   for (const k of ['simples','hibrido','presumido','real','ret']){
     if (out[k] && out[k].elegivel){ out[k].imposto *= meses; out[k].liquido *= meses; }
   }
+  for (const l of out.comprador.linhas){ l.pago *= meses; l.credito *= meses; l.liquido *= meses; }
   return out;
 }
 function ranking(res){
@@ -352,6 +380,9 @@ function entradas(){
     atividade: $('atividade').value,
     folha: parseBRL($('folha').value),
     periodo: parseInt($('periodo').value, 10) || 1,
+    comprador: $('comprador').value,
+    cbs27: num('cbs27') / 100,
+    ibs27: num('ibs27') / 100,
     fatorR: $('fatorr').checked,
     semCompras: $('semcompras').checked,
     margem: num('margem') / 100,
@@ -382,7 +413,7 @@ function renderMemoria(res){
     const linhas = m.linhas.map(l => `<tr><td>${l.t}</td><td>${val(l.base)}</td><td>${l.aliq || '—'}</td><td>${val(l.valor)}</td><td class="nota">${l.nota || ''}</td></tr>`).join('');
     return `<h3>${nome} (mensal)</h3><div class="tablewrap"><table><thead><tr><th>Tributo</th><th>Base</th><th>Alíquota</th><th>Valor</th><th>Como foi calculado</th></tr></thead><tbody>${linhas}<tr class="total"><td>Total</td><td></td><td></td><td>${fmtBRL.format(m.total)}</td><td></td></tr></tbody></table></div>`;
   };
-  box.innerHTML = bloco('Simples Nacional', 'simples') + bloco('Simples híbrido', 'hibrido') + bloco('Lucro Presumido', 'presumido') + bloco('Lucro Real', 'real') + bloco('RET (incorporação)', 'ret');
+  box.innerHTML = bloco('Simples Nacional', 'simples') + bloco('Simples híbrido (ICMS fora do DAS)', 'hibrido') + bloco('Lucro Presumido', 'presumido') + bloco('Lucro Real', 'real') + bloco('RET (incorporação)', 'ret');
 }
 function renderRegimes(){
   const p = entradas();
@@ -428,9 +459,32 @@ function renderFaixas(){
     return `<tr${atual}><td>${fmtBRL.format(R)}</td><td>${NOMES[rank[0]]}</td><td>${fmtBRL.format(res[rank[0]].liquido)}</td></tr>`;
   }).join('');
 }
-function atualizar(){ renderRegimes(); renderFaixas(); }
-['receita','folha','margem','compras','icms','iss'].forEach(id => $(id).addEventListener('input', atualizar));
-['atividade','credhib','fatorr','semcompras','periodo'].forEach(id => $(id).addEventListener('change', atualizar));
+const NOMES_COMPRADOR = {pf:'Pessoa física (consumidor final)', pj_real:'PJ no Lucro Real', pj_presumido:'PJ no Lucro Presumido', pj_simples:'PJ no Simples (recolhe no DAS)', pj_simples_regular:'PJ no Simples com IBS/CBS no regime regular'};
+function renderComprador(){
+  const p = entradas();
+  const res = calcRegimes(p);
+  const c = res.comprador;
+  const corpo = $('tbl-comprador');
+  const resumo = $('comprador-resumo');
+  if (p.receita === 0){
+    corpo.innerHTML = c.linhas.map(l => `<tr><td>${l.nome}</td><td>—</td><td>—</td><td>—</td></tr>`).join('');
+    resumo.textContent = 'Informe o faturamento para ver o custo do comprador.';
+    return;
+  }
+  const menor = Math.min(...c.linhas.map(l => l.liquido));
+  corpo.innerHTML = c.linhas.map(l => `<tr class="${c.tomaCredito && l.liquido === menor ? 'best' : ''}"><td>${l.nome}<div class="hint">${l.nota}</div></td><td>${fmtBRL.format(l.pago)}</td><td>${fmtBRL.format(l.credito)}</td><td>${fmtBRL.format(l.liquido)}</td></tr>`).join('');
+  if (!c.tomaCredito){
+    resumo.textContent = NOMES_COMPRADOR[p.comprador] + ' não aproveita crédito de IBS/CBS: o imposto é custo final, qualquer que seja o regime do fornecedor.';
+  } else if (c.linhas.length > 1){
+    const dif = c.linhas[0].liquido - c.linhas[1].liquido;
+    resumo.textContent = 'Pelo mesmo preço, ' + NOMES_COMPRADOR[p.comprador] + ' paga ' + fmtBRL.format(dif) + ' ' + periodoInfo(p.periodo).sufixo + ' a mais, em custo líquido, comprando de fornecedor no DAS do que de fornecedor com IBS/CBS fora do DAS.';
+  } else {
+    resumo.textContent = 'Esta atividade não pode optar pelo Simples; o comprador toma crédito integral do IBS/CBS destacado.';
+  }
+}
+function atualizar(){ renderRegimes(); renderFaixas(); renderComprador(); }
+['receita','folha','margem','compras','icms','iss','cbs27','ibs27'].forEach(id => $(id).addEventListener('input', atualizar));
+['atividade','credhib','fatorr','semcompras','periodo','comprador'].forEach(id => $(id).addEventListener('change', atualizar));
 
 /* ===== PDF ===== */
 function gerarPdfCore(p, dados, h){
@@ -576,10 +630,16 @@ function gerarPdfCore(p, dados, h){
   tabela(['Faturamento mensal','Melhor regime','Sobra no melhor'], linhasF,
          [CW*0.3, CW*0.4, CW*0.3], ['l','l','r'], FAIXAS.indexOf(p.receita));
 
+  titulo('Comprador e crédito de IBS/CBS (cenário 2027)');
+  texto('Comprador: ' + NOMES_COMPRADOR[p.comprador] + '. CBS ' + fmtPct(p.cbs27) + ' e IBS ' + fmtPct(p.ibs27) + '. Mesmo preço final cobrado em todos os casos.');
+  tabela(['Fornecedor','Valor pago','Crédito','Custo líquido'],
+         res.comprador.linhas.map(l => [l.curto, fmtBRL.format(l.pago), fmtBRL.format(l.credito), fmtBRL.format(l.liquido)]),
+         [CW*0.40, CW*0.20, CW*0.20, CW*0.20], ['l','r','r','r'], -1);
   titulo('Premissas e limites');
   texto('Regras de 2026. Simples Nacional: tabela do Anexo I (comércio), II (indústria) ou III (serviços), pela faixa de faturamento dos últimos 12 meses. Simples híbrido: ICMS fora do DAS, com a partilha do Anexo I (34% nas faixas 1 e 2, 33,5% nas faixas 3 a 5, zero na faixa 6). Lucro Presumido e Lucro Real: IRPJ, CSLL, PIS, COFINS e ICMS. Simples híbrido aplicável a comércio e indústria, até R$ 4,8 milhões por ano.');
   texto('Simplificações: o ICMS é calculado sobre o faturamento como se já estivesse no preço, e a base de PIS e COFINS desconta esse ICMS. Não considera substituição tributária, DIFAL, compensação de prejuízo fiscal, RAT, contribuições a terceiros nem regimes específicos de ICMS. Presunção: comércio e indústria, 8% para IRPJ e 12% para CSLL; serviços, 32% para ambos. Algumas atividades têm presunção diferente e não estão modeladas. PIS e COFINS no Lucro Real são uma apuração simplificada, com crédito sobre as compras informadas.');
   texto('Imobiliário, locação, holding e construção: locação de imóveis próprios, holding de participações e incorporação/loteamento não podem optar pelo Simples (LC 123). Construção usa o Anexo IV; no Presumido, empreitada total com materiais usa 8% (IRPJ) e 12% (CSLL), e os demais casos 32%. Locação e holding usam 32%; incorporação, 8% e 12%. RET de 4% só para incorporação com patrimônio de afetação. Dividendos recebidos pela holding não entram no cálculo. Desoneração da folha e regras cumulativas específicas de PIS/COFINS no Real não estão modeladas.');
+  texto('Cenário 2027 (comprador): alíquota da CBS de 2027 ainda não definida (Senado até 15/12/2026); o valor usado é editável. Comprador PF ou no Simples recolhendo no DAS não toma crédito. Comprador do regime regular toma crédito integral do IBS/CBS destacado, ou só do IBS/CBS pago no DAS quando o fornecedor está no DAS (LC 214/2025, art. 47, § 9º). A fatia de IBS/CBS no DAS assume a fatia atual de PIS e COFINS de cada faixa.');
   texto('Períodos: impostos e sobra são o resultado mensal multiplicado pelos meses do período, supondo faturamento, margem e compras iguais em todos os meses. A alíquota efetiva é a do mês.');
   texto('Fator R: só se aplica a atividades da lista do Anexo V, marcadas na tela. Folha dos últimos 12 meses dividida pela receita dos últimos 12 meses, com 28% como limite. Esta análise usa a folha do mês como aproximação da média de 12 meses.');
   texto('CPP patronal de 20% sobre a folha: no Anexo IV, e nos regimes sem DAS (Presumido e Real), é custo à parte. No Simples (Anexos I, II, III e V) já está dentro do DAS. RAT e contribuições a terceiros não são considerados.');
@@ -638,6 +698,7 @@ function limparConsulta(){
   $('fatorr').checked = false;
   $('semcompras').checked = false;
   $('periodo').value = '1';
+  $('comprador').value = 'pf';
   $('credhib').value = 'sim';
   atualizar();
 }

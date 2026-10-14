@@ -47,7 +47,22 @@ const PERIODOS = {1:{nome:'Mensal', sufixo:'por mês'}, 2:{nome:'Bimestral', suf
 function periodoInfo(n){ return PERIODOS[n] || PERIODOS[1]; }
 const FATOR_R_MINIMO = 0.28;
 const LIMITE_SIMPLES = 4800000;
-const NOMES = {simples:'Simples Nacional', hibrido:'Simples híbrido', presumido:'Lucro Presumido', real:'Lucro Real'};
+const NOMES = {simples:'Simples Nacional', hibrido:'Simples híbrido', presumido:'Lucro Presumido', real:'Lucro Real', ret:'RET (incorporação)'};
+// Regras por atividade: tabela do Simples (null = vedado), ISS e presunção de IRPJ/CSLL no Presumido
+const ATIVIDADES = {
+  comercio:         {tabela:'comercio',  iss:false, pIR:0.08, pCS:0.12, anexo:'Anexo I'},
+  industria:        {tabela:'industria', iss:false, pIR:0.08, pCS:0.12, anexo:'Anexo II'},
+  servicos:         {tabela:'servicos',  iss:true,  pIR:0.32, pCS:0.32, anexo:'Anexo III'},
+  servicos4:        {tabela:'servicos4', iss:true,  pIR:0.32, pCS:0.32, anexo:'Anexo IV'},
+  servicos5:        {tabela:'servicos5', iss:true,  pIR:0.32, pCS:0.32, anexo:'Anexo V'},
+  construcao_total: {tabela:'servicos4', iss:true,  pIR:0.08, pCS:0.12, anexo:'Anexo IV'},
+  construcao_mo:    {tabela:'servicos4', iss:true,  pIR:0.32, pCS:0.32, anexo:'Anexo IV'},
+  locacao:          {tabela:null, iss:false, pIR:0.32, pCS:0.32, anexo:'Não pode optar pelo Simples', vedacao:'locação de imóveis próprios é vedada (LC 123, art. 17, XV)'},
+  holding:          {tabela:null, iss:true,  pIR:0.32, pCS:0.32, anexo:'Não pode optar pelo Simples', vedacao:'empresa que participa do capital de outra é vedada (LC 123, art. 3º, § 4º, VII)'},
+  incorporacao:     {tabela:null, iss:false, pIR:0.08, pCS:0.12, anexo:'Não pode optar pelo Simples', vedacao:'loteamento e incorporação são vedados (LC 123, art. 17, XIV)', ret:true}
+};
+// RET da incorporação (Lei 10.931/2004, arts. 4º e 8º): 4% = IRPJ 1,26% + CSLL 0,66% + PIS 0,37% + COFINS 1,71%
+const RET = {irpj:0.0126, csll:0.0066, pis:0.0037, cofins:0.0171};
 const FAIXAS = [5000, 10000, 15000, 20000, 40000, 60000, 100000, 200000, 350000];
 
 function faixaDe(rbt12, atividade){
@@ -64,16 +79,17 @@ function simplesEfetiva(rbt12, atividade){
 function calcRegimes(p){
   const R = p.receita;
   const isCom = p.atividade === 'comercio' || p.atividade === 'industria';
+  const cfg = ATIVIDADES[p.atividade] || ATIVIDADES.comercio;
   const cpp = CPP_PATRONAL * (p.folha || 0);
   // Fator R: serviços do Anexo V passam ao Anexo III se folha/receita >= 28%
-  let ativ = p.atividade;
+  let ativ = cfg.tabela;
   let fatorR = null;
   // Fator R só vale para atividades da lista do Anexo V (marcadas pelo usuário)
   if (ativ === 'servicos5' && p.fatorR){
     fatorR = R > 0 ? (p.folha || 0) / R : 0;
     ativ = fatorR >= FATOR_R_MINIMO ? 'servicos' : 'servicos5';
   }
-  const anexoBase = {comercio:'Anexo I', industria:'Anexo II', servicos:'Anexo III', servicos4:'Anexo IV', servicos5:'Anexo V'}[p.atividade];
+  const anexoBase = cfg.anexo;
   const anexo = (p.atividade === 'servicos5' && ativ === 'servicos')
     ? 'Anexo III (Fator R ' + Math.round(fatorR * 100) + '%)' : anexoBase;
   const antes = R * p.margem;
@@ -82,15 +98,16 @@ function calcRegimes(p){
   const comprasCred = R * p.compras;
   const icmsCredito = comprasCred * icmsRate;
   const icmsNormal = Math.max(0, icmsDebito - icmsCredito);
-  const issR = isCom ? 0 : p.iss * R;
+  const issR = cfg.iss ? p.iss * R : 0;
   const out = {};
 
   const rbt12 = R * 12;
-  const aliq = simplesEfetiva(rbt12, ativ);
-  const faixa = faixaDe(rbt12, ativ);
+  const aliq = ativ ? simplesEfetiva(rbt12, ativ) : null;
+  const faixa = ativ ? faixaDe(rbt12, ativ) : null;
   if (aliq === null){
-    out.simples = {elegivel:false, motivo:'Faturamento acima de R$ 4,8 mi por ano'};
-    out.hibrido = {elegivel:false, motivo:'Faturamento acima de R$ 4,8 mi por ano'};
+    const motivoS = ativ ? 'Faturamento acima de R$ 4,8 mi por ano' : cfg.vedacao;
+    out.simples = {elegivel:false, motivo: motivoS};
+    out.hibrido = {elegivel:false, motivo: motivoS};
   } else {
     const icmsFora6 = isCom && faixa.icms === 0 ? icmsNormal : 0;
     // Anexo IV: a CPP fica fora do DAS e é paga pela folha
@@ -98,7 +115,7 @@ function calcRegimes(p){
     const impS = R * aliq + icmsFora6 + cppS;
     out.simples = {elegivel:true, imposto: impS, efetiva: R>0 ? impS/R : aliq, liquido: antes - impS};
     if (!isCom){
-      out.hibrido = {elegivel:false, motivo:'Híbrido só se aplica a comércio'};
+      out.hibrido = {elegivel:false, motivo:'Híbrido só se aplica a comércio e indústria'};
     } else {
       const dasSemIcms = R * aliq * (1 - faixa.icms);
       const icmsHibrido = p.credHibrido ? icmsNormal : icmsDebito;
@@ -107,9 +124,9 @@ function calcRegimes(p){
     }
   }
 
-  const baseP = R * (isCom ? 0.08 : 0.32);
+  const baseP = R * cfg.pIR;
   const irpjP = 0.15*baseP + 0.10*Math.max(0, baseP - 20000);
-  const baseCsllP = R * (isCom ? 0.12 : 0.32);
+  const baseCsllP = R * cfg.pCS;
   const csllP = 0.09*baseCsllP;
   const baseTrib = R - icmsDebito;
   const pisCofinsP = (0.0065 + 0.03) * baseTrib;
@@ -122,6 +139,11 @@ function calcRegimes(p){
   const csllR = lucroTrib > 0 ? 0.09*lucroTrib : 0;
   const impR = pisCofinsR + issR + irpjR + csllR + icmsNormal + cpp;
   out.real = {elegivel:true, imposto: impR, efetiva: R>0 ? impR/R : 0, liquido: antes - impR};
+  // RET: só incorporação com patrimônio de afetação; a CPP sobre a folha continua à parte
+  const impRet = (RET.irpj + RET.csll + RET.pis + RET.cofins) * R + cpp;
+  out.ret = cfg.ret
+    ? {elegivel:true, imposto: impRet, efetiva: R>0 ? impRet/R : 0, liquido: antes - impRet}
+    : {elegivel:false, motivo:'Só para incorporação com patrimônio de afetação'};
   // Memória de cálculo mensal, linha a linha (Presumido e Real)
   const pctTxt = v => (v*100).toLocaleString('pt-BR', {maximumFractionDigits:2}) + '%';
   const brl = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
@@ -129,13 +151,13 @@ function calcRegimes(p){
   const baseRealPC = Math.max(0, baseTrib - comprasCred);
   const linhasP = [
     lin('Margem antes de impostos', antes, '', null, 'Entrada da tela'),
-    lin('IRPJ (parcela de 15%)', baseP, '15%', 0.15*baseP, 'Base = receita × presunção de ' + (isCom ? '8%' : '32%')),
+    lin('IRPJ (parcela de 15%)', baseP, '15%', 0.15*baseP, 'Base = receita × presunção de ' + pctTxt(cfg.pIR)),
     lin('IRPJ adicional', Math.max(0, baseP-20000), '10%', 0.10*Math.max(0, baseP-20000), 'Só sobre a parte da base acima de R$ 20.000 no mês'),
-    lin('CSLL', baseCsllP, '9%', csllP, 'Base = receita × presunção de ' + (isCom ? '12%' : '32%')),
+    lin('CSLL', baseCsllP, '9%', csllP, 'Base = receita × presunção de ' + pctTxt(cfg.pCS)),
     lin('PIS', baseTrib, '0,65%', 0.0065*baseTrib, 'Base = receita − ICMS destacado'),
     lin('COFINS', baseTrib, '3%', 0.03*baseTrib, 'Base = receita − ICMS destacado'),
   ];
-  if (!isCom) linhasP.push(lin('ISS', R, pctTxt(p.iss), issR, 'Alíquota municipal × receita'));
+  if (cfg.iss) linhasP.push(lin('ISS', R, pctTxt(p.iss), issR, 'Alíquota municipal × receita'));
   if (isCom) linhasP.push(lin('ICMS a recolher', icmsDebito, pctTxt(icmsRate), icmsNormal, 'Débito ' + brl(icmsDebito) + ' − crédito ' + brl(icmsCredito)));
   linhasP.push(lin('CPP patronal 20%', p.folha || 0, '20%', cpp, 'Custo sobre a folha, fora do DAS'));
   const linhasR = [
@@ -143,7 +165,7 @@ function calcRegimes(p){
     lin('PIS', baseRealPC, '1,65%', 0.0165*baseRealPC, 'Base = receita − ICMS − compras com crédito'),
     lin('COFINS', baseRealPC, '7,6%', 0.076*baseRealPC, 'Mesma base do PIS'),
   ];
-  if (!isCom) linhasR.push(lin('ISS', R, pctTxt(p.iss), issR, 'Alíquota municipal × receita'));
+  if (cfg.iss) linhasR.push(lin('ISS', R, pctTxt(p.iss), issR, 'Alíquota municipal × receita'));
   linhasR.push(lin('CPP patronal 20%', p.folha || 0, '20%', cpp, 'Custo sobre a folha, dedutível no lucro real'));
   linhasR.push(lin('Lucro tributável (base de IRPJ e CSLL)', lucroTrib, '', null, 'Margem − CPP − PIS − COFINS − ISS'));
   linhasR.push(lin('IRPJ (parcela de 15%)', Math.max(0, lucroTrib), '15%', lucroTrib > 0 ? 0.15*lucroTrib : 0, 'Sobre o lucro tributável positivo'));
@@ -173,11 +195,18 @@ function calcRegimes(p){
       ], total: dasSemIcms + icmsH};
     }
   }
-  out.memoria = {simples: memoS, hibrido: memoH, presumido: {linhas: linhasP, total: impP}, real: {linhas: linhasR, total: impR}};
+  const memoRet = cfg.ret ? {linhas: [
+    lin('IRPJ (RET)', R, '1,26%', RET.irpj*R, 'Pagamento unificado sobre a receita recebida'),
+    lin('CSLL (RET)', R, '0,66%', RET.csll*R, 'Pagamento unificado sobre a receita recebida'),
+    lin('PIS (RET)', R, '0,37%', RET.pis*R, 'Pagamento unificado sobre a receita recebida'),
+    lin('COFINS (RET)', R, '1,71%', RET.cofins*R, 'Pagamento unificado sobre a receita recebida'),
+    lin('CPP patronal 20%', p.folha || 0, '20%', cpp, 'Não faz parte do RET'),
+  ], total: impRet} : null;
+  out.memoria = {simples: memoS, hibrido: memoH, presumido: {linhas: linhasP, total: impP}, real: {linhas: linhasR, total: impR}, ret: memoRet};
   out.anexo = anexo;
   // Escala impostos e sobra para o período (a alíquota efetiva continua mensal)
   const meses = p.periodo || 1;
-  for (const k of ['simples','hibrido','presumido','real']){
+  for (const k of ['simples','hibrido','presumido','real','ret']){
     if (out[k] && out[k].elegivel){ out[k].imposto *= meses; out[k].liquido *= meses; }
   }
   return out;
@@ -353,7 +382,7 @@ function renderMemoria(res){
     const linhas = m.linhas.map(l => `<tr><td>${l.t}</td><td>${val(l.base)}</td><td>${l.aliq || '—'}</td><td>${val(l.valor)}</td><td class="nota">${l.nota || ''}</td></tr>`).join('');
     return `<h3>${nome} (mensal)</h3><div class="tablewrap"><table><thead><tr><th>Tributo</th><th>Base</th><th>Alíquota</th><th>Valor</th><th>Como foi calculado</th></tr></thead><tbody>${linhas}<tr class="total"><td>Total</td><td></td><td></td><td>${fmtBRL.format(m.total)}</td><td></td></tr></tbody></table></div>`;
   };
-  box.innerHTML = bloco('Simples Nacional', 'simples') + bloco('Simples híbrido', 'hibrido') + bloco('Lucro Presumido', 'presumido') + bloco('Lucro Real', 'real');
+  box.innerHTML = bloco('Simples Nacional', 'simples') + bloco('Simples híbrido', 'hibrido') + bloco('Lucro Presumido', 'presumido') + bloco('Lucro Real', 'real') + bloco('RET (incorporação)', 'ret');
 }
 function renderRegimes(){
   const p = entradas();
@@ -374,7 +403,7 @@ function renderRegimes(){
     banner.className = 'banner';
     banner.innerHTML = `<span>Melhor regime para este faturamento</span><strong>${NOMES[rank[0]]}</strong><span>${txt}</span>`;
   }
-  $('tbl-regimes').innerHTML = ['simples','hibrido','presumido','real'].map(k => {
+  $('tbl-regimes').innerHTML = ['simples','hibrido','presumido','real','ret'].filter(k => k !== 'ret' || res.ret.elegivel).map(k => {
     const r = res[k];
     if (!r.elegivel) return `<tr><td>${NOMES[k]}</td><td class="na" colspan="3">Não se aplica: ${r.motivo}</td></tr>`;
     if (p.receita === 0) return `<tr><td>${NOMES[k]}</td><td>—</td><td>—</td><td>—</td></tr>`;
@@ -507,7 +536,7 @@ function gerarPdfCore(p, dados, h){
   pares([
     ['Faturamento mensal', fmtBRL.format(p.receita)],
     ['Período do resultado', periodoInfo(p.periodo).nome],
-    ['Atividade', ({comercio:'Comércio', industria:'Indústria', servicos:'Serviços (Anexo III)', servicos4:'Limpeza, vigilância, obras e paisagismo (Anexo IV)', servicos5:'Serviços do Anexo V'})[p.atividade]],
+    ['Atividade', ({comercio:'Comércio', industria:'Indústria', servicos:'Serviços (Anexo III)', servicos4:'Limpeza, vigilância, obras e paisagismo (Anexo IV)', servicos5:'Serviços do Anexo V', construcao_total:'Construção civil: empreitada total com materiais', construcao_mo:'Construção civil: mão de obra ou materiais parciais', locacao:'Locação de imóveis próprios', holding:'Holding de participações', incorporacao:'Incorporação e loteamento'})[p.atividade]],
     ['Anexo do Simples', res.anexo],
     ['Folha de pagamento mensal', fmtBRL.format(p.folha || 0)],
     ['Fator R aplicável (lista do Anexo V)', p.atividade === 'servicos5' ? (p.fatorR ? 'Sim' : 'Não') : '—'],
@@ -519,7 +548,7 @@ function gerarPdfCore(p, dados, h){
   ]);
 
   titulo('Resultado: ' + periodoInfo(p.periodo).nome);
-  const chaves = ['simples','hibrido','presumido','real'];
+  const chaves = ['simples','hibrido','presumido','real'].concat(res.ret.elegivel ? ['ret'] : []);
   const linhasR = chaves.map(k => {
     const r = res[k];
     if (!r.elegivel) return [NOMES[k], '—', '—', 'Não se aplica'];
@@ -550,6 +579,7 @@ function gerarPdfCore(p, dados, h){
   titulo('Premissas e limites');
   texto('Regras de 2026. Simples Nacional: tabela do Anexo I (comércio), II (indústria) ou III (serviços), pela faixa de faturamento dos últimos 12 meses. Simples híbrido: ICMS fora do DAS, com a partilha do Anexo I (34% nas faixas 1 e 2, 33,5% nas faixas 3 a 5, zero na faixa 6). Lucro Presumido e Lucro Real: IRPJ, CSLL, PIS, COFINS e ICMS. Simples híbrido aplicável a comércio e indústria, até R$ 4,8 milhões por ano.');
   texto('Simplificações: o ICMS é calculado sobre o faturamento como se já estivesse no preço, e a base de PIS e COFINS desconta esse ICMS. Não considera substituição tributária, DIFAL, compensação de prejuízo fiscal, RAT, contribuições a terceiros nem regimes específicos de ICMS. Presunção: comércio e indústria, 8% para IRPJ e 12% para CSLL; serviços, 32% para ambos. Algumas atividades têm presunção diferente e não estão modeladas. PIS e COFINS no Lucro Real são uma apuração simplificada, com crédito sobre as compras informadas.');
+  texto('Imobiliário, locação, holding e construção: locação de imóveis próprios, holding de participações e incorporação/loteamento não podem optar pelo Simples (LC 123). Construção usa o Anexo IV; no Presumido, empreitada total com materiais usa 8% (IRPJ) e 12% (CSLL), e os demais casos 32%. Locação e holding usam 32%; incorporação, 8% e 12%. RET de 4% só para incorporação com patrimônio de afetação. Dividendos recebidos pela holding não entram no cálculo. Desoneração da folha e regras cumulativas específicas de PIS/COFINS no Real não estão modeladas.');
   texto('Períodos: impostos e sobra são o resultado mensal multiplicado pelos meses do período, supondo faturamento, margem e compras iguais em todos os meses. A alíquota efetiva é a do mês.');
   texto('Fator R: só se aplica a atividades da lista do Anexo V, marcadas na tela. Folha dos últimos 12 meses dividida pela receita dos últimos 12 meses, com 28% como limite. Esta análise usa a folha do mês como aproximação da média de 12 meses.');
   texto('CPP patronal de 20% sobre a folha: no Anexo IV, e nos regimes sem DAS (Presumido e Real), é custo à parte. No Simples (Anexos I, II, III e V) já está dentro do DAS. RAT e contribuições a terceiros não são considerados.');

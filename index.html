@@ -218,6 +218,11 @@ tr.current td{font-weight:700}
         <option value="servicos">Serviços (Anexo III)</option>
         <option value="servicos4">Serviços de limpeza, vigilância, obras e paisagismo (Anexo IV)</option>
         <option value="servicos5">Serviços do Anexo V (intelectuais e técnicos)</option>
+        <option value="construcao_total">Construção civil: empreitada total com materiais (Anexo IV)</option>
+        <option value="construcao_mo">Construção civil: mão de obra ou materiais parciais (Anexo IV)</option>
+        <option value="locacao">Locação de imóveis próprios (inclui holding patrimonial)</option>
+        <option value="holding">Holding de participações: receitas de administração</option>
+        <option value="incorporacao">Imobiliário: incorporação e loteamento</option>
       </select>
       <p class="hint">Anexo IV: ex. construção civil, vigilância, limpeza e conservação, paisagismo, advocacia. Anexo V: só entra com Fator R se a atividade estiver na lista do Anexo V.</p>
       <p class="hint"><label for="fatorr" style="display:inline;margin:0"><input id="fatorr" type="checkbox" style="width:auto"> Esta atividade está na lista do Fator R (Anexo V)?</label></p>
@@ -300,6 +305,7 @@ tr.current td{font-weight:700}
         <li>Fator R: só para atividades da lista do Anexo V, marcadas na tela. Folha dos últimos 12 meses ÷ receita dos últimos 12 meses, com 28% como limite. A tela usa a folha do mês como aproximação.</li>
         <li>CPP de 20% sobre a folha: no Anexo IV, e nos regimes sem DAS (Presumido e Real), é custo à parte. RAT e terceiros não são considerados.</li>
         <li>Simplificações: não considera substituição tributária, DIFAL, RAT, regimes específicos de ICMS do estado nem presunções de serviços abaixo de 32%.</li>
+        <li>Imobiliário, locação, holding e construção: locação de imóveis próprios, holding de participações e incorporação/loteamento não podem optar pelo Simples. Construção usa o Anexo IV; no Presumido, empreitada total com materiais usa 8% (IRPJ) e 12% (CSLL), e os demais casos 32%. Locação e holding usam 32%; incorporação, 8% e 12%. RET de 4% só para incorporação com patrimônio de afetação. Dividendos da holding não entram no cálculo.</li>
         <li>Períodos: bimestral, semestral e anual multiplicam o resultado mensal, supondo o mesmo faturamento e margem em todos os meses.</li>
         <li>Estimativa. Confirme com o contador responsável antes de decidir a troca de regime.</li>
       </ul>

@@ -10,11 +10,16 @@ Informe o CNPJ (a razão social preenche sozinha quando a consulta funciona), o 
 - Serviços (Anexo III), para atividades que não estão nos Anexos IV e V.
 - Serviços de limpeza, vigilância, obras e paisagismo (Anexo IV), com CPP de 20% sobre a folha fora do DAS.
 - Serviços do Anexo V, com Fator R apenas quando a atividade estiver marcada como da lista do Fator R.
+- Construção civil (Anexo IV no Simples). No Presumido: empreitada total com materiais, 8% (IRPJ) e 12% (CSLL); mão de obra ou materiais parciais, 32%.
+- Locação de imóveis próprios, incluindo holding patrimonial: vedada no Simples (LC 123, art. 17, XV); Presumido com 32%, sem ISS.
+- Holding de participações (receitas de administração): vedada no Simples (LC 123, art. 3º, § 4º, VII); Presumido com 32%. Dividendos recebidos não entram no cálculo.
+- Incorporação e loteamento: vedados no Simples (LC 123, art. 17, XIV); Presumido com 8% e 12%; RET de 4% (Lei 10.931/2004) para incorporação com patrimônio de afetação.
 
 ## Simplificações
 - Fator R usa a folha do mês como aproximação da média de 12 meses.
 - PIS e COFINS no Lucro Real são apuração simplificada, com crédito sobre as compras informadas.
 - Presunção de serviços: 32% para IRPJ e CSLL. Atividades com presunção diferente não estão modeladas.
+- Não considera desoneração da folha (CPRB) da construção, RET de 1% para habitação de interesse social, nem regras cumulativas específicas de PIS/COFINS no Real para construção e incorporação.
 - Não considera MEI, substituição tributária, DIFAL, RAT, contribuições a terceiros, compensação de prejuízo nem regimes específicos de ICMS.
 
 ## Limitações

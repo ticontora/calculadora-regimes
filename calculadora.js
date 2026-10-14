@@ -540,7 +540,14 @@ function renderComprador(){
     resumo.textContent = 'Esta atividade não pode optar pelo Simples; o comprador toma crédito integral do IBS/CBS destacado.';
   }
 }
-function atualizar(){ renderRegimes(); renderFaixas(); renderComprador(); }
+// O Fator R só aparece e só pode ser marcado quando a atividade é do Anexo V
+function atualizarFatorR(){
+  const anexoV = $('atividade').value === 'servicos5';
+  $('linha-fatorr').hidden = !anexoV;
+  $('fatorr').disabled = !anexoV;
+  if (!anexoV) $('fatorr').checked = false;
+}
+function atualizar(){ atualizarFatorR(); renderRegimes(); renderFaixas(); renderComprador(); }
 ['receita','folha','margem','compras','icms','iss','cbs27','ibs27'].forEach(id => $(id).addEventListener('input', atualizar));
 ['atividade','credhib','fatorr','semcompras','periodo','comprador'].forEach(id => $(id).addEventListener('change', atualizar));
 

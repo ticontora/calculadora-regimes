@@ -240,6 +240,52 @@ body::after{
 }
 .rodape-app{position:relative; z-index:1}
 .card{box-shadow:0 1px 0 rgba(14,19,32,.04), 0 18px 40px -22px rgba(14,19,32,.35)}
+
+/* Fundo com mais presença: área azulada sob o cabeçalho, brilhos em movimento lento e pontos na grade */
+body{background-color:#EDF1F6; background-image:linear-gradient(180deg, #D6DEF5 0, #E4E9F6 260px, #EDF1F6 560px); background-repeat:no-repeat}
+body::before{
+  background:
+    radial-gradient(900px 520px at 85% -120px, rgba(47,75,255,.30), transparent 65%),
+    radial-gradient(720px 540px at -10% 110%, rgba(27,138,90,.18), transparent 65%),
+    radial-gradient(620px 420px at 108% 72%, rgba(124,92,255,.13), transparent 70%);
+  animation:deriva 26s ease-in-out infinite alternate;
+}
+@keyframes deriva{
+  0%{transform:translate3d(0,0,0) scale(1)}
+  50%{transform:translate3d(-2.5%,1.5%,0) scale(1.05)}
+  100%{transform:translate3d(2%,-1%,0) scale(1.02)}
+}
+body::after{
+  background-image:
+    radial-gradient(circle at 0 0, rgba(47,75,255,.45) 1.6px, transparent 2.2px),
+    linear-gradient(rgba(14,19,32,.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14,19,32,.08) 1px, transparent 1px),
+    linear-gradient(rgba(14,19,32,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14,19,32,.04) 1px, transparent 1px);
+  background-size:120px 120px, 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  background-position:0 0, -1px -1px, -1px -1px, -1px -1px, -1px -1px;
+  -webkit-mask-image:radial-gradient(ellipse 140% 100% at 50% 0%, #000 45%, rgba(0,0,0,.35) 85%, transparent 100%);
+  mask-image:radial-gradient(ellipse 140% 100% at 50% 0%, #000 45%, rgba(0,0,0,.35) 85%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce){ body::before{animation:none} }
+
+/* Ajuste de intensidade do fundo */
+body{background-image:linear-gradient(180deg, #BFCBF2 0, #D3DBF5 220px, #E6EBF7 480px, #EDF1F6 720px)}
+body::before{
+  background:
+    radial-gradient(1000px 560px at 88% -140px, rgba(47,75,255,.42), transparent 62%),
+    radial-gradient(820px 600px at -12% 112%, rgba(27,138,90,.26), transparent 62%),
+    radial-gradient(700px 460px at 112% 70%, rgba(124,92,255,.20), transparent 68%),
+    radial-gradient(520px 360px at 8% 18%, rgba(47,75,255,.14), transparent 70%);
+}
+body::after{
+  background-image:
+    radial-gradient(circle at 0 0, rgba(47,75,255,.65) 1.8px, transparent 2.4px),
+    linear-gradient(rgba(14,19,32,.10) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14,19,32,.10) 1px, transparent 1px),
+    linear-gradient(rgba(14,19,32,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14,19,32,.045) 1px, transparent 1px);
+}
 </style>
 </head>
 <body>

@@ -177,7 +177,7 @@ function calcRegimes(p){
   const lin = (t, base, aliq, valor, nota) => ({t, base, aliq, valor, nota});
   const baseRealPC = Math.max(0, baseTrib - comprasCred);
   const linhasP = [
-    lin('Margem antes de impostos', antes, '', null, 'Entrada da tela'),
+    lin('Lucro antes dos impostos', antes, '', null, 'Entrada da tela'),
     lin('IRPJ (parcela de 15%)', baseP, '15%', 0.15*baseP, 'Base = receita × presunção de ' + pctTxt(cfg.pIR)),
     lin('IRPJ adicional', Math.max(0, baseP-20000), '10%', 0.10*Math.max(0, baseP-20000), 'Só sobre a parte da base acima de R$ 20.000 no mês'),
     lin('CSLL', baseCsllP, '9%', csllP, 'Base = receita × presunção de ' + pctTxt(cfg.pCS)),
@@ -188,13 +188,13 @@ function calcRegimes(p){
   if (isCom) linhasP.push(lin('ICMS a recolher', icmsDebito, pctTxt(icmsRate), icmsNormal, 'Débito ' + brl(icmsDebito) + ' − crédito ' + brl(icmsCredito)));
   linhasP.push(lin('CPP patronal 20%', p.folha || 0, '20%', cpp, 'Custo sobre a folha, fora do DAS'));
   const linhasR = [
-    lin('Margem antes de impostos', antes, '', null, 'Entrada da tela'),
+    lin('Lucro antes dos impostos', antes, '', null, 'Entrada da tela'),
     lin('PIS', baseRealPC, '1,65%', 0.0165*baseRealPC, 'Base = receita − ICMS − compras com crédito'),
     lin('COFINS', baseRealPC, '7,6%', 0.076*baseRealPC, 'Mesma base do PIS'),
   ];
   if (cfg.iss) linhasR.push(lin('ISS', R, pctTxt(p.iss), issR, 'Alíquota municipal × receita'));
   linhasR.push(lin('CPP patronal 20%', p.folha || 0, '20%', cpp, 'Custo sobre a folha, dedutível no lucro real'));
-  linhasR.push(lin('Lucro tributável (base de IRPJ e CSLL)', lucroTrib, '', null, 'Margem − CPP − PIS − COFINS − ISS'));
+  linhasR.push(lin('Lucro tributável (base de IRPJ e CSLL)', lucroTrib, '', null, 'Lucro antes dos impostos − CPP − PIS − COFINS − ISS'));
   linhasR.push(lin('IRPJ (parcela de 15%)', Math.max(0, lucroTrib), '15%', lucroTrib > 0 ? 0.15*lucroTrib : 0, 'Sobre o lucro tributável positivo'));
   linhasR.push(lin('IRPJ adicional', Math.max(0, lucroTrib-20000), '10%', lucroTrib > 0 ? 0.10*Math.max(0, lucroTrib-20000) : 0, 'Acima de R$ 20.000 no mês'));
   linhasR.push(lin('CSLL', Math.max(0, lucroTrib), '9%', csllR, 'Sobre o lucro tributável positivo'));
@@ -206,8 +206,10 @@ function calcRegimes(p){
     const icmsF6 = isCom && faixa.icms === 0 ? icmsNormal : 0;
     const linhasS = [
       lin('Receita dos últimos 12 meses (RBT12)', rbt12, '', null, 'Mensal × 12. Define a faixa da tabela'),
-      lin('Alíquota nominal da faixa', rbt12, pctTxt(faixa.aliq), null, 'Parcela a deduzir de ' + brl(faixa.ded)),
-      lin('DAS (alíquota efetiva)', R, pctTxt(aliq), R*aliq, 'Alíquota efetiva = (RBT12 × nominal − parcela) ÷ RBT12. Já inclui os tributos do DAS'),
+      lin('RBT12 × alíquota nominal', rbt12*faixa.aliq, pctTxt(faixa.aliq), null, 'Alíquota nominal da faixa sobre a receita de 12 meses'),
+      lin('(−) Parcela a deduzir', faixa.ded, '', null, 'Valor fixo da faixa na tabela do anexo'),
+      lin('(=) Imposto anual da faixa', rbt12*faixa.aliq - faixa.ded, '', null, '÷ RBT12 = alíquota efetiva de ' + pctTxt(aliq)),
+      lin('DAS do mês (alíquota efetiva)', R, pctTxt(aliq), R*aliq, 'Faturamento do mês × alíquota efetiva. Já inclui os tributos do DAS'),
     ];
     if (isCom && faixa.icms === 0) linhasS.push(lin('ICMS fora do DAS (6ª faixa)', icmsDebito, pctTxt(icmsRate), icmsF6, 'Débito − crédito, pelo regime normal de ICMS'));
     if (cppSm) linhasS.push(lin('CPP patronal 20% (Anexo IV)', p.folha || 0, '20%', cppSm, 'Paga pela folha, fora do DAS'));
@@ -594,7 +596,7 @@ function gerarPdfCore(p, dados, h){
     ['Anexo do Simples', res.anexo],
     ['Folha de pagamento mensal', fmtBRL.format(p.folha || 0)],
     ['Fator R aplicável (lista do Anexo V)', p.atividade === 'servicos5' ? (p.fatorR ? 'Sim' : 'Não') : '—'],
-    ['Margem antes de impostos', fmtPct(p.margem)],
+    ['Lucro antes dos impostos', fmtPct(p.margem) + ' do faturamento'],
     ['Compras com crédito', fmtPct(p.compras) + ' do faturamento'],
     ['ICMS (São Paulo)', fmtPct(p.icms)],
     ['ISS (Guarulhos)', fmtPct(p.iss)],

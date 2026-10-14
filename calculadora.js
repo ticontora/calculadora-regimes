@@ -268,6 +268,8 @@ function zerarEntradas(){
   $('margem').value = '0';
   $('compras').value = '0';
   $('folha').value = fmtBRL.format(0);
+  $('cnae').value = '';
+  aplicarCnae();
   $('icms').value = '0';
   $('iss').value = '0';
   atualizar();
@@ -310,6 +312,7 @@ async function consultarPublica(d){
   const j = await r.json();
   return {
     razao: j.razao_social || '',
+    cnae: (j.estabelecimento && j.estabelecimento.atividade_principal && j.estabelecimento.atividade_principal.id) || '',
     situacao: (j.estabelecimento && j.estabelecimento.situacao_cadastral) || 'Não informada'
   };
 }
@@ -319,6 +322,7 @@ async function consultarBrasilApi(d){
   const j = await r.json();
   return {
     razao: j.razao_social || '',
+    cnae: j.cnae_fiscal ? String(j.cnae_fiscal).padStart(7, '0') : '',
     situacao: j.descricao_situacao_cadastral ? j.descricao_situacao_cadastral.charAt(0) + j.descricao_situacao_cadastral.slice(1).toLowerCase() : 'Não informada'
   };
 }
@@ -367,6 +371,7 @@ async function buscarEmpresa(d){
     sit.className = 'situacao' + (s === 'ATIVA' ? '' : (s === 'SUSPENSA' ? ' warn' : ' bad'));
     $('cnpj-msg').className = 'status ok';
     $('cnpj-msg').textContent = 'Empresa encontrada.';
+    if (e.cnae){ $('cnae').value = mascaraCnae(e.cnae); aplicarCnae(); }
   } catch (err){
     if (digitosCnpj() !== d) return;
     ultimoCnpj = '';
@@ -375,10 +380,61 @@ async function buscarEmpresa(d){
   }
 }
 
+/* ===== CNAE: escolhe a atividade e o Fator R ===== */
+// CNAEs vedados no Simples que a calculadora trata (fora da tabela CNAE_TABELA)
+const CNAE_EXTRA = {
+  '6810202': ['Aluguel de imóveis próprios', 'locacao'],
+  '6810203': ['Loteamento de imóveis próprios', 'incorporacao'],
+  '4110700': ['Incorporação de empreendimentos imobiliários', 'incorporacao'],
+  '6462000': ['Holdings de instituições não-financeiras', 'holding'],
+  '6463800': ['Outras sociedades de participação, exceto holdings', 'holding']
+};
+function mascaraCnae(v){
+  const d = String(v || '').replace(/\D/g, '').slice(0, 7);
+  if (d.length <= 4) return d;
+  if (d.length === 5) return d.slice(0, 4) + '-' + d.slice(4);
+  return d.slice(0, 4) + '-' + d.slice(4, 5) + '/' + d.slice(5);
+}
+function classificarCnae(d){
+  if (CNAE_EXTRA[d]) return {desc: CNAE_EXTRA[d][0], atividade: CNAE_EXTRA[d][1], fatorR: false, vedado: true, aviso: ''};
+  const t = (typeof CNAE_TABELA !== 'undefined') ? CNAE_TABELA[d] : null;
+  if (!t) return null;
+  const [desc, anexos, fr] = t;
+  const lista = anexos.split('/');
+  let atividade, aviso = '';
+  if (fr){
+    atividade = 'servicos5';
+    if (lista.includes('IV')) aviso = 'A lista indica os Anexos IV e V para este CNAE; confira com o contador.';
+  } else {
+    const a = lista[0];
+    const construcao = ['41', '42', '43'].includes(d.slice(0, 2));
+    atividade = a === 'I' ? 'comercio' : a === 'II' ? 'industria' : a === 'III' ? 'servicos' : a === 'IV' ? (construcao ? 'construcao_mo' : 'servicos4') : 'servicos5';
+    if (lista.length > 1) aviso = 'CNAE em mais de um anexo (' + anexos + '); confira a atividade exercida.';
+    if (atividade === 'construcao_mo') aviso = 'Se for empreitada total com materiais, troque a atividade para "empreitada total".';
+  }
+  return {desc, atividade, fatorR: !!fr, vedado: false, anexos, aviso};
+}
+function aplicarCnae(){
+  const d = ($('cnae').value || '').replace(/\D/g, '');
+  const info = $('cnae-info');
+  if (d.length === 0){ info.className = 'status'; info.textContent = 'Opcional. Com o CNAE, a atividade e o Fator R são escolhidos sozinhos.'; return; }
+  if (d.length < 7){ info.className = 'status'; info.textContent = 'Faltam ' + (7 - d.length) + ' dígitos.'; return; }
+  const c = classificarCnae(d);
+  if (!c){ info.className = 'status bad'; info.textContent = 'CNAE fora da tabela. Pode ser atividade vedada no Simples; escolha a atividade manualmente.'; return; }
+  $('atividade').value = c.atividade;
+  $('fatorr').checked = c.fatorR;
+  const destino = c.vedado ? 'não pode optar pelo Simples' : (c.fatorR ? 'sujeito ao Fator R (Anexo III ou V, conforme a folha)' : 'Anexo ' + c.anexos);
+  info.className = 'status ok';
+  info.textContent = c.desc + ': ' + destino + '.' + (c.aviso ? ' ' + c.aviso : '');
+  atualizar();
+}
+$('cnae').addEventListener('input', () => { $('cnae').value = mascaraCnae($('cnae').value); aplicarCnae(); });
+
 /* ===== Entradas ===== */
 function entradas(){
   return {
     receita: parseBRL($('receita').value),
+    cnae: ($('cnae').value || '').replace(/\D/g, ''),
     atividade: $('atividade').value,
     folha: parseBRL($('folha').value),
     periodo: parseInt($('periodo').value, 10) || 1,
@@ -591,6 +647,7 @@ function gerarPdfCore(p, dados, h){
   titulo('Dados informados');
   pares([
     ['Faturamento mensal', fmtBRL.format(p.receita)],
+    ['CNAE principal', p.cnae ? mascaraCnae(p.cnae) : 'Não informado'],
     ['Período do resultado', periodoInfo(p.periodo).nome],
     ['Atividade', ({comercio:'Comércio', industria:'Indústria', servicos:'Serviços (Anexo III)', servicos4:'Limpeza, vigilância, obras e paisagismo (Anexo IV)', servicos5:'Serviços do Anexo V', construcao_total:'Construção civil: empreitada total com materiais', construcao_mo:'Construção civil: mão de obra ou materiais parciais', locacao:'Locação de imóveis próprios', holding:'Holding de participações', incorporacao:'Incorporação e loteamento'})[p.atividade]],
     ['Anexo do Simples', res.anexo],

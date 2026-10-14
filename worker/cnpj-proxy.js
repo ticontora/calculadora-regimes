@@ -26,6 +26,7 @@ async function consultarFontes(d){
       const j = await r.json();
       return {
         razao: j.razao_social || '',
+        cnae: (j.estabelecimento && j.estabelecimento.atividade_principal && j.estabelecimento.atividade_principal.id) || '',
         situacao: (j.estabelecimento && j.estabelecimento.situacao_cadastral) || 'Não informada'
       };
     }
@@ -36,6 +37,7 @@ async function consultarFontes(d){
       const j = await r.json();
       return {
         razao: j.razao_social || '',
+        cnae: j.cnae_fiscal ? String(j.cnae_fiscal).padStart(7, '0') : '',
         situacao: j.descricao_situacao_cadastral || 'Não informada'
       };
     }

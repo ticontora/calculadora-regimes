@@ -239,6 +239,10 @@ table:has(#tbl-regimes) #tbl-regimes td:first-child{white-space:normal;text-alig
       <label for="receita">Faturamento mensal</label>
       <input id="receita" type="text" inputmode="numeric" autocomplete="off" value="R$ 0,00">
 
+      <label for="cnae">CNAE principal</label>
+      <input id="cnae" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="0000-0/00">
+      <p class="status" id="cnae-info">Opcional. Com o CNAE, a atividade e o Fator R são escolhidos sozinhos.</p>
+
       <label for="atividade">Atividade</label>
       <select id="atividade">
         <option value="comercio" selected>Comércio (venda de produtos)</option>
@@ -374,6 +378,7 @@ table:has(#tbl-regimes) #tbl-regimes td:first-child{white-space:normal;text-alig
 <footer class="rodape-app">By Italo Govêa</footer>
 </div>
 <script src="lib/jspdf.umd.min.js"></script>
+<script src="cnae.js"></script>
 <script src="calculadora.js"></script>
 <script>
 (function(){

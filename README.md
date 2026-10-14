@@ -6,6 +6,7 @@ Ferramenta de estimativa para comparar regimes tributários de clientes, com bas
 Informe o CNPJ (a razão social preenche sozinha quando a consulta funciona), o faturamento, a atividade e os percentuais de margem, compras, ICMS e ISS. Gere o PDF da análise.
 
 ## Atividades e anexos
+- CNAE principal: ao digitar o CNAE (ou ao consultar o CNPJ), a calculadora escolhe a atividade e marca o Fator R pela tabela `cnae.js` (1.181 CNAEs, lista da Contabilizei, Tabela Simples Nacional 2026). CNAEs de locação de imóveis próprios, loteamento, incorporação e holdings são tratados como vedados no Simples. Construção (divisões 41 a 43) entra como "mão de obra"; se for empreitada total com materiais, troque a atividade.
 - Comércio (Anexo I) e indústria (Anexo II), com híbrido.
 - Serviços (Anexo III), para atividades que não estão nos Anexos IV e V.
 - Serviços de limpeza, vigilância, obras e paisagismo (Anexo IV), com CPP de 20% sobre a folha fora do DAS.

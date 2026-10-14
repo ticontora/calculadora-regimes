@@ -200,6 +200,22 @@ table:has(#tbl-regimes) #tbl-regimes td:first-child{white-space:normal;text-alig
   table:has(#tbl-regimes) #tbl-regimes tr.best td{background:transparent}
   table:has(#tbl-regimes) #tbl-regimes td[data-label]::before{content:attr(data-label);display:block;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
 }
+
+/* Organização: passos, campos por atividade e seções recolhidas */
+[hidden]{display:none !important}
+.card h2.passo{margin-top:26px;padding-top:18px;border-top:1px solid #E1E7ED}
+.opc{font-weight:400;color:var(--muted);font-size:11px;margin-left:4px;text-transform:none;letter-spacing:0}
+.cab-res{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.cab-res h2{margin:0}
+.cab-res select{width:auto;min-width:130px}
+details.secao > summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px}
+details.secao > summary::-webkit-details-marker{display:none}
+details.secao > summary h2{margin:0}
+details.secao > summary::after{content:"+";font-size:20px;line-height:1;color:var(--muted)}
+details.secao[open] > summary::after{content:"\2212"}
+details.secao[open] > summary{margin-bottom:14px}
+p.hint.so-com{margin-bottom:12px}
+@media (min-width:820px){.grid > .card:has(#tbl-regimes){position:sticky;top:16px;align-self:start}}
 </style>
 </head>
 <body>
@@ -224,8 +240,7 @@ table:has(#tbl-regimes) #tbl-regimes td:first-child{white-space:normal;text-alig
 
   <div class="grid">
     <section class="card" aria-labelledby="h-in">
-      <h2 id="h-in">Cliente</h2>
-
+      <h2 id="h-in">1. Empresa</h2>
       <label for="cnpj">CNPJ</label>
       <input id="cnpj" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="00.000.000/0000-00">
       <p class="status" id="cnpj-msg">Digite os 14 números do CNPJ.</p>
@@ -234,15 +249,11 @@ table:has(#tbl-regimes) #tbl-regimes td:first-child{white-space:normal;text-alig
       <input id="nome" type="text" autocomplete="off" placeholder="Preenchida ao consultar o CNPJ">
       <span class="situacao" id="situacao" hidden></span>
 
-      <h2 style="margin-top:22px">Entradas</h2>
-
-      <label for="receita">Faturamento mensal</label>
-      <input id="receita" type="text" inputmode="numeric" autocomplete="off" value="R$ 0,00">
-
-      <label for="cnae">CNAE principal</label>
+      <label for="cnae">CNAE principal <span class="opc">opcional</span></label>
       <input id="cnae" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="0000-0/00">
-      <p class="status" id="cnae-info">Opcional. Com o CNAE, a atividade e o Fator R são escolhidos sozinhos.</p>
+      <p class="status" id="cnae-info">Define a atividade e o Fator R automaticamente.</p>
 
+      <h2 class="passo">2. Atividade e faturamento</h2>
       <label for="atividade">Atividade</label>
       <select id="atividade">
         <option value="comercio" selected>Comércio (venda de produtos)</option>
@@ -256,48 +267,52 @@ table:has(#tbl-regimes) #tbl-regimes td:first-child{white-space:normal;text-alig
         <option value="holding">Holding de participações: receitas de administração</option>
         <option value="incorporacao">Imobiliário: incorporação e loteamento</option>
       </select>
-      <p class="hint">Anexo IV: ex. construção civil, vigilância, limpeza e conservação, paisagismo, advocacia. Anexo V: só entra com Fator R se a atividade estiver na lista do Anexo V.</p>
-      <p class="hint" id="linha-fatorr" hidden><label for="fatorr" style="display:inline;margin:0"><input id="fatorr" type="checkbox" disabled style="width:auto"> Esta atividade está na lista do Fator R (Anexo V)?</label></p>
+      <p class="hint" id="linha-fatorr" hidden><label for="fatorr" style="display:inline;margin:0"><input id="fatorr" type="checkbox" disabled style="width:auto"> Atividade da lista do Fator R</label></p>
 
-      <label for="folha">Folha de pagamento mensal (salários, pró-labore e encargos)</label>
-      <input id="folha" type="text" inputmode="numeric" autocomplete="off" value="R$ 0,00">
-      <p class="hint">Usada no Fator R (serviços do Anexo V) e na CPP de 20%, que é paga à parte no Anexo IV, no Presumido e no Real. Com zero, Presumido e Real ficam subestimados.</p>
+      <label for="receita">Faturamento mensal</label>
+      <input id="receita" type="text" inputmode="numeric" autocomplete="off" value="R$ 0,00">
 
-      <label for="margem">Lucro antes dos impostos (% do faturamento)</label>
+      <label for="margem">Lucro antes dos impostos (%)</label>
       <input id="margem" type="number" min="0" max="100" step="0.5" value="0">
-      <p class="hint">O que sobra depois de mercadoria, aluguel, frete, salários e pró-labore, antes de qualquer imposto. Ex.: fatura R$ 20.000 e gasta R$ 16.000 = 20%. Afeta o Lucro Real e a sobra; não muda o imposto do Simples e do Presumido.</p>
+      <p class="hint">O que sobra após todos os custos, antes dos impostos. Ex.: fatura R$ 20.000 e gasta R$ 16.000 = 20%.</p>
 
-      <label for="compras">Compras com crédito de imposto (% do faturamento)</label>
+      <label for="folha">Folha de pagamento mensal</label>
+      <input id="folha" type="text" inputmode="numeric" autocomplete="off" value="R$ 0,00">
+      <p class="hint">Salários, pró-labore e encargos.</p>
+
+      <h2 class="passo">3. Compras e impostos</h2>
+      <label for="compras">Compras com crédito (% do faturamento)</label>
       <input id="compras" type="number" min="0" max="100" step="1" value="0">
-      <p class="hint"><label for="semcompras" style="display:inline;margin:0"><input id="semcompras" type="checkbox" style="width:auto"> Não há compras com crédito neste caso</label></p>
-      <p class="hint">Mercadoria comprada de atacado ou indústria, com nota que destaca ICMS.</p>
+      <p class="hint so-com"><label for="semcompras" style="display:inline;margin:0"><input id="semcompras" type="checkbox" style="width:auto"> Não há compras com crédito</label></p>
 
-      <label for="icms">ICMS de São Paulo (%)</label>
-      <input id="icms" type="number" min="0" max="30" step="0.5" value="0">
-      <p class="hint">Alíquota geral de SP. Alguns alimentos têm 7% ou 12%.</p>
+      <div class="so-com">
+        <label for="icms">ICMS de SP (%)</label>
+        <input id="icms" type="number" min="0" max="30" step="0.5" value="0">
+        <p class="hint">18% em geral; 7% ou 12% para alguns alimentos.</p>
+        <label for="credhib">Crédito de ICMS no híbrido</label>
+        <select id="credhib">
+          <option value="sim" selected>Sim</option>
+          <option value="nao">Não</option>
+        </select>
+      </div>
 
-      <label for="credhib">No híbrido, as compras geram crédito de ICMS?</label>
-      <select id="credhib">
-        <option value="sim" selected>Sim</option>
-        <option value="nao">Não</option>
-      </select>
-      <p class="hint">Confirme a regra com a legislação paulista antes de usar com cliente.</p>
-
-      <label for="iss">ISS de Guarulhos (%)</label>
-      <input id="iss" type="number" min="0" max="5" step="0.1" value="0">
-      <p class="hint">Só se aplica a serviços. Maioria dos serviços em 5%.</p>
+      <div class="so-iss">
+        <label for="iss">ISS de Guarulhos (%)</label>
+        <input id="iss" type="number" min="0" max="5" step="0.1" value="0">
+        <p class="hint">Entre 2% e 5%; a maioria dos serviços paga 5%.</p>
+      </div>
     </section>
 
     <section class="card" aria-labelledby="h-out" aria-live="polite">
-      <h2 id="h-out">Resultado</h2>
-      <label for="periodo">Ver o resultado em</label>
-      <select id="periodo">
-        <option value="1" selected>Mensal</option>
-        <option value="2">Bimestral</option>
-        <option value="6">Semestral</option>
-        <option value="12">Anual</option>
-      </select>
-      <p class="hint">O período multiplica o resultado mensal, supondo o mesmo faturamento, margem e compras em todos os meses.</p>
+      <div class="cab-res">
+        <h2 id="h-out">Resultado</h2>
+        <select id="periodo" aria-label="Período do resultado">
+          <option value="1" selected>Mensal</option>
+          <option value="2">Bimestral</option>
+          <option value="6">Semestral</option>
+          <option value="12">Anual</option>
+        </select>
+      </div>
       <div class="banner" id="banner"></div>
       <div class="tablewrap">
         <table>
@@ -316,7 +331,8 @@ table:has(#tbl-regimes) #tbl-regimes td:first-child{white-space:normal;text-alig
     </section>
 
     <section class="card full" aria-labelledby="h-comp" aria-live="polite">
-      <h2 id="h-comp">Comprador e crédito de IBS/CBS (cenário 2027)</h2>
+      <details class="secao">
+        <summary><h2 id="h-comp">Comprador e crédito de IBS/CBS (cenário 2027)</h2></summary>
       <label for="comprador">Quem compra do seu cliente</label>
       <select id="comprador">
         <option value="pf" selected>Pessoa física (consumidor final)</option>
@@ -335,7 +351,7 @@ table:has(#tbl-regimes) #tbl-regimes td:first-child{white-space:normal;text-alig
           <input id="ibs27" type="number" min="0" max="30" step="0.01" value="0.1">
         </div>
       </div>
-      <p class="hint">A CBS de 2027 ainda não foi fixada (Senado até 15/12/2026). 9,11% é estimativa: 9,21% da Res. CGIBS 14/2026 menos 0,1 ponto (LC 214, art. 347). Mesmo preço final cobrado em todos os casos.</p>
+      <p class="hint">CBS de 2027 ainda não fixada (Senado até 15/12/2026); 9,11% é estimativa. Mesmo preço final em todos os casos.</p>
       <div class="tablewrap">
         <table>
           <thead><tr><th>Fornecedor</th><th>Valor pago</th><th>Crédito do comprador</th><th>Custo líquido</th></tr></thead>
@@ -343,21 +359,25 @@ table:has(#tbl-regimes) #tbl-regimes td:first-child{white-space:normal;text-alig
         </table>
       </div>
       <p class="status" id="comprador-resumo"></p>
+      </details>
     </section>
 
     <section class="card full" aria-labelledby="h-faixa">
-      <h2 id="h-faixa">Qual regime ganha em cada faturamento</h2>
-      <p class="hint">Mantém a atividade, a margem e as compras informadas. A linha destacada é o valor atual.</p>
+      <details class="secao">
+        <summary><h2 id="h-faixa">Simulação: qual regime ganha em cada faturamento</h2></summary>
+      <p class="hint">Mesmas entradas, mudando só o faturamento. A linha destacada é o valor atual.</p>
       <div class="tablewrap">
         <table>
           <thead><tr><th>Faturamento mensal</th><th>Melhor regime</th><th>Sobra no melhor</th></tr></thead>
           <tbody id="tbl-faixa"></tbody>
         </table>
       </div>
+      </details>
     </section>
 
     <section class="card full" aria-labelledby="h-lim">
-      <h2 id="h-lim">Premissas e limites</h2>
+      <details class="secao">
+        <summary><h2 id="h-lim">Premissas e limites</h2></summary>
       <ul class="limits">
         <li>Regras de 2026. A partir de 2027, PIS e COFINS saem e entra a CBS, e esta tela não modela essa transição.</li>
         <li>Simples Nacional: faixa pelo faturamento dos últimos 12 meses, com a tabela do Anexo I (comércio), II (indústria), III, IV ou V (serviços). ICMS dentro do DAS, sem crédito. CPP dentro do DAS nos Anexos III e V.</li>
@@ -372,6 +392,7 @@ table:has(#tbl-regimes) #tbl-regimes td:first-child{white-space:normal;text-alig
         <li>Períodos: bimestral, semestral e anual multiplicam o resultado mensal, supondo o mesmo faturamento e margem em todos os meses.</li>
         <li>Estimativa. Confirme com o contador responsável antes de decidir a troca de regime.</li>
       </ul>
+      </details>
     </section>
   </div>
 </div>

@@ -417,7 +417,7 @@ function classificarCnae(d){
 function aplicarCnae(){
   const d = ($('cnae').value || '').replace(/\D/g, '');
   const info = $('cnae-info');
-  if (d.length === 0){ info.className = 'status'; info.textContent = 'Opcional. Com o CNAE, a atividade e o Fator R são escolhidos sozinhos.'; return; }
+  if (d.length === 0){ info.className = 'status'; info.textContent = 'Define a atividade e o Fator R automaticamente.'; return; }
   if (d.length < 7){ info.className = 'status'; info.textContent = 'Faltam ' + (7 - d.length) + ' dígitos.'; return; }
   const c = classificarCnae(d);
   if (!c){ info.className = 'status bad'; info.textContent = 'CNAE fora da tabela. Pode ser atividade vedada no Simples; escolha a atividade manualmente.'; return; }
@@ -542,10 +542,16 @@ function renderComprador(){
 }
 // O Fator R só aparece e só pode ser marcado quando a atividade é do Anexo V
 function atualizarFatorR(){
-  const anexoV = $('atividade').value === 'servicos5';
+  const at = $('atividade').value;
+  const anexoV = at === 'servicos5';
   $('linha-fatorr').hidden = !anexoV;
   $('fatorr').disabled = !anexoV;
   if (!anexoV) $('fatorr').checked = false;
+  // Mostra só os campos que valem para a atividade
+  const com = at === 'comercio' || at === 'industria';
+  const iss = !!(ATIVIDADES[at] && ATIVIDADES[at].iss);
+  document.querySelectorAll('.so-com').forEach(el => { el.hidden = !com; });
+  document.querySelectorAll('.so-iss').forEach(el => { el.hidden = !iss; });
 }
 function atualizar(){ atualizarFatorR(); renderRegimes(); renderFaixas(); renderComprador(); }
 ['receita','folha','margem','compras','icms','iss','cbs27','ibs27'].forEach(id => $(id).addEventListener('input', atualizar));

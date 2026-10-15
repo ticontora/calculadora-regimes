@@ -307,6 +307,8 @@ select:disabled{opacity:1;background:#EEF1F7;color:var(--ink);cursor:not-allowed
 /* Seções do final em bloco próprio: o resultado não passa por cima delas */
 .extras{display:grid;gap:16px;margin-top:16px}
 .extras .card{margin:0}
+
+h3.sub{font-size:13px;font-weight:700;margin:20px 0 4px;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -385,11 +387,6 @@ select:disabled{opacity:1;background:#EEF1F7;color:var(--ink);cursor:not-allowed
         <label for="icms">ICMS de SP</label>
         <div class="campo-pct"><input id="icms" type="number" min="0" max="30" step="0.5" value="0"><span class="sufixo" aria-hidden="true">%</span></div>
         <p class="hint">18% em geral; 7% ou 12% para alguns alimentos.</p>
-        <label for="credhib">Crédito de ICMS no híbrido</label>
-        <select id="credhib">
-          <option value="sim" selected>Sim</option>
-          <option value="nao">Não</option>
-        </select>
       </div>
 
       <div class="so-iss">
@@ -431,7 +428,7 @@ select:disabled{opacity:1;background:#EEF1F7;color:var(--ink);cursor:not-allowed
   <div class="extras">
     <section class="card full" aria-labelledby="h-comp" aria-live="polite">
       <details class="secao">
-        <summary><h2 id="h-comp">Comprador e crédito de IBS/CBS (cenário 2027)</h2></summary>
+        <summary><h2 id="h-comp">Reforma 2027: Simples híbrido e crédito do comprador</h2></summary>
       <label for="comprador">Quem compra do seu cliente</label>
       <select id="comprador">
         <option value="pf" selected>Pessoa física (consumidor final)</option>
@@ -450,7 +447,16 @@ select:disabled{opacity:1;background:#EEF1F7;color:var(--ink);cursor:not-allowed
           <div class="campo-pct"><input id="ibs27" type="number" min="0" max="30" step="0.01" value="0.1"><span class="sufixo" aria-hidden="true">%</span></div>
         </div>
       </div>
-      <p class="hint">CBS de 2027 ainda não fixada (Senado até 15/12/2026); 9,11% é estimativa. Mesmo preço final em todos os casos.</p>
+      <p class="hint">CBS de 2027 ainda não fixada (Senado até 15/12/2026); 9,11% é estimativa. Mesmo preço final em todos os casos; crédito das compras supõe fornecedores do regime regular.</p>
+      <h3 class="sub">Seu cliente: Simples no DAS ou Simples híbrido</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Opção</th><th>DAS</th><th>IBS/CBS fora do DAS</th><th>Total de imposto</th></tr></thead>
+          <tbody id="tbl-hibrido27"></tbody>
+        </table>
+      </div>
+      <p class="status" id="hibrido27-resumo"></p>
+      <h3 class="sub">Comprador: custo com o crédito</h3>
       <div class="tablewrap">
         <table>
           <thead><tr><th>Fornecedor</th><th>Valor pago</th><th>Crédito do comprador</th><th>Custo líquido</th></tr></thead>
@@ -480,14 +486,14 @@ select:disabled{opacity:1;background:#EEF1F7;color:var(--ink);cursor:not-allowed
       <ul class="limits">
         <li>Regras de 2026. A partir de 2027, PIS e COFINS saem e entra a CBS, e esta tela não modela essa transição.</li>
         <li>Simples Nacional: faixa pelo faturamento dos últimos 12 meses, com a tabela do Anexo I (comércio), II (indústria), III, IV ou V (serviços). ICMS dentro do DAS, sem crédito. CPP dentro do DAS nos Anexos III e V.</li>
-        <li>Simples híbrido (comércio e indústria): ICMS fora do DAS, com a partilha do Anexo I (34% nas faixas 1 e 2, 33,5% nas faixas 3 a 5, zero na faixa 6). ICMS pelo regime normal.</li>
+        <li>Simples híbrido (a partir de 2027): IBS e CBS fora do DAS, pelo regime regular, opcional para qualquer optante do Simples, inclusive serviços (LC 214/2025, art. 41, § 3º). Aparece no bloco da reforma. Não existe opção de tirar o ICMS do DAS: ICMS e ISS só saem do DAS acima do sublimite de R$ 3,6 milhões.</li>
         <li>Lucro Presumido: presunção de IRPJ de 8% (comércio e indústria) ou 32% (serviços), e de CSLL de 12% (comércio e indústria) ou 32% (serviços). IRPJ de 15% com adicional de 10% acima de R$ 20 mil no mês, CSLL de 9%, PIS de 0,65% e COFINS de 3%.</li>
         <li>Lucro Real: IRPJ de 15% com adicional de 10%, CSLL de 9%, PIS de 1,65% e COFINS de 7,6%, com crédito sobre as compras informadas (apuração simplificada). Não considera prejuízo fiscal.</li>
         <li>Fator R: só para atividades da lista do Anexo V, marcadas na tela. Folha dos últimos 12 meses ÷ receita dos últimos 12 meses, com 28% como limite. A tela usa a folha do mês como aproximação.</li>
         <li>CPP de 20% sobre a folha: no Anexo IV, e nos regimes sem DAS (Presumido e Real), é custo à parte. RAT e terceiros não são considerados.</li>
         <li>Simplificações: não considera substituição tributária, DIFAL, RAT, regimes específicos de ICMS do estado nem presunções de serviços abaixo de 32%.</li>
         <li>Imobiliário, locação, holding e construção: locação de imóveis próprios, holding de participações e incorporação/loteamento não podem optar pelo Simples. Construção usa o Anexo IV; no Presumido, empreitada total com materiais usa 8% (IRPJ) e 12% (CSLL), e os demais casos 32%. Locação e holding usam 32%; incorporação, 8% e 12%. RET de 4% só para incorporação com patrimônio de afetação. Dividendos da holding não entram no cálculo.</li>
-        <li>Cenário 2027 (comprador): comprador PF ou no Simples recolhendo no DAS não toma crédito de IBS/CBS. Comprador do regime regular toma crédito integral do IBS/CBS destacado, ou só do IBS/CBS pago no DAS quando o fornecedor está no DAS (LC 214/2025, art. 47, § 9º). A fatia de IBS/CBS no DAS assume a fatia atual de PIS e COFINS de cada faixa. Os dois híbridos são diferentes: o da tabela de regimes deixa o ICMS fora do DAS; o da reforma deixa IBS e CBS fora do DAS.</li>
+        <li>Cenário 2027 (comprador): comprador PF ou no Simples recolhendo no DAS não toma crédito de IBS/CBS. Comprador do regime regular toma crédito integral do IBS/CBS destacado, ou só do IBS/CBS pago no DAS quando o fornecedor está no DAS (LC 214/2025, art. 47, § 9º). A fatia de IBS/CBS no DAS assume a fatia atual de PIS e COFINS de cada faixa.</li>
         <li>Períodos: bimestral, semestral e anual multiplicam o resultado mensal, supondo o mesmo faturamento e margem em todos os meses.</li>
         <li>Estimativa. Confirme com o contador responsável antes de decidir a troca de regime.</li>
       </ul>

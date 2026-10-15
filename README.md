@@ -1,4 +1,4 @@
-# Calculadora de regimes tributários (Simples, híbrido, Presumido e Real)
+# Calculadora de regimes tributários (Simples, Presumido, Real e Simples híbrido 2027)
 
 Ferramenta de estimativa para comparar regimes tributários de clientes, com base na legislação de Guarulhos/SP. Roda no navegador.
 
@@ -7,7 +7,7 @@ Informe o CNPJ (a razão social preenche sozinha quando a consulta funciona), o 
 
 ## Atividades e anexos
 - CNAE principal: ao digitar o CNAE (ou ao consultar o CNPJ), a calculadora escolhe a atividade e marca o Fator R pela tabela `cnae.js` (1.181 CNAEs, lista da Contabilizei, Tabela Simples Nacional 2026). CNAEs de locação de imóveis próprios, loteamento, incorporação e holdings são tratados como vedados no Simples. Construção (divisões 41 a 43) entra como "mão de obra"; se for empreitada total com materiais, troque a atividade.
-- Comércio (Anexo I) e indústria (Anexo II), com híbrido.
+- Comércio (Anexo I) e indústria (Anexo II).
 - Serviços (Anexo III), para atividades que não estão nos Anexos IV e V.
 - Serviços de limpeza, vigilância, obras e paisagismo (Anexo IV), com CPP de 20% sobre a folha fora do DAS.
 - Serviços do Anexo V, com Fator R apenas quando a atividade estiver marcada como da lista do Fator R.
@@ -21,7 +21,8 @@ Informe o CNPJ (a razão social preenche sozinha quando a consulta funciona), o 
 - PF e PJ no DAS não tomam crédito. PJ do regime regular toma crédito integral do IBS/CBS destacado, ou só do IBS/CBS pago no DAS quando o fornecedor recolhe no DAS (LC 214/2025, art. 47, § 9º).
 - Compara, pelo mesmo preço final, fornecedor no DAS, fornecedor no Simples híbrido da reforma (IBS/CBS fora do DAS, LC 214, art. 41, § 3º) e fornecedor no Presumido/Real.
 - A CBS de 2027 ainda não foi fixada; o campo é editável (padrão 9,11%, estimativa). A fatia de IBS/CBS no DAS assume a fatia atual de PIS e COFINS de cada faixa.
-- O "Simples híbrido" da tabela de regimes é outra coisa: deixa o ICMS fora do DAS.
+- Simples híbrido (a partir de 2027): IBS e CBS fora do DAS, opcional para qualquer optante do Simples, inclusive serviços. O bloco compara o imposto do cliente no DAS e no híbrido (DAS sem a fatia de IBS/CBS + IBS/CBS pelo regime regular, com crédito das compras).
+- Não existe opção de tirar o ICMS do DAS: ICMS e ISS só saem do DAS acima do sublimite de R$ 3,6 milhões, o que a calculadora já trata na 6ª faixa.
 
 ## Simplificações
 - Fator R usa a folha do mês como aproximação da média de 12 meses.

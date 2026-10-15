@@ -47,7 +47,7 @@ const PERIODOS = {1:{nome:'Mensal', sufixo:'por mês'}, 2:{nome:'Bimestral', suf
 function periodoInfo(n){ return PERIODOS[n] || PERIODOS[1]; }
 const FATOR_R_MINIMO = 0.28;
 const LIMITE_SIMPLES = 4800000;
-const NOMES = {simples:'Simples Nacional', hibrido:'Simples híbrido (ICMS fora do DAS)', presumido:'Lucro Presumido', real:'Lucro Real', ret:'RET (incorporação)'};
+const NOMES = {simples:'Simples Nacional', presumido:'Lucro Presumido', real:'Lucro Real', ret:'RET (incorporação)'};
 // Regras por atividade: tabela do Simples (null = vedado), ISS e presunção de IRPJ/CSLL no Presumido
 const ATIVIDADES = {
   comercio:         {tabela:'comercio',  iss:false, pIR:0.08, pCS:0.12, anexo:'Anexo I'},
@@ -171,6 +171,17 @@ function calcRegimes(p){
   linhasC.push({nome:'Fornecedor no Lucro Presumido ou Real', curto:'Lucro Presumido ou Real', pago:R, credito: tomaCredito ? destacado : 0, liquido:R - (tomaCredito ? destacado : 0),
     nota:'IBS/CBS destacado pelo regime regular'});
   out.comprador = {linhas: linhasC, tomaCredito, destacado};
+  // Simples híbrido da reforma (2027): IBS/CBS fora do DAS, pelo regime regular, para qualquer optante
+  out.hibrido27 = null;
+  if (aliq !== null){
+    const idxH = SIMPLES[ativ].indexOf(faixa);
+    const fatiaH = (CBS_IBS_DAS[ativ] ? CBS_IBS_DAS[ativ][idxH] : 0) / 100;
+    const das = R * aliq;
+    const dasHib = das * (1 - fatiaH);
+    const creditoCompras = t27 > 0 ? comprasCred * t27 / (1 + t27) : 0;
+    const fora = Math.max(0, destacado - creditoCompras);
+    out.hibrido27 = {das, dasHib, debito: destacado, credito: creditoCompras, fora, total: dasHib + fora, dif: dasHib + fora - das, fatia: fatiaH};
+  }
   // Memória de cálculo mensal, linha a linha (Presumido e Real)
   const pctTxt = v => (v*100).toLocaleString('pt-BR', {maximumFractionDigits:2}) + '%';
   const brl = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
@@ -239,6 +250,7 @@ function calcRegimes(p){
     if (out[k] && out[k].elegivel){ out[k].imposto *= meses; out[k].liquido *= meses; }
   }
   for (const l of out.comprador.linhas){ l.pago *= meses; l.credito *= meses; l.liquido *= meses; }
+  if (out.hibrido27){ for (const k of ['das','dasHib','debito','credito','fora','total','dif']) out.hibrido27[k] *= meses; }
   return out;
 }
 function ranking(res){
@@ -469,7 +481,6 @@ function entradas(){
     margem: num('margem') / 100,
     compras: num('compras') / 100,
     icms: num('icms') / 100,
-    credHibrido: $('credhib').value === 'sim',
     iss: num('iss') / 100
   };
 }
@@ -494,7 +505,7 @@ function renderMemoria(res){
     const linhas = m.linhas.map(l => `<tr><td>${l.t}</td><td>${val(l.base)}</td><td>${l.aliq || '—'}</td><td>${val(l.valor)}</td><td class="nota">${l.nota || ''}</td></tr>`).join('');
     return `<h3>${nome} (mensal)</h3><div class="tablewrap"><table><thead><tr><th>Tributo</th><th>Base</th><th>Alíquota</th><th>Valor</th><th>Como foi calculado</th></tr></thead><tbody>${linhas}<tr class="total"><td>Total</td><td></td><td></td><td>${fmtBRL.format(m.total)}</td><td></td></tr></tbody></table></div>`;
   };
-  box.innerHTML = bloco('Simples Nacional', 'simples') + bloco('Simples híbrido (ICMS fora do DAS)', 'hibrido') + bloco('Lucro Presumido', 'presumido') + bloco('Lucro Real', 'real') + bloco('RET (incorporação)', 'ret');
+  box.innerHTML = bloco('Simples Nacional', 'simples') + bloco('Lucro Presumido', 'presumido') + bloco('Lucro Real', 'real') + bloco('RET (incorporação)', 'ret');
 }
 function renderRegimes(){
   const p = entradas();
@@ -515,7 +526,7 @@ function renderRegimes(){
     banner.className = 'banner';
     banner.innerHTML = `<span>Melhor regime para este faturamento</span><strong>${NOMES[rank[0]]}</strong><span>${txt}</span>`;
   }
-  $('tbl-regimes').innerHTML = ['simples','hibrido','presumido','real','ret'].filter(k => k !== 'ret' || res.ret.elegivel).map(k => {
+  $('tbl-regimes').innerHTML = ['simples','presumido','real','ret'].filter(k => k !== 'ret' || res.ret.elegivel).map(k => {
     const r = res[k];
     if (!r.elegivel) return `<tr><td>${NOMES[k]}</td><td class="na" colspan="3">Não se aplica: ${r.motivo}</td></tr>`;
     if (p.receita === 0) return `<tr><td>${NOMES[k]}</td><td data-label="Impostos">—</td><td data-label="Alíquota efetiva">—</td><td data-label="Sobra após impostos">—</td></tr>`;
@@ -547,6 +558,23 @@ function renderComprador(){
   const c = res.comprador;
   const corpo = $('tbl-comprador');
   const resumo = $('comprador-resumo');
+  const h = res.hibrido27;
+  const tbH = $('tbl-hibrido27');
+  const rsH = $('hibrido27-resumo');
+  const suf = periodoInfo(p.periodo).sufixo;
+  if (!h){
+    tbH.innerHTML = '<tr><td class="na" colspan="4">Esta atividade não pode optar pelo Simples; o híbrido não se aplica.</td></tr>';
+    rsH.textContent = '';
+  } else if (p.receita === 0){
+    tbH.innerHTML = '<tr><td>Simples (IBS/CBS no DAS)</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Simples híbrido (IBS/CBS fora do DAS)</td><td>—</td><td>—</td><td>—</td></tr>';
+    rsH.textContent = '';
+  } else {
+    tbH.innerHTML = `<tr><td>Simples (IBS/CBS no DAS)</td><td>${fmtBRL.format(h.das)}</td><td>—</td><td>${fmtBRL.format(h.das)}</td></tr>`
+      + `<tr><td>Simples híbrido (IBS/CBS fora do DAS)<div class="hint">IBS/CBS: débito ${fmtBRL.format(h.debito)} − crédito das compras ${fmtBRL.format(h.credito)}</div></td><td>${fmtBRL.format(h.dasHib)}</td><td>${fmtBRL.format(h.fora)}</td><td>${fmtBRL.format(h.total)}</td></tr>`;
+    const ganho = c.linhas.length > 1 ? c.linhas[1].credito - c.linhas[0].credito : 0;
+    rsH.textContent = 'No híbrido, seu cliente paga ' + fmtBRL.format(Math.abs(h.dif)) + ' ' + suf + (h.dif >= 0 ? ' a mais' : ' a menos') + ' de imposto. '
+      + (c.tomaCredito ? 'Em troca, ' + NOMES_COMPRADOR[p.comprador] + ' toma ' + fmtBRL.format(ganho) + ' ' + suf + ' a mais de crédito.' : 'O comprador escolhido não toma crédito, então o híbrido não traz vantagem para ele.');
+  }
   if (p.receita === 0){
     corpo.innerHTML = c.linhas.map(l => `<tr><td>${l.nome}</td><td>—</td><td>—</td><td>—</td></tr>`).join('');
     resumo.textContent = 'Informe o faturamento para ver o custo do comprador.';
@@ -578,7 +606,7 @@ function atualizarFatorR(){
 }
 function atualizar(){ atualizarFatorR(); renderRegimes(); renderFaixas(); renderComprador(); }
 ['receita','folha','margem','compras','icms','iss','cbs27','ibs27'].forEach(id => $(id).addEventListener('input', atualizar));
-['atividade','credhib','fatorr','semcompras','periodo','comprador'].forEach(id => $(id).addEventListener('change', atualizar));
+['atividade','fatorr','semcompras','periodo','comprador'].forEach(id => $(id).addEventListener('change', atualizar));
 
 /* ===== PDF ===== */
 function gerarPdfCore(p, dados, h){
@@ -693,11 +721,10 @@ function gerarPdfCore(p, dados, h){
     ['Compras com crédito', fmtPct(p.compras) + ' do faturamento'],
     ['ICMS (São Paulo)', fmtPct(p.icms)],
     ['ISS (Guarulhos)', fmtPct(p.iss)],
-    ['Crédito de ICMS no híbrido', p.credHibrido ? 'Sim' : 'Não'],
   ]);
 
   titulo('Resultado: ' + periodoInfo(p.periodo).nome);
-  const chaves = ['simples','hibrido','presumido','real'].concat(res.ret.elegivel ? ['ret'] : []);
+  const chaves = ['simples','presumido','real'].concat(res.ret.elegivel ? ['ret'] : []);
   const linhasR = chaves.map(k => {
     const r = res[k];
     if (!r.elegivel) return [NOMES[k], '—', '—', 'Não se aplica'];
@@ -725,13 +752,20 @@ function gerarPdfCore(p, dados, h){
   tabela(['Faturamento mensal','Melhor regime','Sobra no melhor'], linhasF,
          [CW*0.3, CW*0.4, CW*0.3], ['l','l','r'], FAIXAS.indexOf(p.receita));
 
-  titulo('Comprador e crédito de IBS/CBS (cenário 2027)');
+  titulo('Reforma 2027: Simples híbrido e crédito do comprador');
   texto('Comprador: ' + NOMES_COMPRADOR[p.comprador] + '. CBS ' + fmtPct(p.cbs27) + ' e IBS ' + fmtPct(p.ibs27) + '. Mesmo preço final cobrado em todos os casos.');
+  if (res.hibrido27){
+    const hh = res.hibrido27;
+    tabela(['Opção do cliente','DAS','IBS/CBS fora do DAS','Total'],
+           [['Simples (IBS/CBS no DAS)', fmtBRL.format(hh.das), '—', fmtBRL.format(hh.das)],
+            ['Simples híbrido', fmtBRL.format(hh.dasHib), fmtBRL.format(hh.fora), fmtBRL.format(hh.total)]],
+           [CW*0.40, CW*0.20, CW*0.20, CW*0.20], ['l','r','r','r'], -1);
+  }
   tabela(['Fornecedor','Valor pago','Crédito','Custo líquido'],
          res.comprador.linhas.map(l => [l.curto, fmtBRL.format(l.pago), fmtBRL.format(l.credito), fmtBRL.format(l.liquido)]),
          [CW*0.40, CW*0.20, CW*0.20, CW*0.20], ['l','r','r','r'], -1);
   titulo('Premissas e limites');
-  texto('Regras de 2026. Simples Nacional: tabela do Anexo I (comércio), II (indústria) ou III (serviços), pela faixa de faturamento dos últimos 12 meses. Simples híbrido: ICMS fora do DAS, com a partilha do Anexo I (34% nas faixas 1 e 2, 33,5% nas faixas 3 a 5, zero na faixa 6). Lucro Presumido e Lucro Real: IRPJ, CSLL, PIS, COFINS e ICMS. Simples híbrido aplicável a comércio e indústria, até R$ 4,8 milhões por ano.');
+  texto('Regras de 2026. Simples Nacional: tabela do anexo da atividade, pela faixa de faturamento dos últimos 12 meses; acima do sublimite de R$ 3,6 milhões, ICMS e ISS saem do DAS. Lucro Presumido e Lucro Real: IRPJ, CSLL, PIS, COFINS, ICMS e ISS. O Simples híbrido (IBS e CBS fora do DAS) só existe a partir de 2027, para qualquer optante, inclusive serviços (LC 214/2025, art. 41, § 3º), e aparece no bloco da reforma.');
   texto('Simplificações: o ICMS é calculado sobre o faturamento como se já estivesse no preço, e a base de PIS e COFINS desconta esse ICMS. Não considera substituição tributária, DIFAL, compensação de prejuízo fiscal, RAT, contribuições a terceiros nem regimes específicos de ICMS. Presunção: comércio e indústria, 8% para IRPJ e 12% para CSLL; serviços, 32% para ambos. Algumas atividades têm presunção diferente e não estão modeladas. PIS e COFINS no Lucro Real são uma apuração simplificada, com crédito sobre as compras informadas.');
   texto('Imobiliário, locação, holding e construção: locação de imóveis próprios, holding de participações e incorporação/loteamento não podem optar pelo Simples (LC 123). Construção usa o Anexo IV; no Presumido, empreitada total com materiais usa 8% (IRPJ) e 12% (CSLL), e os demais casos 32%. Locação e holding usam 32%; incorporação, 8% e 12%. RET de 4% só para incorporação com patrimônio de afetação. Dividendos recebidos pela holding não entram no cálculo. Desoneração da folha e regras cumulativas específicas de PIS/COFINS no Real não estão modeladas.');
   texto('Cenário 2027 (comprador): alíquota da CBS de 2027 ainda não definida (Senado até 15/12/2026); o valor usado é editável. Comprador PF ou no Simples recolhendo no DAS não toma crédito. Comprador do regime regular toma crédito integral do IBS/CBS destacado, ou só do IBS/CBS pago no DAS quando o fornecedor está no DAS (LC 214/2025, art. 47, § 9º). A fatia de IBS/CBS no DAS assume a fatia atual de PIS e COFINS de cada faixa.');
@@ -794,7 +828,6 @@ function limparConsulta(){
   $('semcompras').checked = false;
   $('periodo').value = '1';
   $('comprador').value = 'pf';
-  $('credhib').value = 'sim';
   atualizar();
 }
 $('btn-limpar').addEventListener('click', limparConsulta);

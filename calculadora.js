@@ -183,10 +183,10 @@ function calcRegimes(p){
     out.hibrido27 = {das, dasHib, debito: destacado, credito: creditoCompras, fora, total: dasHib + fora, dif: dasHib + fora - das, fatia: fatiaH};
     const pctH = v => (v*100).toLocaleString('pt-BR', {maximumFractionDigits:2}) + '%';
     var memoHib27 = {linhas: [
-      {t:'DAS do Simples (tudo no DAS)', base:R, aliq:pctH(aliq), valor:null, nota:'Referência: ' + das.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})},
+      {t:'DAS do Simples (tudo no DAS)', base:R, aliq:pctH(aliq), valor:null, nota:'Valor de referência, para comparar'},
       {t:'DAS sem a fatia de IBS/CBS', base:das, aliq:pctH(1 - fatiaH), valor:dasHib, nota:'DAS × (1 − fatia de IBS/CBS de ' + pctH(fatiaH) + ')'},
       {t:'IBS/CBS sobre as vendas (débito)', base:R, aliq:pctH(t27), valor:null, nota:'Imposto contido no preço: receita × alíquota ÷ (1 + alíquota)'},
-      {t:'IBS/CBS fora do DAS (débito − crédito)', base:destacado, aliq:'', valor:fora, nota:'Débito ' + destacado.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) + ' − crédito das compras ' + creditoCompras.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}
+      {t:'IBS/CBS fora do DAS (débito − crédito)', base:destacado, aliq:'', valor:fora, nota:'Débito sobre as vendas − crédito de IBS/CBS das compras'}
     ], total: dasHib + fora};
   }
   // Memória de cálculo mensal, linha a linha (Presumido e Real)
@@ -203,7 +203,7 @@ function calcRegimes(p){
     lin('COFINS', baseTrib, '3%', 0.03*baseTrib, 'Base = receita − ICMS destacado'),
   ];
   if (cfg.iss) linhasP.push(lin('ISS', R, pctTxt(p.iss), issR, 'Alíquota municipal × receita'));
-  if (isCom) linhasP.push(lin('ICMS a recolher', icmsDebito, pctTxt(icmsRate), icmsNormal, 'Débito ' + brl(icmsDebito) + ' − crédito ' + brl(icmsCredito)));
+  if (isCom) linhasP.push(lin('ICMS a recolher', icmsDebito, pctTxt(icmsRate), icmsNormal, 'Débito sobre as vendas − crédito sobre as compras'));
   linhasP.push(lin('CPP patronal 20%', p.folha || 0, '20%', cpp, 'Custo sobre a folha, fora do DAS'));
   const linhasR = [
     lin('Lucro antes dos impostos', antes, '', null, 'Entrada da tela'),
@@ -216,7 +216,7 @@ function calcRegimes(p){
   linhasR.push(lin('IRPJ (parcela de 15%)', Math.max(0, lucroTrib), '15%', lucroTrib > 0 ? 0.15*lucroTrib : 0, 'Sobre o lucro tributável positivo'));
   linhasR.push(lin('IRPJ adicional', Math.max(0, lucroTrib-20000), '10%', lucroTrib > 0 ? 0.10*Math.max(0, lucroTrib-20000) : 0, 'Acima de R$ 20.000 no mês'));
   linhasR.push(lin('CSLL', Math.max(0, lucroTrib), '9%', csllR, 'Sobre o lucro tributável positivo'));
-  if (isCom) linhasR.push(lin('ICMS a recolher', icmsDebito, pctTxt(icmsRate), icmsNormal, 'Débito ' + brl(icmsDebito) + ' − crédito ' + brl(icmsCredito)));
+  if (isCom) linhasR.push(lin('ICMS a recolher', icmsDebito, pctTxt(icmsRate), icmsNormal, 'Débito sobre as vendas − crédito sobre as compras'));
   // Memória de cálculo mensal: Simples Nacional e híbrido
   let memoS = null, memoH = null;
   if (aliq !== null){
@@ -227,7 +227,7 @@ function calcRegimes(p){
       lin('RBT12 × alíquota nominal', rbt12*faixa.aliq, pctTxt(faixa.aliq), null, 'Alíquota nominal da faixa sobre a receita de 12 meses'),
       lin('(−) Parcela a deduzir', faixa.ded, '', null, 'Valor fixo da faixa na tabela do anexo'),
       lin('(=) Imposto anual da faixa', rbt12*faixa.aliq - faixa.ded, '', null, '÷ RBT12 = alíquota efetiva de ' + pctTxt(aliq)),
-      lin('DAS do mês (alíquota efetiva)', R, pctTxt(aliq), R*aliq, 'Faturamento do mês × alíquota efetiva. Já inclui os tributos do DAS'),
+      lin('DAS (alíquota efetiva)', R, pctTxt(aliq), R*aliq, 'Faturamento do período × alíquota efetiva. Já inclui os tributos do DAS'),
     ];
     if (isCom && faixa.icms === 0) linhasS.push(lin('ICMS fora do DAS (6ª faixa)', icmsDebito, pctTxt(icmsRate), icmsF6, 'Débito − crédito, pelo regime normal de ICMS'));
     if (cppSm) linhasS.push(lin('CPP patronal 20% (Anexo IV)', p.folha || 0, '20%', cppSm, 'Paga pela folha, fora do DAS'));
@@ -258,6 +258,17 @@ function calcRegimes(p){
   }
   for (const l of out.comprador.linhas){ l.pago *= meses; l.credito *= meses; l.liquido *= meses; }
   if (out.hibrido27){ for (const k of ['das','dasHib','debito','credito','fora','total','dif']) out.hibrido27[k] *= meses; }
+  // Memória de cálculo no período escolhido (as linhas anuais da faixa do Simples não mudam)
+  const FIXOS = new Set(['Receita dos últimos 12 meses (RBT12)', 'RBT12 × alíquota nominal', '(−) Parcela a deduzir', '(=) Imposto anual da faixa']);
+  for (const m of Object.values(out.memoria)){
+    if (!m) continue;
+    for (const l of m.linhas){
+      if (FIXOS.has(l.t)) continue;
+      if (typeof l.base === 'number') l.base *= meses;
+      if (typeof l.valor === 'number') l.valor *= meses;
+    }
+    m.total *= meses;
+  }
   return out;
 }
 function ranking(res){
@@ -508,7 +519,9 @@ $('folha').addEventListener('input', () => {
 function faltaCompras(p){
   return (p.atividade === 'comercio' || p.atividade === 'industria') && p.receita > 0 && p.compras === 0 && !p.semCompras;
 }
-function renderMemoria(res){
+function renderMemoria(res, p){
+  const per = periodoInfo(p.periodo).nome.toLowerCase();
+  document.querySelector('.memo-calc > summary').textContent = 'Memória de cálculo (todos os regimes), ' + per;
   const box = $('memoria');
   const bloco = (nome, k) => {
     if (!res.memoria[k]) return '';
@@ -516,14 +529,14 @@ function renderMemoria(res){
     const m = res.memoria[k];
     const val = v => (v === null || v === undefined) ? '—' : fmtBRL.format(v);
     const linhas = m.linhas.map(l => `<tr><td>${l.t}</td><td>${val(l.base)}</td><td>${l.aliq || '—'}</td><td>${val(l.valor)}</td><td class="nota">${l.nota || ''}</td></tr>`).join('');
-    return `<h3>${nome} (mensal)</h3><div class="tablewrap"><table><thead><tr><th>Tributo</th><th>Base</th><th>Alíquota</th><th>Valor</th><th>Como foi calculado</th></tr></thead><tbody>${linhas}<tr class="total"><td>Total</td><td></td><td></td><td>${fmtBRL.format(m.total)}</td><td></td></tr></tbody></table></div>`;
+    return `<h3>${nome} (${per})</h3><div class="tablewrap"><table><thead><tr><th>Tributo</th><th>Base</th><th>Alíquota</th><th>Valor</th><th>Como foi calculado</th></tr></thead><tbody>${linhas}<tr class="total"><td>Total</td><td></td><td></td><td>${fmtBRL.format(m.total)}</td><td></td></tr></tbody></table></div>`;
   };
   box.innerHTML = bloco('Simples Nacional', 'simples') + bloco('Simples híbrido (a partir de 2027)', 'hibrido27') + bloco('Lucro Presumido', 'presumido') + bloco('Lucro Real', 'real') + bloco('RET (incorporação)', 'ret');
 }
 function renderRegimes(){
   const p = entradas();
   const res = calcRegimes(p);
-  renderMemoria(res);
+  renderMemoria(res, p);
   const rank = ranking(res);
   $('alerta-compras').hidden = !faltaCompras(p);
   const banner = $('banner');
@@ -791,6 +804,17 @@ function gerarPdfCore(p, dados, h){
   tabela(['Fornecedor','Valor pago','Crédito','Custo líquido'],
          res.comprador.linhas.map(l => [l.curto, fmtBRL.format(l.pago), fmtBRL.format(l.credito), fmtBRL.format(l.liquido)]),
          [CW*0.40, CW*0.20, CW*0.20, CW*0.20], ['l','r','r','r'], -1);
+  titulo('Memória de cálculo: ' + periodoInfo(p.periodo).nome);
+  const semMenos = t => String(t).replace(/\u2212/g, '-');
+  const valMemo = v => (v === null || v === undefined) ? '-' : fmtBRL.format(v);
+  [['Simples Nacional', 'simples'], ['Simples híbrido (a partir de 2027)', 'hibrido27'], ['Lucro Presumido', 'presumido'], ['Lucro Real', 'real'], ['RET (incorporação)', 'ret']].forEach(([nomeM, k]) => {
+    const m = res.memoria[k];
+    if (!m || (res[k] && res[k].elegivel === false)) return;
+    texto(nomeM, 10);
+    const linhasM = m.linhas.map(l => [semMenos(l.t), valMemo(l.base), semMenos(l.aliq || '-'), valMemo(l.valor)]);
+    linhasM.push(['Total', '', '', fmtBRL.format(m.total)]);
+    tabela(['Tributo', 'Base', 'Alíquota', 'Valor'], linhasM, [CW*0.46, CW*0.2, CW*0.14, CW*0.2], ['l','r','r','r'], linhasM.length - 1);
+  });
   titulo('Premissas e limites');
   texto('Regras de 2026. Simples Nacional: tabela do anexo da atividade, pela faixa de faturamento dos últimos 12 meses; acima do sublimite de R$ 3,6 milhões, ICMS e ISS saem do DAS. Lucro Presumido e Lucro Real: IRPJ, CSLL, PIS, COFINS, ICMS e ISS. O Simples híbrido (IBS e CBS fora do DAS) só existe a partir de 2027, para qualquer optante, inclusive serviços (LC 214/2025, art. 41, § 3º), e aparece no bloco da reforma.');
   texto('Simplificações: o ICMS é calculado sobre o faturamento como se já estivesse no preço, e a base de PIS e COFINS desconta esse ICMS. Não considera substituição tributária, DIFAL, compensação de prejuízo fiscal, RAT, contribuições a terceiros nem regimes específicos de ICMS. Presunção: comércio e indústria, 8% para IRPJ e 12% para CSLL; serviços, 32% para ambos. Algumas atividades têm presunção diferente e não estão modeladas. PIS e COFINS no Lucro Real são uma apuração simplificada, com crédito sobre as compras informadas.');

@@ -416,6 +416,14 @@ function classificarCnae(d){
   }
   return {desc, atividade, fatorR: !!fr, vedado: false, anexos, aviso};
 }
+var enquadramentoTravado = false;
+function travarEnquadramento(travar){
+  enquadramentoTravado = travar;
+  $('atividade').disabled = travar;
+  $('linha-trava').hidden = !travar;
+  atualizarFatorR();
+}
+$('btn-destravar').addEventListener('click', () => { travarEnquadramento(false); $('atividade').focus(); });
 function mostrarAtividade(texto){
   const caixa = $('caixa-atividade');
   caixa.hidden = !texto;
@@ -424,10 +432,11 @@ function mostrarAtividade(texto){
 function aplicarCnae(descApi){
   const d = ($('cnae').value || '').replace(/\D/g, '');
   const info = $('cnae-info');
-  if (d.length === 0){ mostrarAtividade(''); info.className = 'status'; info.textContent = 'Define a atividade e o Fator R automaticamente.'; return; }
-  if (d.length < 7){ mostrarAtividade(''); info.className = 'status'; info.textContent = 'Faltam ' + (7 - d.length) + ' dígitos.'; return; }
+  if (d.length === 0){ travarEnquadramento(false); mostrarAtividade(''); info.className = 'status'; info.textContent = 'Define a atividade e o Fator R automaticamente.'; return; }
+  if (d.length < 7){ travarEnquadramento(false); mostrarAtividade(''); info.className = 'status'; info.textContent = 'Faltam ' + (7 - d.length) + ' dígitos.'; return; }
   const c = classificarCnae(d);
   if (!c){
+    travarEnquadramento(false);
     mostrarAtividade(descApi || '');
     info.className = 'status bad';
     info.textContent = 'CNAE fora da tabela. Pode ser atividade vedada no Simples; escolha o enquadramento manualmente.';
@@ -435,6 +444,7 @@ function aplicarCnae(descApi){
   }
   $('atividade').value = c.atividade;
   $('fatorr').checked = c.fatorR;
+  travarEnquadramento(true);
   mostrarAtividade(c.desc);
   const destino = c.vedado ? 'Não pode optar pelo Simples.' : (c.fatorR ? 'Sujeito ao Fator R: Anexo III ou V, conforme a folha.' : 'Anexo ' + c.anexos + '.');
   info.className = 'status ok';
@@ -558,7 +568,7 @@ function atualizarFatorR(){
   const at = $('atividade').value;
   const anexoV = at === 'servicos5';
   $('linha-fatorr').hidden = !anexoV;
-  $('fatorr').disabled = !anexoV;
+  $('fatorr').disabled = !anexoV || (typeof enquadramentoTravado !== 'undefined' && enquadramentoTravado);
   if (!anexoV) $('fatorr').checked = false;
   // Mostra só os campos que valem para a atividade
   const com = at === 'comercio' || at === 'industria';

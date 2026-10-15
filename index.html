@@ -293,6 +293,20 @@ body::after{
 
 /* Resultado um pouco mais à direita: mais espaço entre as colunas, mesma largura do quadro */
 @media (min-width:820px){ .wrap{max-width:1064px} .grid{column-gap:40px} }
+
+/* Enquadramento travado pelo CNAE */
+select:disabled{opacity:1;background:#EEF1F7;color:var(--ink);cursor:not-allowed}
+.link-mini{border:0;background:none;padding:0;margin-left:4px;font:inherit;font-weight:600;color:var(--accent);text-decoration:underline;cursor:pointer}
+/* Sufixo de porcentagem dentro do campo */
+.campo-pct{position:relative}
+.campo-pct input{padding-right:34px}
+.campo-pct.longo input{padding-right:138px}
+.campo-pct .sufixo{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;font-weight:600;pointer-events:none}
+.campo-pct input[type=number]{-moz-appearance:textfield;appearance:textfield}
+.campo-pct input::-webkit-outer-spin-button,.campo-pct input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+/* Seções do final em bloco próprio: o resultado não passa por cima delas */
+.extras{display:grid;gap:16px;margin-top:16px}
+.extras .card{margin:0}
 </style>
 </head>
 <body>
@@ -348,13 +362,14 @@ body::after{
         <option value="holding">Holding de participações: receitas de administração</option>
         <option value="incorporacao">Imobiliário: incorporação e loteamento</option>
       </select>
+      <p class="hint" id="linha-trava" hidden>Preenchido pelo CNAE. <button type="button" id="btn-destravar" class="link-mini">Alterar manualmente</button></p>
       <p class="hint" id="linha-fatorr" hidden><label for="fatorr" style="display:inline;margin:0"><input id="fatorr" type="checkbox" disabled style="width:auto"> Atividade da lista do Fator R</label></p>
 
       <label for="receita">Faturamento mensal</label>
       <input id="receita" type="text" inputmode="numeric" autocomplete="off" value="R$ 0,00">
 
-      <label for="margem">Lucro antes dos impostos (%)</label>
-      <input id="margem" type="number" min="0" max="100" step="0.5" value="0">
+      <label for="margem">Lucro antes dos impostos</label>
+      <div class="campo-pct longo"><input id="margem" type="number" min="0" max="100" step="0.5" value="0"><span class="sufixo" aria-hidden="true">% do faturamento</span></div>
       <p class="hint">O que sobra após todos os custos, antes dos impostos. Ex.: fatura R$ 20.000 e gasta R$ 16.000 = 20%.</p>
 
       <label for="folha">Folha de pagamento mensal</label>
@@ -362,13 +377,13 @@ body::after{
       <p class="hint">Salários, pró-labore e encargos.</p>
 
       <h2 class="passo">3. Compras e impostos</h2>
-      <label for="compras">Compras com crédito (% do faturamento)</label>
-      <input id="compras" type="number" min="0" max="100" step="1" value="0">
+      <label for="compras">Compras com crédito</label>
+      <div class="campo-pct longo"><input id="compras" type="number" min="0" max="100" step="1" value="0"><span class="sufixo" aria-hidden="true">% do faturamento</span></div>
       <p class="hint so-com"><label for="semcompras" style="display:inline;margin:0"><input id="semcompras" type="checkbox" style="width:auto"> Não há compras com crédito</label></p>
 
       <div class="so-com">
-        <label for="icms">ICMS de SP (%)</label>
-        <input id="icms" type="number" min="0" max="30" step="0.5" value="0">
+        <label for="icms">ICMS de SP</label>
+        <div class="campo-pct"><input id="icms" type="number" min="0" max="30" step="0.5" value="0"><span class="sufixo" aria-hidden="true">%</span></div>
         <p class="hint">18% em geral; 7% ou 12% para alguns alimentos.</p>
         <label for="credhib">Crédito de ICMS no híbrido</label>
         <select id="credhib">
@@ -378,8 +393,8 @@ body::after{
       </div>
 
       <div class="so-iss">
-        <label for="iss">ISS de Guarulhos (%)</label>
-        <input id="iss" type="number" min="0" max="5" step="0.1" value="0">
+        <label for="iss">ISS de Guarulhos</label>
+        <div class="campo-pct"><input id="iss" type="number" min="0" max="5" step="0.1" value="0"><span class="sufixo" aria-hidden="true">%</span></div>
         <p class="hint">Entre 2% e 5%; a maioria dos serviços paga 5%.</p>
       </div>
     </section>
@@ -411,6 +426,9 @@ body::after{
       <p class="hint" id="aviso-contador">Estimativa para apoio à decisão. Revise com o contador antes de usar com o cliente.</p>
     </section>
 
+
+  </div>
+  <div class="extras">
     <section class="card full" aria-labelledby="h-comp" aria-live="polite">
       <details class="secao">
         <summary><h2 id="h-comp">Comprador e crédito de IBS/CBS (cenário 2027)</h2></summary>
@@ -424,12 +442,12 @@ body::after{
       </select>
       <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div>
-          <label for="cbs27">CBS 2027 (%)</label>
-          <input id="cbs27" type="number" min="0" max="30" step="0.01" value="9.11">
+          <label for="cbs27">CBS 2027</label>
+          <div class="campo-pct"><input id="cbs27" type="number" min="0" max="30" step="0.01" value="9.11"><span class="sufixo" aria-hidden="true">%</span></div>
         </div>
         <div>
-          <label for="ibs27">IBS 2027 (%)</label>
-          <input id="ibs27" type="number" min="0" max="30" step="0.01" value="0.1">
+          <label for="ibs27">IBS 2027</label>
+          <div class="campo-pct"><input id="ibs27" type="number" min="0" max="30" step="0.01" value="0.1"><span class="sufixo" aria-hidden="true">%</span></div>
         </div>
       </div>
       <p class="hint">CBS de 2027 ainda não fixada (Senado até 15/12/2026); 9,11% é estimativa. Mesmo preço final em todos os casos.</p>

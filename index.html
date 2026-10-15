@@ -290,6 +290,9 @@ body::after{
 .caixa-atividade{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-left:3px solid var(--accent);background:#F6F8FD;border-radius:4px}
 .caixa-atividade .rotulo{display:block;font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
 .caixa-atividade p{margin:0;font-size:14px;line-height:1.35;color:var(--ink)}
+
+/* Resultado um pouco mais à direita: mais espaço entre as colunas, mesma largura do quadro */
+@media (min-width:820px){ .wrap{max-width:1064px} .grid{column-gap:40px} }
 </style>
 </head>
 <body>

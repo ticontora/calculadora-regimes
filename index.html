@@ -286,6 +286,10 @@ body::after{
     linear-gradient(rgba(14,19,32,.045) 1px, transparent 1px),
     linear-gradient(90deg, rgba(14,19,32,.045) 1px, transparent 1px);
 }
+
+.caixa-atividade{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-left:3px solid var(--accent);background:#F6F8FD;border-radius:4px}
+.caixa-atividade .rotulo{display:block;font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.caixa-atividade p{margin:0;font-size:14px;line-height:1.35;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -322,9 +326,13 @@ body::after{
       <label for="cnae">CNAE principal <span class="opc">opcional</span></label>
       <input id="cnae" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="0000-0/00">
       <p class="status" id="cnae-info">Define a atividade e o Fator R automaticamente.</p>
+      <div id="caixa-atividade" class="caixa-atividade" hidden>
+        <span class="rotulo">Atividade</span>
+        <p id="cnae-atividade"></p>
+      </div>
 
       <h2 class="passo">2. Atividade e faturamento</h2>
-      <label for="atividade">Atividade</label>
+      <label for="atividade">Enquadramento para o cálculo</label>
       <select id="atividade">
         <option value="comercio" selected>Comércio (venda de produtos)</option>
         <option value="industria">Indústria (fabricação)</option>

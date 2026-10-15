@@ -313,6 +313,7 @@ async function consultarPublica(d){
   return {
     razao: j.razao_social || '',
     cnae: (j.estabelecimento && j.estabelecimento.atividade_principal && j.estabelecimento.atividade_principal.id) || '',
+    cnaeDesc: (j.estabelecimento && j.estabelecimento.atividade_principal && j.estabelecimento.atividade_principal.descricao) || '',
     situacao: (j.estabelecimento && j.estabelecimento.situacao_cadastral) || 'Não informada'
   };
 }
@@ -323,6 +324,7 @@ async function consultarBrasilApi(d){
   return {
     razao: j.razao_social || '',
     cnae: j.cnae_fiscal ? String(j.cnae_fiscal).padStart(7, '0') : '',
+    cnaeDesc: j.cnae_fiscal_descricao || '',
     situacao: j.descricao_situacao_cadastral ? j.descricao_situacao_cadastral.charAt(0) + j.descricao_situacao_cadastral.slice(1).toLowerCase() : 'Não informada'
   };
 }
@@ -371,7 +373,7 @@ async function buscarEmpresa(d){
     sit.className = 'situacao' + (s === 'ATIVA' ? '' : (s === 'SUSPENSA' ? ' warn' : ' bad'));
     $('cnpj-msg').className = 'status ok';
     $('cnpj-msg').textContent = 'Empresa encontrada.';
-    if (e.cnae){ $('cnae').value = mascaraCnae(e.cnae); aplicarCnae(); }
+    if (e.cnae){ $('cnae').value = mascaraCnae(e.cnae); aplicarCnae(e.cnaeDesc); }
   } catch (err){
     if (digitosCnpj() !== d) return;
     ultimoCnpj = '';
@@ -414,18 +416,29 @@ function classificarCnae(d){
   }
   return {desc, atividade, fatorR: !!fr, vedado: false, anexos, aviso};
 }
-function aplicarCnae(){
+function mostrarAtividade(texto){
+  const caixa = $('caixa-atividade');
+  caixa.hidden = !texto;
+  $('cnae-atividade').textContent = texto || '';
+}
+function aplicarCnae(descApi){
   const d = ($('cnae').value || '').replace(/\D/g, '');
   const info = $('cnae-info');
-  if (d.length === 0){ info.className = 'status'; info.textContent = 'Define a atividade e o Fator R automaticamente.'; return; }
-  if (d.length < 7){ info.className = 'status'; info.textContent = 'Faltam ' + (7 - d.length) + ' dígitos.'; return; }
+  if (d.length === 0){ mostrarAtividade(''); info.className = 'status'; info.textContent = 'Define a atividade e o Fator R automaticamente.'; return; }
+  if (d.length < 7){ mostrarAtividade(''); info.className = 'status'; info.textContent = 'Faltam ' + (7 - d.length) + ' dígitos.'; return; }
   const c = classificarCnae(d);
-  if (!c){ info.className = 'status bad'; info.textContent = 'CNAE fora da tabela. Pode ser atividade vedada no Simples; escolha a atividade manualmente.'; return; }
+  if (!c){
+    mostrarAtividade(descApi || '');
+    info.className = 'status bad';
+    info.textContent = 'CNAE fora da tabela. Pode ser atividade vedada no Simples; escolha o enquadramento manualmente.';
+    return;
+  }
   $('atividade').value = c.atividade;
   $('fatorr').checked = c.fatorR;
-  const destino = c.vedado ? 'não pode optar pelo Simples' : (c.fatorR ? 'sujeito ao Fator R (Anexo III ou V, conforme a folha)' : 'Anexo ' + c.anexos);
+  mostrarAtividade(c.desc);
+  const destino = c.vedado ? 'Não pode optar pelo Simples.' : (c.fatorR ? 'Sujeito ao Fator R: Anexo III ou V, conforme a folha.' : 'Anexo ' + c.anexos + '.');
   info.className = 'status ok';
-  info.textContent = c.desc + ': ' + destino + '.' + (c.aviso ? ' ' + c.aviso : '');
+  info.textContent = destino + (c.aviso ? ' ' + c.aviso : '');
   atualizar();
 }
 $('cnae').addEventListener('input', () => { $('cnae').value = mascaraCnae($('cnae').value); aplicarCnae(); });

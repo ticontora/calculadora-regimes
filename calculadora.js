@@ -438,11 +438,16 @@ function classificarCnae(d){
 var enquadramentoTravado = false;
 function travarEnquadramento(travar){
   enquadramentoTravado = travar;
-  $('atividade').disabled = travar;
+  const sel = $('atividade');
+  sel.setAttribute('aria-disabled', travar ? 'true' : 'false');
+  sel.classList.toggle('travado', travar);
   $('linha-trava').hidden = !travar;
   atualizarFatorR();
 }
 $('btn-destravar').addEventListener('click', () => { travarEnquadramento(false); $('atividade').focus(); });
+// Travado: o campo segue focável e legível, mas não muda de valor
+$('atividade').addEventListener('mousedown', e => { if (enquadramentoTravado) e.preventDefault(); });
+$('atividade').addEventListener('keydown', e => { if (enquadramentoTravado && e.key !== 'Tab' && e.key !== 'Shift') e.preventDefault(); });
 function mostrarAtividade(texto){
   const caixa = $('caixa-atividade');
   caixa.hidden = !texto;

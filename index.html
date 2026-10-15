@@ -313,6 +313,17 @@ h3.sub{font-size:13px;font-weight:700;margin:20px 0 4px;color:var(--ink)}
 .tag.tag-2027{background:var(--accent)}
 #tbl-regimes tr.futuro td{color:#3B4A63;background:#F5F7FD}
 #tbl-regimes tr.futuro .hint{margin:2px 0 0;font-size:11.5px}
+
+/* ===== Acessibilidade (WCAG 2.1 AA) ===== */
+:root{--ok:#157148}
+input,select{border-color:#7D8A9C}
+::placeholder{color:#6B7280;opacity:1}
+select.travado{background:#EEF1F7;cursor:not-allowed}
+p.hint > label{display:inline-flex !important;align-items:center;gap:8px;min-height:28px}
+input[type=checkbox]{width:20px;height:20px;flex:0 0 auto}
+.link-mini{display:inline-block;padding:4px 2px;min-height:24px}
+details > summary{padding:10px 0}
+details.secao > summary{padding:6px 0}
 </style>
 </head>
 <body>
@@ -331,7 +342,7 @@ h3.sub{font-size:13px;font-weight:700;margin:20px 0 4px;color:var(--ink)}
   <div class="rodape-intro">By Italo Govêa</div>
 </section>
 <div id="app" hidden>
-<div class="wrap">
+<main class="wrap">
   <div class="cabecalho"><span class="marca" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#0E1320"/><rect x="12" y="32" width="10" height="20" rx="3" fill="#9AAEFF"/><rect x="27" y="18" width="10" height="34" rx="3" fill="#B5F5D4"/><rect x="42" y="26" width="10" height="26" rx="3" fill="#9AAEFF"/></svg></span><div><h1>Calculadora de Regimes Tributários</h1>
   <p class="sub">Informe o CNPJ e o faturamento. Veja qual regime deixa mais sobra e gere o PDF para o cliente.</p></div></div>
 
@@ -339,16 +350,16 @@ h3.sub{font-size:13px;font-weight:700;margin:20px 0 4px;color:var(--ink)}
     <section class="card" aria-labelledby="h-in">
       <h2 id="h-in">1. Empresa</h2>
       <label for="cnpj">CNPJ</label>
-      <input id="cnpj" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="00.000.000/0000-00">
-      <p class="status" id="cnpj-msg">Digite os 14 números do CNPJ.</p>
+      <input id="cnpj" aria-describedby="cnpj-msg" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="00.000.000/0000-00">
+      <p class="status" id="cnpj-msg" role="status">Digite os 14 números do CNPJ.</p>
 
       <label for="nome">Razão social</label>
       <input id="nome" type="text" autocomplete="off" placeholder="Preenchida ao consultar o CNPJ">
       <span class="situacao" id="situacao" hidden></span>
 
       <label for="cnae">CNAE principal <span class="opc">opcional</span></label>
-      <input id="cnae" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="0000-0/00">
-      <p class="status" id="cnae-info">Define a atividade e o Fator R automaticamente.</p>
+      <input id="cnae" aria-describedby="cnae-info" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="0000-0/00">
+      <p class="status" id="cnae-info" role="status">Define a atividade e o Fator R automaticamente.</p>
       <div id="caixa-atividade" class="caixa-atividade" hidden>
         <span class="rotulo">Atividade</span>
         <p id="cnae-atividade"></p>
@@ -356,7 +367,7 @@ h3.sub{font-size:13px;font-weight:700;margin:20px 0 4px;color:var(--ink)}
 
       <h2 class="passo">2. Atividade e faturamento</h2>
       <label for="atividade">Enquadramento para o cálculo</label>
-      <select id="atividade">
+      <select id="atividade" aria-describedby="linha-trava">
         <option value="comercio" selected>Comércio (venda de produtos)</option>
         <option value="industria">Indústria (fabricação)</option>
         <option value="servicos">Serviços (Anexo III)</option>
@@ -400,7 +411,7 @@ h3.sub{font-size:13px;font-weight:700;margin:20px 0 4px;color:var(--ink)}
       </div>
     </section>
 
-    <section class="card" aria-labelledby="h-out" aria-live="polite">
+    <section class="card" aria-labelledby="h-out">
       <div class="cab-res">
         <h2 id="h-out">Resultado</h2>
         <select id="periodo" aria-label="Período do resultado">
@@ -410,26 +421,26 @@ h3.sub{font-size:13px;font-weight:700;margin:20px 0 4px;color:var(--ink)}
           <option value="12">Anual</option>
         </select>
       </div>
-      <div class="banner" id="banner"></div>
+      <div class="banner" id="banner" aria-live="polite" aria-atomic="true"></div>
       <div class="tablewrap">
         <table>
           <thead><tr><th>Regime</th><th>Impostos</th><th>Alíquota efetiva</th><th>Sobra após impostos</th></tr></thead>
           <tbody id="tbl-regimes"></tbody>
         </table>
       </div>
-      <p class="status bad" id="alerta-compras" hidden>Em comércio e indústria, informe as compras com crédito ou marque que não há. Sem elas, Presumido e Real ficam subestimados e o PDF não é gerado.</p>
+      <p class="status bad" id="alerta-compras" role="alert" hidden>Em comércio e indústria, informe as compras com crédito ou marque que não há. Sem elas, Presumido e Real ficam subestimados e o PDF não é gerado.</p>
       <details class="memo-calc">
         <summary>Memória de cálculo (todos os regimes), mensal</summary>
         <div id="memoria"></div>
       </details>
       <div class="acoes"><button id="btn-pdf" class="btn" type="button">Baixar análise em PDF</button><button id="btn-limpar" class="btn-secundario" type="button">Limpar Consulta</button></div>
-      <p class="status" id="pdf-msg"></p>
+      <p class="status" id="pdf-msg" role="status"></p>
     </section>
 
 
   </div>
   <div class="extras">
-    <section class="card full" aria-labelledby="h-comp" aria-live="polite">
+    <section class="card full" aria-labelledby="h-comp">
       <details class="secao">
         <summary><h2 id="h-comp">Reforma 2027: Simples híbrido e crédito do comprador</h2></summary>
       <label for="comprador">Quem compra do seu cliente</label>
@@ -503,12 +514,12 @@ h3.sub{font-size:13px;font-weight:700;margin:20px 0 4px;color:var(--ink)}
       </details>
     </section>
   </div>
-</div>
-<footer class="rodape-app">By Italo Govêa · versão 2026-10-15.1</footer>
+</main>
+<footer class="rodape-app">By Italo Govêa · versão 2026-10-15.2</footer>
 </div>
 <script src="lib/jspdf.umd.min.js"></script>
-<script src="cnae.js?v=2026-10-15.1"></script>
-<script src="calculadora.js?v=2026-10-15.1"></script>
+<script src="cnae.js?v=2026-10-15.2"></script>
+<script src="calculadora.js?v=2026-10-15.2"></script>
 <script>
 (function(){
   var intro = document.getElementById('intro');
@@ -519,6 +530,7 @@ h3.sub{font-size:13px;font-weight:700;margin:20px 0 4px;color:var(--ink)}
       intro.hidden = true;
       app.hidden = false;
       window.scrollTo(0, 0);
+      var campo = document.getElementById('cnpj'); if (campo) campo.focus();
     }, 450);
   });
 })();

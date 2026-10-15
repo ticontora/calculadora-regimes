@@ -325,6 +325,23 @@ input[type=checkbox]{width:20px;height:20px;flex:0 0 auto}
 details > summary{padding:10px 0}
 details.secao > summary{padding:6px 0}
 </style>
+<script>
+/* Atualização automática: se houver versão nova publicada, recarrega sem precisar de Ctrl+F5 */
+(function(){
+  var VERSAO = '2026-10-15.4';
+  if (location.protocol.indexOf('http') !== 0 || !window.fetch) return;
+  fetch('version.json?t=' + Date.now(), {cache: 'no-store'})
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(j){
+      if (!j || !j.v || j.v === VERSAO) return;
+      var u = new URL(location.href);
+      if (u.searchParams.get('v') === j.v) return;
+      u.searchParams.set('v', j.v);
+      location.replace(u.toString());
+    })
+    .catch(function(){});
+})();
+</script>
 </head>
 <body>
 <section id="intro" class="intro" aria-labelledby="intro-title">
@@ -515,11 +532,11 @@ details.secao > summary{padding:6px 0}
     </section>
   </div>
 </main>
-<footer class="rodape-app">By Italo Govêa · versão 2026-10-15.3</footer>
+<footer class="rodape-app">By Italo Govêa · versão 2026-10-15.4</footer>
 </div>
 <script src="lib/jspdf.umd.min.js"></script>
-<script src="cnae.js?v=2026-10-15.3"></script>
-<script src="calculadora.js?v=2026-10-15.3"></script>
+<script src="cnae.js?v=2026-10-15.4"></script>
+<script src="calculadora.js?v=2026-10-15.4"></script>
 <script>
 (function(){
   var intro = document.getElementById('intro');

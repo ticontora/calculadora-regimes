@@ -32,7 +32,7 @@ Informe o CNPJ (a razão social preenche sozinha quando a consulta funciona), o 
 - Não considera MEI, substituição tributária, DIFAL, RAT, contribuições a terceiros, compensação de prejuízo nem regimes específicos de ICMS.
 
 ## Limitações
-- Os valores são estimativas e não substituem a apuração do contador. Revise com o contador antes de usar com o cliente.
+- Os valores são estimativas e não substituem a apuração do contador.
 - A consulta de CNPJ depende de um serviço externo, que pode ser bloqueado pelo navegador.
 
 ## Publicação

@@ -181,6 +181,13 @@ function calcRegimes(p){
     const creditoCompras = t27 > 0 ? comprasCred * t27 / (1 + t27) : 0;
     const fora = Math.max(0, destacado - creditoCompras);
     out.hibrido27 = {das, dasHib, debito: destacado, credito: creditoCompras, fora, total: dasHib + fora, dif: dasHib + fora - das, fatia: fatiaH};
+    const pctH = v => (v*100).toLocaleString('pt-BR', {maximumFractionDigits:2}) + '%';
+    var memoHib27 = {linhas: [
+      {t:'DAS do Simples (tudo no DAS)', base:R, aliq:pctH(aliq), valor:null, nota:'Referência: ' + das.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})},
+      {t:'DAS sem a fatia de IBS/CBS', base:das, aliq:pctH(1 - fatiaH), valor:dasHib, nota:'DAS × (1 − fatia de IBS/CBS de ' + pctH(fatiaH) + ')'},
+      {t:'IBS/CBS sobre as vendas (débito)', base:R, aliq:pctH(t27), valor:null, nota:'Imposto contido no preço: receita × alíquota ÷ (1 + alíquota)'},
+      {t:'IBS/CBS fora do DAS (débito − crédito)', base:destacado, aliq:'', valor:fora, nota:'Débito ' + destacado.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) + ' − crédito das compras ' + creditoCompras.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}
+    ], total: dasHib + fora};
   }
   // Memória de cálculo mensal, linha a linha (Presumido e Real)
   const pctTxt = v => (v*100).toLocaleString('pt-BR', {maximumFractionDigits:2}) + '%';
@@ -242,7 +249,7 @@ function calcRegimes(p){
     lin('COFINS (RET)', R, '1,71%', RET.cofins*R, 'Pagamento unificado sobre a receita recebida'),
     lin('CPP patronal 20%', p.folha || 0, '20%', cpp, 'Não faz parte do RET'),
   ], total: impRet} : null;
-  out.memoria = {simples: memoS, hibrido: memoH, presumido: {linhas: linhasP, total: impP}, real: {linhas: linhasR, total: impR}, ret: memoRet};
+  out.memoria = {simples: memoS, hibrido: memoH, presumido: {linhas: linhasP, total: impP}, real: {linhas: linhasR, total: impR}, ret: memoRet, hibrido27: (typeof memoHib27 !== 'undefined' ? memoHib27 : null)};
   out.anexo = anexo;
   // Escala impostos e sobra para o período (a alíquota efetiva continua mensal)
   const meses = p.periodo || 1;
@@ -499,13 +506,14 @@ function faltaCompras(p){
 function renderMemoria(res){
   const box = $('memoria');
   const bloco = (nome, k) => {
-    if (!res[k].elegivel) return '';
+    if (!res.memoria[k]) return '';
+    if (res[k] && res[k].elegivel === false) return '';
     const m = res.memoria[k];
     const val = v => (v === null || v === undefined) ? '—' : fmtBRL.format(v);
     const linhas = m.linhas.map(l => `<tr><td>${l.t}</td><td>${val(l.base)}</td><td>${l.aliq || '—'}</td><td>${val(l.valor)}</td><td class="nota">${l.nota || ''}</td></tr>`).join('');
     return `<h3>${nome} (mensal)</h3><div class="tablewrap"><table><thead><tr><th>Tributo</th><th>Base</th><th>Alíquota</th><th>Valor</th><th>Como foi calculado</th></tr></thead><tbody>${linhas}<tr class="total"><td>Total</td><td></td><td></td><td>${fmtBRL.format(m.total)}</td><td></td></tr></tbody></table></div>`;
   };
-  box.innerHTML = bloco('Simples Nacional', 'simples') + bloco('Lucro Presumido', 'presumido') + bloco('Lucro Real', 'real') + bloco('RET (incorporação)', 'ret');
+  box.innerHTML = bloco('Simples Nacional', 'simples') + bloco('Simples híbrido (a partir de 2027)', 'hibrido27') + bloco('Lucro Presumido', 'presumido') + bloco('Lucro Real', 'real') + bloco('RET (incorporação)', 'ret');
 }
 function renderRegimes(){
   const p = entradas();
@@ -536,7 +544,17 @@ function renderRegimes(){
       <td data-label="Impostos">${fmtBRL.format(r.imposto)}</td>
       <td data-label="Alíquota efetiva">${fmtPct(r.efetiva)}</td>
       <td data-label="Sobra após impostos">${fmtBRL.format(r.liquido)}</td></tr>`;
-  }).join('');
+  }).join('') + linhaHibrido27(res, p);
+}
+// Linha do Simples híbrido (2027) na tabela: informativa, fora da escolha do melhor regime de 2026
+function linhaHibrido27(res, p){
+  const h = res.hibrido27;
+  const nome = 'Simples híbrido <span class="tag tag-2027">2027</span><div class="hint">IBS/CBS fora do DAS, a partir de 2027</div>';
+  if (!h) return res.simples.elegivel ? '' : `<tr class="futuro"><td>${nome}</td><td class="na" colspan="3">Não se aplica: ${res.simples.motivo}</td></tr>`;
+  if (p.receita === 0) return `<tr class="futuro"><td>${nome}</td><td data-label="Impostos">—</td><td data-label="Alíquota efetiva">—</td><td data-label="Sobra após impostos">—</td></tr>`;
+  const meses = p.periodo || 1;
+  const antes = res.simples.liquido + res.simples.imposto;
+  return `<tr class="futuro"><td>${nome}</td><td data-label="Impostos">${fmtBRL.format(h.total)}</td><td data-label="Alíquota efetiva">${fmtPct(h.total / (p.receita * meses))}</td><td data-label="Sobra após impostos">${fmtBRL.format(antes - h.total)}</td></tr>`;
 }
 function renderFaixas(){
   const p = entradas();
@@ -613,8 +631,8 @@ function gerarPdfCore(p, dados, h){
   const {fmtBRL,fmtPct,calcRegimes,ranking,NOMES,FAIXAS,jsPDF} = h;
   const doc = new jsPDF({unit:'mm', format:'a4'});
   const W = 210, M = 16, CW = W - 2*M, TOP = 42, BOTTOM = 272;
-  const C = {acc:[31,93,74], ink:[28,28,26], mut:[106,105,98], line:[214,211,202],
-             zebra:[246,245,241], soft:[227,239,234], white:[255,255,255]};
+  const C = {acc:[20,33,71], ink:[22,27,40], mut:[96,106,124], line:[212,218,230],
+             zebra:[244,246,251], soft:[228,233,247], white:[255,255,255]};
   const dataHoje = new Date().toLocaleDateString('pt-BR');
   let y = TOP;
   function cabecalho(){
@@ -730,9 +748,13 @@ function gerarPdfCore(p, dados, h){
     if (!r.elegivel) return [NOMES[k], '—', '—', 'Não se aplica'];
     return [NOMES[k], fmtBRL.format(r.imposto), fmtPct(r.efetiva), fmtBRL.format(r.liquido)];
   });
+  if (res.hibrido27){
+    const hh = res.hibrido27, antesP = res.simples.liquido + res.simples.imposto;
+    linhasR.push(['Simples híbrido (a partir de 2027)', fmtBRL.format(hh.total), fmtPct(hh.total / (p.receita * (p.periodo || 1))), fmtBRL.format(antesP - hh.total)]);
+  }
+  const idxMelhor = rank.length ? linhasR.findIndex(l => l[0] === NOMES[rank[0]]) : -1;
   tabela(['Regime','Impostos','Alíquota efetiva','Sobra após impostos'], linhasR,
-         [CW*0.38, CW*0.2, CW*0.2, CW*0.22], ['l','r','r','r'],
-         rank.length ? chaves.indexOf(rank[0]) : -1);
+         [CW*0.38, CW*0.2, CW*0.2, CW*0.22], ['l','r','r','r'], idxMelhor);
 
   if (rank.length){
     const linhasBox = ['Melhor regime para este faturamento: ' + NOMES[rank[0]] + '.'];

@@ -225,3 +225,22 @@ th.melhor,td.melhor{background:var(--gold-soft)}
 @keyframes subir{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition:none !important}}
 [hidden]{display:none !important}
+/* Simples Híbrido antes de 2027 */
+td.futuro{color:var(--gold-ink);font-style:italic;text-align:right !important;white-space:normal}
+.reg.futuro{background:var(--gold-soft);border-style:dashed}
+.reg.futuro .btn-secundario{margin-top:10px}
+
+/* Escolha da calculadora */
+.escolha{padding-top:28px}
+.escolha > h2{font-size:22px;margin:0 0 16px}
+.escolha-cards{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-bottom:18px}
+.escolha-card{text-align:left;cursor:pointer;background:var(--card);border:1.5px solid var(--line2);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:8px;color:var(--ink);box-shadow:inset 0 4px 0 var(--gold)}
+.escolha-card b{font-size:19px}
+.escolha-card span{color:var(--mut);font-size:14.5px;line-height:1.45}
+.escolha-card:hover{border-color:var(--ink)}
+.escolha-card:focus-visible{outline:3px solid var(--foco);outline-offset:3px}
+.btn-topo{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:9px;padding:8px 14px;min-height:40px;cursor:pointer;font-weight:600;font-size:13.5px}
+.btn-topo:hover{border-color:var(--gold);color:#f3d77a}
+.btn-topo:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.sub3{font-size:15px;margin:20px 0 2px;color:var(--ink)}
+.tag-atual{background:var(--ink)}

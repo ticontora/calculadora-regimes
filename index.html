@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%2314213D%22/><rect x=%2212%22 y=%2232%22 width=%2210%22 height=%2220%22 rx=%223%22 fill=%22%23E9DDB8%22/><rect x=%2227%22 y=%2218%22 width=%2210%22 height=%2234%22 rx=%223%22 fill=%22%23C9A227%22/><rect x=%2242%22 y=%2226%22 width=%2210%22 height=%2226%22 rx=%223%22 fill=%22%23E9DDB8%22/></svg>">
 <title>Calculadora de Regimes Tributários</title>
-<link rel="stylesheet" href="estilo.css?v=2026-10-16.2">
+<link rel="stylesheet" href="estilo.css?v=2026-10-16.3">
 <script>
 /* Atualização automática: se houver versão nova publicada, recarrega sem precisar de Ctrl+F5 */
 (function(){
-  var VERSAO = '2026-10-16.2';
+  var VERSAO = '2026-10-16.3';
   if (location.protocol.indexOf('http') !== 0 || !window.fetch) return;
   fetch('version.json?t=' + Date.now(), {cache: 'no-store'})
     .then(function(r){ return r.ok ? r.json() : null; })
@@ -48,10 +48,29 @@
       <p class="sub">Simples, Presumido e Real, com a transição da reforma de 2026 a 2033.</p>
     </div>
     <p class="rascunho" id="rascunho" role="status" aria-live="polite"></p>
+    <button type="button" class="btn-topo" id="btn-trocar" hidden>Trocar calculadora</button>
   </div>
 </header>
 
-<main class="wrap">
+<section class="wrap escolha" id="escolha" aria-labelledby="t-escolha" hidden>
+  <h2 id="t-escolha">O que você quer calcular?</h2>
+  <div class="escolha-cards">
+    <button type="button" class="escolha-card" data-modo="regimes">
+      <b>Regimes da empresa</b>
+      <span>Simples, Simples Híbrido, Presumido e Real pelo faturamento, de 2026 a 2033, com o lucro levado aos sócios.</span>
+    </button>
+    <button type="button" class="escolha-card" data-modo="imob">
+      <b>Imobiliário</b>
+      <span>Venda ou locação de imóvel por pessoa física ou empresa: IR, CBS/IBS com redutores e comparação PF × PJ.</span>
+    </button>
+  </div>
+  <details class="card secao">
+    <summary><h2>Histórico neste navegador</h2></summary>
+    <ul class="historico" id="historico-escolha"></ul>
+  </details>
+</section>
+
+<main class="wrap" id="main-regimes" hidden>
   <nav class="stepper" aria-label="Etapas da simulação">
     <ol>
       <li><button type="button" class="passo" data-passo="1"><span class="num" aria-hidden="true">1</span><span class="rot">Empresa</span></button></li>
@@ -322,18 +341,230 @@
     </details>
   </section>
 </main>
-<footer class="rodape-app">By Italo Govêa · versão 2026-10-16.2</footer>
+
+<main class="wrap" id="main-imob" hidden>
+  <nav class="stepper" aria-label="Etapas da simulação imobiliária">
+    <ol>
+      <li><button type="button" class="passo passo-im" data-passo="1"><span class="num" aria-hidden="true">1</span><span class="rot">Operação</span></button></li>
+      <li><button type="button" class="passo passo-im" data-passo="2"><span class="num" aria-hidden="true">2</span><span class="rot">Proprietário</span></button></li>
+      <li><button type="button" class="passo passo-im" data-passo="3"><span class="num" aria-hidden="true">3</span><span class="rot">Valores</span></button></li>
+      <li><button type="button" class="passo passo-im" data-passo="4"><span class="num" aria-hidden="true">4</span><span class="rot">Transição</span></button></li>
+      <li><button type="button" class="passo passo-im" data-passo="5"><span class="num" aria-hidden="true">5</span><span class="rot">Resultado</span></button></li>
+    </ol>
+  </nav>
+
+  <form id="im-form" novalidate onsubmit="return false">
+  <section class="card etapa-im" data-etapa="1" aria-labelledby="im-t1">
+    <h2 id="im-t1">Operação</h2>
+    <fieldset class="cards-escolha">
+      <legend>O que vai acontecer com o imóvel</legend>
+      <label class="cartao"><input type="radio" name="im-operacao" value="venda" checked><span><b>Venda</b><small>Imposto sobre o ganho e CBS/IBS na alienação.</small></span></label>
+      <label class="cartao"><input type="radio" name="im-operacao" value="locacao"><span><b>Locação</b><small>Aluguel recebido: carnê-leão, empresa e CBS/IBS.</small></span></label>
+    </fieldset>
+    <p class="hint">Sob consulta nesta versão: cessão de direitos, permuta, incorporação e parcelamento do solo.</p>
+  </section>
+
+  <section class="card etapa-im" data-etapa="2" aria-labelledby="im-t2" hidden>
+    <h2 id="im-t2">Proprietário</h2>
+    <fieldset class="cards-escolha">
+      <legend>Quem é o dono hoje</legend>
+      <label class="cartao"><input type="radio" name="im-perfil" value="pf" checked><span><b>Pessoa física</b><small>O imóvel está no CPF.</small></span></label>
+      <label class="cartao"><input type="radio" name="im-perfil" value="pjPresumido"><span><b>Empresa no Presumido</b><small>Holding ou imobiliária.</small></span></label>
+      <label class="cartao"><input type="radio" name="im-perfil" value="pjReal"><span><b>Empresa no Lucro Real</b><small>Tributa o lucro efetivo.</small></span></label>
+      <label class="cartao im-so-venda"><input type="radio" name="im-perfil" value="pjSimples"><span><b>Empresa no Simples</b><small>Só para compra e venda; locação é vedada.</small></span></label>
+    </fieldset>
+    <p class="hint">O resultado compara todas as formas; esta escolha marca o seu cenário atual.</p>
+
+    <h3 class="sub3">A pessoa física paga CBS/IBS?</h3>
+    <p class="hint">A partir de 2027, a pessoa física só entra na CBS/IBS acima dos limites do art. 251 da LC 214/2025.</p>
+    <div class="grade2 im-so-venda">
+      <div><label for="im-vendasAnt">Imóveis vendidos no ano anterior</label><input id="im-vendasAnt" type="number" min="0" step="1" value="0" aria-describedby="im-dica-vendas"><p class="hint" id="im-dica-vendas">Só os que estavam no seu nome havia menos de 5 anos.</p></div>
+      <div><label for="im-constrAnt">Imóveis construídos por você e vendidos no ano anterior</label><input id="im-constrAnt" type="number" min="0" step="1" value="0"></div>
+      <div><label for="im-vendasAtual">Vendas neste ano, contando esta</label><input id="im-vendasAtual" type="number" min="0" step="1" value="1"></div>
+      <div><label for="im-constrAtual">Construídos por você e vendidos neste ano</label><input id="im-constrAtual" type="number" min="0" step="1" value="0"></div>
+    </div>
+    <div class="grade2 im-so-locacao">
+      <div><label for="im-locAnt">Aluguéis recebidos no ano anterior</label><div class="campo-moeda"><span aria-hidden="true">R$</span><input id="im-locAnt" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00"></div></div>
+      <div><label for="im-imoveisAnt">Imóveis alugados no ano anterior</label><input id="im-imoveisAnt" type="number" min="0" step="1" value="0"></div>
+    </div>
+
+    <h3 class="sub3">Se o imóvel estiver em uma empresa</h3>
+    <div class="grade3">
+      <div><label for="im-socios">Número de sócios</label><input id="im-socios" type="number" min="1" max="20" step="1" value="1"></div>
+      <div><label for="im-prolabore">Pró-labore por sócio, mensal</label><div class="campo-moeda"><span aria-hidden="true">R$</span><input id="im-prolabore" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00"></div></div>
+      <div><label for="im-outras">Outras rendas de cada sócio no ano</label><div class="campo-moeda"><span aria-hidden="true">R$</span><input id="im-outras" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00"></div></div>
+    </div>
+    <p class="hint"><label for="im-divsimples" class="check"><input id="im-divsimples" type="checkbox" checked> Aplicar a Lei 15.270 aos dividendos do Simples (posição da Receita)</label></p>
+  </section>
+
+  <section class="card etapa-im" data-etapa="3" aria-labelledby="im-t3" hidden>
+    <h2 id="im-t3">Valores</h2>
+    <div class="im-so-venda">
+      <div class="grade2">
+        <div><label for="im-valor">Valor de venda</label><div class="campo-moeda"><span aria-hidden="true">R$</span><input id="im-valor" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00"></div></div>
+        <div><label for="im-custo">Custo de aquisição</label><div class="campo-moeda"><span aria-hidden="true">R$</span><input id="im-custo" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00" aria-describedby="im-dica-custo"></div><p class="hint" id="im-dica-custo">Valor da declaração de IR, com benfeitorias. Digite 0 se não houver.</p></div>
+        <div><label for="im-aquisicao">Mês e ano da aquisição</label><input id="im-aquisicao" type="month" min="1900-01" max="2033-12" aria-describedby="im-aviso-aquisicao"><p class="aviso" id="im-aviso-aquisicao" hidden></p></div>
+        <div><label for="im-mes">Mês da venda</label><select id="im-mes"><option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option><option value="4">Abril</option><option value="5">Maio</option><option value="6" selected>Junho</option><option value="7">Julho</option><option value="8">Agosto</option><option value="9">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option></select><p class="hint">O ano é escolhido no resultado (2026 a 2033).</p></div>
+        <div><label for="im-tipo">Tipo de imóvel</label><select id="im-tipo"><option value="residencial_usado">Residencial usado</option><option value="residencial_novo">Residencial novo (nunca ocupado)</option><option value="lote">Lote residencial</option><option value="comercial">Comercial ou outro</option></select></div>
+        <div><label for="im-corretagem">Corretagem paga pelo vendedor <span class="opc">opcional</span></label><div class="campo-moeda"><span aria-hidden="true">R$</span><input id="im-corretagem" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00"></div></div>
+      </div>
+      <h3 class="sub3">Pessoa física: isenções</h3>
+      <p class="hint"><label for="im-unico" class="check"><input id="im-unico" type="checkbox"> É o único imóvel e não houve outra venda nos últimos 5 anos</label></p>
+      <div class="grade2">
+        <div><label for="im-reinvest">Valor aplicado em outro imóvel residencial em até 180 dias <span class="opc">opcional</span></label><div class="campo-moeda"><span aria-hidden="true">R$</span><input id="im-reinvest" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00"></div></div>
+        <div><p class="hint" style="margin-top:38px"><label for="im-usou" class="check"><input id="im-usou" type="checkbox"> Já usei essa isenção nos últimos 5 anos</label></p></div>
+      </div>
+      <h3 class="sub3">Empresa</h3>
+      <div class="grade2">
+        <div><label for="im-natureza">O imóvel, na empresa, é</label><select id="im-natureza"><option value="estoque">Estoque (empresa compra e vende imóveis)</option><option value="ativo">Ativo (empresa de outra atividade)</option></select></div>
+        <div><label for="im-rbt12">Faturamento de 12 meses da empresa no Simples <span class="opc">opcional</span></label><div class="campo-moeda"><span aria-hidden="true">R$</span><input id="im-rbt12" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00" aria-describedby="im-dica-rbt"></div><p class="hint" id="im-dica-rbt">Se vazio, usa o valor da venda.</p></div>
+        <div><label for="im-despvenda">Despesas da venda na empresa (Lucro Real) <span class="opc">opcional</span></label><div class="campo-moeda"><span aria-hidden="true">R$</span><input id="im-despvenda" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00"></div></div>
+      </div>
+      <details class="saiba"><summary>Saiba mais: o que entra no redutor de ajuste</summary>
+        <p>A partir de 2027, a CBS/IBS da venda incide sobre o valor menos o redutor de ajuste: o custo de aquisição corrigido pelo IPCA, mais ITBI, laudêmio e contrapartidas urbanísticas pagas (LC 214/2025, arts. 257 e 258). Imóvel residencial novo também desconta R$ 100 mil e lote, R$ 30 mil, corrigidos (art. 259).</p>
+        <div class="grade2">
+          <div><label for="im-itbi">ITBI e laudêmio pagos na compra</label><div class="campo-moeda"><span aria-hidden="true">R$</span><input id="im-itbi" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00"></div></div>
+          <div><label for="im-contrap">Contrapartidas urbanísticas e ambientais</label><div class="campo-moeda"><span aria-hidden="true">R$</span><input id="im-contrap" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00"></div></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="im-so-locacao">
+      <div class="grade2">
+        <div><label for="im-aluguel">Aluguel mensal (soma dos imóveis)</label><div class="campo-moeda"><span aria-hidden="true">R$</span><input id="im-aluguel" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00" aria-describedby="im-dica-aluguel"></div><p class="hint" id="im-dica-aluguel">Sem condomínio, IPTU e taxas repassadas ao inquilino.</p></div>
+        <div><label for="im-imoveis">Quantidade de imóveis alugados</label><input id="im-imoveis" type="number" min="1" step="1" value="1"></div>
+        <div><label for="im-despesas">Despesas pagas pelo proprietário, por mês <span class="opc">opcional</span></label><div class="campo-moeda"><span aria-hidden="true">R$</span><input id="im-despesas" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00" aria-describedby="im-dica-desp"></div><p class="hint" id="im-dica-desp">IPTU, condomínio e taxa da imobiliária pagos por você.</p></div>
+        <div><label for="im-outrasMes">Outras rendas tributáveis da pessoa física, por mês <span class="opc">opcional</span></label><div class="campo-moeda"><span aria-hidden="true">R$</span><input id="im-outrasMes" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00" aria-describedby="im-dica-outras"></div><p class="hint" id="im-dica-outras">Salário ou aposentadoria: o aluguel é tributado na faixa marginal.</p></div>
+        <div><label for="im-despPJ">Despesas da empresa por mês (Lucro Real) <span class="opc">opcional</span></label><div class="campo-moeda"><span aria-hidden="true">R$</span><input id="im-despPJ" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00"></div></div>
+      </div>
+      <p class="hint"><label for="im-residencial" class="check"><input id="im-residencial" type="checkbox" checked> Uso residencial (desconta o redutor social de R$ 600 por mês por imóvel)</label></p>
+      <p class="hint"><label for="im-temporada" class="check"><input id="im-temporada" type="checkbox"> Temporada (até 90 dias): segue as regras de hotelaria</label></p>
+      <p class="hint"><label for="im-simplificado" class="check"><input id="im-simplificado" type="checkbox"> Usar o desconto simplificado mensal no carnê-leão (tese; o padrão é não usar)</label></p>
+    </div>
+  </section>
+
+  <section class="card etapa-im" data-etapa="4" aria-labelledby="im-t4" hidden>
+    <h2 id="im-t4">Regime de transição</h2>
+    <div class="im-so-locacao">
+      <fieldset class="cards-escolha">
+        <legend>Como a CBS/IBS do aluguel será calculada</legend>
+        <label class="cartao"><input type="radio" name="im-transicao" value="regular" checked><span><b>Regra geral</b><small>Alíquota com 70% de redução e redutor social.</small></span></label>
+        <label class="cartao"><input type="radio" name="im-transicao" value="art487"><span><b>Contrato antigo: 3,65%</b><small>Contrato com prazo determinado assinado até 16/01/2025 (art. 487).</small></span></label>
+      </fieldset>
+      <div class="im-so-487">
+        <label for="im-finalidade">Finalidade do contrato antigo</label>
+        <select id="im-finalidade"><option value="nao_residencial">Não residencial (vale pelo prazo original, se registrado até 31/12/2025)</option><option value="residencial">Residencial (vale até 31/12/2028)</option></select>
+      </div>
+    </div>
+    <div class="im-so-venda">
+      <fieldset class="cards-escolha">
+        <legend>Como a CBS/IBS da venda será calculada</legend>
+        <label class="cartao"><input type="radio" name="im-transicao-v" value="regular" checked><span><b>Regra geral</b><small>Alíquota com 50% de redução, redutor de ajuste e redutor social.</small></span></label>
+      </fieldset>
+      <p class="hint">Sob consulta nesta versão: RET da incorporação (art. 485, 2,08% ou 0,53%), parcelamento do solo (art. 486, 3,65%) e dedução de insumos (art. 488).</p>
+    </div>
+    <details class="saiba"><summary>Alíquotas de referência da reforma</summary>
+      <div class="grade2">
+        <div><label for="im-refcbs">CBS de referência</label><div class="campo-pct"><input id="im-refcbs" type="number" min="0" max="30" step="0.01" value="9.21"><span class="sufixo" aria-hidden="true">%</span></div></div>
+        <div><label for="im-refibs">IBS de referência</label><div class="campo-pct"><input id="im-refibs" type="number" min="0" max="40" step="0.01" value="18.7"><span class="sufixo" aria-hidden="true">%</span></div></div>
+      </div>
+      <p class="hint">Estimativa do Comitê Gestor (Resolução CGIBS nº 14/2026). A CBS de 2027 será fixada pelo Senado até 15/12/2026.</p>
+    </details>
+  </section>
+
+  <div class="nav-etapas" id="im-nav">
+    <p class="falta" id="im-falta" role="status" aria-live="polite"></p>
+    <div class="botoes">
+      <button type="button" class="btn-secundario" id="im-voltar">Voltar</button>
+      <button type="button" class="btn" id="im-proximo">Próximo</button>
+    </div>
+  </div>
+  </form>
+
+  <section class="resultado" id="im-resultado" aria-labelledby="im-t5" hidden>
+    <div class="barra-res card">
+      <h2 id="im-t5">Resultado</h2>
+      <div class="controles">
+        <div class="ctl im-so-locacao">
+          <label for="im-periodo">Período</label>
+          <select id="im-periodo"><option value="1" selected>Mensal</option><option value="3">Trimestral</option><option value="6">Semestral</option><option value="12">Anual</option></select>
+        </div>
+        <div class="ctl ctl-ano">
+          <label for="im-ano">Ano da operação: <output id="im-ano-saida" for="im-ano">2026</output></label>
+          <input id="im-ano" type="range" min="2026" max="2033" step="1" value="2026" aria-describedby="im-ano-fase">
+          <div class="marcas" aria-hidden="true"><span>2026</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>2033</span></div>
+          <p class="hint" id="im-ano-fase"></p>
+        </div>
+      </div>
+    </div>
+    <div class="kpis" id="im-kpis" aria-live="polite" aria-atomic="true"></div>
+    <section class="card" aria-labelledby="im-h-trib">
+      <div class="cab">
+        <h2 id="im-h-trib">Tributos por forma de ter o imóvel</h2>
+        <div class="segmentado" role="group" aria-label="Filtrar por categoria">
+          <button type="button" data-catim="todos" aria-pressed="true">Consolidado</button>
+          <button type="button" data-catim="renda" aria-pressed="false">Renda</button>
+          <button type="button" data-catim="consumo" aria-pressed="false">Consumo</button>
+        </div>
+      </div>
+      <div class="tablewrap"><table class="tbl-trib" id="im-tbl"></table></div>
+    </section>
+    <section class="card" aria-labelledby="im-h-comp">
+      <h2 id="im-h-comp">Pessoa física × empresa</h2>
+      <p class="hint" id="im-comp-dica"></p>
+      <div class="comparativo" id="im-comparativo"></div>
+    </section>
+    <section class="card" aria-labelledby="im-h-ins">
+      <h2 id="im-h-ins">Leituras do resultado</h2>
+      <ul class="insights" id="im-insights"></ul>
+    </section>
+    <details class="card secao">
+      <summary><h2 id="im-h-memo">Memória de cálculo</h2></summary>
+      <div id="im-memoria" class="memo"></div>
+    </details>
+    <details class="card secao">
+      <summary><h2>Premissas e pontos a confirmar</h2></summary>
+      <ul class="limits" id="im-limits">
+        <li>Valores de venda e aluguel sem CBS/IBS: os tributos da reforma são calculados por fora, sobre o valor informado.</li>
+        <li>Redutor de ajuste e redutor social corrigidos pelo IPCA (Banco Central, série 433) até o último mês publicado, sem projeção. Isso deixa os redutores menores e a CBS/IBS maior, do lado conservador. Aquisições anteriores a 07/1994 são corrigidas a partir de 07/1994.</li>
+        <li>ITBI, laudêmio e contrapartidas são corrigidos desde a data de aquisição.</li>
+        <li>Redutor social corrigido a partir de fevereiro de 2025, mês seguinte à publicação da LC 214.</li>
+        <li>Venda pela empresa: tratada como a única receita do trimestre (limite do adicional de IRPJ de R$ 60 mil) e do ano (LC 224/2025). Lucro Real sem créditos de PIS/COFINS.</li>
+        <li>Venda do ativo por empresa do Simples: ganho de capital fora do DAS. A incidência de CBS/IBS nessa venda ainda precisa ser confirmada.</li>
+        <li>Temporada até 90 dias: redução de 40% das regras de hotelaria, sem redutor social.</li>
+        <li>Carnê-leão: tabela mensal de 2026 com a redução da Lei 15.270, marginal sobre as outras rendas, sem desconto simplificado (opção na etapa 3).</li>
+        <li>Benfeitorias posteriores a 1988 somadas ao custo recebem a redução do art. 18 junto com o imóvel; nesse caso o IR sai menor do que o devido.</li>
+        <li>Distribuição: o lucro da empresa vai integralmente aos sócios, em partes iguais. Venda: em um único mês.</li>
+        <li>Sob consulta: cessão de direitos, permuta, incorporação (art. 485), parcelamento do solo (art. 486), art. 488, atualização da Lei 14.973 e vários imóveis na mesma simulação.</li>
+        <li>Estimativa. Confirme com o contador responsável antes de decidir.</li>
+      </ul>
+    </details>
+    <div class="acoes">
+      <button id="im-pdf" class="btn" type="button">Exportar PDF</button>
+      <button id="im-compartilhar" class="btn-secundario" type="button">Compartilhar</button>
+      <button id="im-salvar" class="btn-secundario" type="button">Salvar no histórico</button>
+      <button id="im-editar" class="btn-secundario" type="button">Editar dados</button>
+      <button id="im-limpar" class="btn-secundario" type="button">Nova simulação</button>
+    </div>
+    <p class="status" id="im-msg" role="status" aria-live="polite"></p>
+  </section>
+</main>
+<footer class="rodape-app">By Italo Govêa · versão 2026-10-16.3</footer>
 </div>
 
 <script src="lib/jspdf.umd.min.js"></script>
-<script src="cnae.js?v=2026-10-16.2"></script>
-<script src="motor/parametros.js?v=2026-10-16.2"></script>
-<script src="motor/simples.js?v=2026-10-16.2"></script>
-<script src="motor/renda-pf.js?v=2026-10-16.2"></script>
-<script src="motor/regimes.js?v=2026-10-16.2"></script>
-<script src="motor/insights.js?v=2026-10-16.2"></script>
-<script src="motor/ganho-capital.js?v=2026-10-16.2"></script>
-<script src="dados/armazenamento.js?v=2026-10-16.2"></script>
-<script src="calculadora.js?v=2026-10-16.2"></script>
+<script src="cnae.js?v=2026-10-16.3"></script>
+<script src="motor/parametros.js?v=2026-10-16.3"></script>
+<script src="motor/simples.js?v=2026-10-16.3"></script>
+<script src="motor/renda-pf.js?v=2026-10-16.3"></script>
+<script src="motor/regimes.js?v=2026-10-16.3"></script>
+<script src="motor/insights.js?v=2026-10-16.3"></script>
+<script src="motor/ganho-capital.js?v=2026-10-16.3"></script>
+<script src="motor/ipca.js?v=2026-10-16.3"></script>
+<script src="motor/imobiliario.js?v=2026-10-16.3"></script>
+<script src="dados/armazenamento.js?v=2026-10-16.3"></script>
+<script src="pdf-base.js?v=2026-10-16.3"></script>
+<script src="calculadora.js?v=2026-10-16.3"></script>
+<script src="imobiliario-ui.js?v=2026-10-16.3"></script>
 </body>
 </html>

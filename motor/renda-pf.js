@@ -24,9 +24,10 @@
     return Math.max(0, Math.min(imposto, r));
   }
 
-  // IRPF mensal. deducoesLegais: INSS, dependentes etc. Usa o desconto simplificado se for maior.
-  function irpfMensal(rendimento, deducoesLegais) {
-    const deducao = Math.max(deducoesLegais || 0, P.DESCONTO_SIMPLIFICADO_MENSAL);
+  // IRPF mensal. deducoesLegais: INSS, dependentes etc. Usa o desconto simplificado se for maior
+  // (Lei 9.250/1995, art. 4º, § 2º), salvo quando usarSimplificado = false.
+  function irpfMensal(rendimento, deducoesLegais, usarSimplificado) {
+    const deducao = usarSimplificado === false ? (deducoesLegais || 0) : Math.max(deducoesLegais || 0, P.DESCONTO_SIMPLIFICADO_MENSAL);
     const base = Math.max(0, rendimento - deducao);
     const tabela = tabelaProgressiva(base, P.IRPF_MENSAL);
     const red = reducao(rendimento, tabela, P.REDUCAO_MENSAL);
@@ -70,7 +71,8 @@
    */
   function custoDistribuicao(e) {
     const divMes = Math.max(0, e.dividendosMes || 0);
-    const divAno = divMes * 12;
+    const mesesPagamento = e.mesesPagamento || 12;   // venda de imóvel: um único pagamento
+    const divAno = divMes * mesesPagamento;
     const proLabore = Math.max(0, e.proLabore || 0);
     const inssMes = inssProLabore(proLabore);
     const irProLaboreMes = irpfMensal(proLabore, inssMes).imposto;
@@ -91,7 +93,7 @@
     const irpfmFinal = Math.max(0, devidoCom - redutor);
     // O IRPFM relativo aos dividendos é o que a distribuição acrescenta; o retido é antecipação (art. 16-A, § 5º)
     const custoDividendos = Math.max(0, irpfmFinal - devidoSem);
-    const retidoAno = retidoMes * 12;
+    const retidoAno = retidoMes * mesesPagamento;
     return {
       dividendosMes: divMes, dividendosAno: divAno,
       proLabore, inssMes, irProLaboreMes,

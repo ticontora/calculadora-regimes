@@ -1,5 +1,5 @@
 /*
- * Comparação de regimes por ano (2026–2033): Simples (CBS/IBS no DAS), Simples com CBS/IBS fora do DAS,
+ * Comparação de regimes por ano (2026–2033): Simples (CBS/IBS no DAS), Simples Híbrido (CBS/IBS fora do DAS),
  * Lucro Presumido, Lucro Real e RET. Cada regime devolve tributos por categoria e memória de cálculo
  * com fórmula, valor e fundamento legal. Sem DOM: roda no navegador e no Node.
  *
@@ -20,7 +20,7 @@
 
   const NOMES = {
     simples: 'Simples Nacional',
-    simplesFora: 'Simples com CBS/IBS fora do DAS',
+    simplesFora: 'Simples Híbrido',
     presumido: 'Lucro Presumido',
     real: 'Lucro Real',
     ret: 'RET (incorporação)'
@@ -145,7 +145,7 @@
 
       // Variante 2: CBS/IBS fora do DAS (opção a partir de 2027)
       if (!reforma) {
-        out.regimes.simplesFora = {chave: 'simplesFora', nome: NOMES.simplesFora, elegivel: false, motivo: 'opção existe a partir de 2027 (LC 214/2025, art. 41, § 3º)'};
+        out.regimes.simplesFora = {chave: 'simplesFora', nome: NOMES.simplesFora, elegivel: false, futuro: true, motivo: 'opção existe a partir de 2027 (LC 214/2025, art. 41, § 3º)'};
       } else {
         const reg = cbsIbsRegular((icmsFora ? icmsDebito : 0) + (issFora ? issValor : 0));
         const baseDas = R - reg.debito;

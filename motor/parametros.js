@@ -206,9 +206,34 @@
   // Alíquotas progressivas do ganho de capital. Fonte: Lei 8.981/1995, art. 21, com redação da Lei 13.259/2016
   const ALIQUOTAS_GANHO_CAPITAL = [[5000000, 0.15], [10000000, 0.175], [30000000, 0.20], [Infinity, 0.225]];
 
+  /* ---------- Operações com bens imóveis ---------- */
+  const IMOBILIARIO = {
+    // Redução das alíquotas de CBS/IBS: 50% nas operações com imóveis; 70% na locação, cessão onerosa e arrendamento.
+    // Fonte: LC 214/2025, art. 261, caput e parágrafo único
+    reducaoVenda: 0.50, reducaoLocacao: 0.70,
+    // Locação residencial de até 90 dias segue as regras de hotelaria. Fonte: LC 214/2025, art. 253.
+    // PREMISSA: redução de 40% das regras de hotelaria; sem redutor social.
+    reducaoTemporada: 0.40,
+    // Redutor social: R$ 100 mil por imóvel residencial novo, R$ 30 mil por lote residencial (venda) e
+    // R$ 600 por mês por imóvel residencial (locação), corrigidos pelo IPCA desde a publicação da LC 214 (16/01/2025).
+    // Fonte: LC 214/2025, arts. 259 e 260 (redação da LC 227/2026). PREMISSA: correção a partir de fev/2025.
+    redutorSocialNovo: 100000, redutorSocialLote: 30000, redutorSocialLocacaoMes: 600, inicioCorrecao: {ano: 2025, mes: 2},
+    // PF contribuinte do regime regular. Fonte: LC 214/2025, art. 251, §§ 1º, 2º e 5º
+    pfLimiteLocacao: 240000, pfImoveisLocacao: 3, pfVendas: 3, pfConstruidos: 1, pfFolgaAnoCorrente: 0.20,
+    // Regimes de transição. Fonte: LC 214/2025, art. 487 (locação de contratos anteriores a 16/01/2025: 3,65%);
+    // arts. 485 e 486 (incorporação e parcelamento do solo) ficam "sob consulta" nesta versão.
+    art487: 0.0365,
+    // Isenção do único imóvel até R$ 440 mil, sem outra alienação em 5 anos. Fonte: Lei 9.250/1995, art. 23
+    isencaoUnicoImovel: 440000,
+    // Isenção por reinvestimento em imóvel residencial em 180 dias, proporcional. Fonte: Lei 11.196/2005, art. 39
+    reinvestimentoDias: 180,
+    // PJ: presunção na venda de imóveis (atividade imobiliária) e na locação. Fonte: Lei 9.249/1995, arts. 15 e 20
+    presuncaoVenda: {irpj: 0.08, csll: 0.12}, presuncaoLocacao: {irpj: 0.32, csll: 0.32}
+  };
+
   /* ---------- Categorias de tributo ---------- */
   const CATEGORIAS = {
-    renda:   {nome: 'Renda', tributos: ['IRPJ', 'CSLL']},
+    renda:   {nome: 'Renda', tributos: ['IRPJ', 'CSLL', 'IRPF']},
     consumo: {nome: 'Consumo', tributos: ['PIS', 'COFINS', 'IPI', 'ICMS', 'ISS', 'CBS', 'IBS', 'CBS/IBS (RET)']},
     folha:   {nome: 'Folha', tributos: ['CPP']}
   };
@@ -220,6 +245,6 @@
     REFERENCIA_CBS_IBS, CRONOGRAMA_CBS_IBS, INICIO_OPCAO_FORA_DAS,
     IRPF_MENSAL, REDUCAO_MENSAL, IRPF_ANUAL, REDUCAO_ANUAL, DESCONTO_SIMPLIFICADO_MENSAL, DEDUCAO_DEPENDENTE_MENSAL,
     INSS_PRO_LABORE, RETENCAO_DIVIDENDOS, IRPFM, LIMITE_CARGA_PJ_PF,
-    REDUCAO_ART18, FATORES_REDUCAO, ALIQUOTAS_GANHO_CAPITAL, CATEGORIAS
+    REDUCAO_ART18, FATORES_REDUCAO, ALIQUOTAS_GANHO_CAPITAL, CATEGORIAS, IMOBILIARIO
   };
 });

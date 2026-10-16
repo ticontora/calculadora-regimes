@@ -49,12 +49,12 @@
       const dif = R.simplesFora.total - R.simples.total;
       if (res.comprador && res.comprador.tomaCredito) {
         const ganho = (R.simplesFora.creditoComprador || 0) - (R.simples.creditoComprador || 0);
-        itens.push({tipo: 'info', texto: 'Seu cliente toma crédito. Com CBS/IBS fora do DAS, ele aproveita ' + brl(ganho) + ' a mais de crédito, e a empresa paga ' + brl(Math.abs(dif)) + (dif >= 0 ? ' a mais' : ' a menos') + ' de imposto. Compare os dois números antes de negociar preço.'});
+        itens.push({tipo: 'info', texto: 'Seu cliente toma crédito. No Simples Híbrido (CBS/IBS fora do DAS), ele aproveita ' + brl(ganho) + ' a mais de crédito, e a empresa paga ' + brl(Math.abs(dif)) + (dif >= 0 ? ' a mais' : ' a menos') + ' de imposto. Compare os dois números antes de negociar preço.'});
       } else {
-        itens.push({tipo: 'info', texto: 'Quem compra é consumidor final ou não toma crédito: tirar CBS/IBS do DAS custaria ' + brl(dif) + ' a mais sem benefício para o cliente.'});
+        itens.push({tipo: 'info', texto: 'Quem compra é consumidor final ou não toma crédito: o Simples Híbrido custaria ' + brl(dif) + ' a mais sem benefício para o cliente.'});
       }
     }
-    if (res.ano === 2026) itens.push({tipo: 'info', texto: 'Em 2026 a CBS (0,9%) e o IBS (0,1%) são de teste e compensados com PIS/COFINS. Arraste o ano para ver 2027 em diante.'});
+    if (res.ano === 2026) itens.push({tipo: 'info', texto: 'Em 2026 a CBS (0,9%) e o IBS (0,1%) são de teste e compensados com PIS/COFINS. O Simples Híbrido começa em 2027: arraste o ano para comparar.'});
     // Distribuição
     const melhor = rk.length ? R[rk[0]] : null;
     if (melhor && melhor.distribuicao) {

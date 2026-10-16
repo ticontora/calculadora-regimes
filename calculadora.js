@@ -373,31 +373,33 @@ function renderKpis(res, e){
 }
 
 function renderTributos(res){
+  const futuro = res.regimes.simplesFora && res.regimes.simplesFora.futuro;
   const ks = elegiveis(res);
+  if (futuro){ const i = ks.indexOf('presumido'); ks.splice(i < 0 ? ks.length : i, 0, 'simplesFora'); }
   const melhor = res.ranking[0];
   const head = '<thead><tr><th scope="col">' + (categoria === 'todos' ? 'Categoria' : 'Tributo') + '</th>' + ks.map(k => `<th scope="col" class="${k === melhor ? 'melhor' : ''}">${esc(NOMES[k])}${k === melhor ? '<span class="tag">melhor</span>' : ''}</th>`).join('') + '</tr></thead>';
-  const cel = (k, v) => `<td class="${k === melhor ? 'melhor' : ''}">${v}</td>`;
+  const cel = (k, v) => (futuro && k === 'simplesFora') ? '<td class="na futuro">a partir de 2027</td>' : `<td class="${k === melhor ? 'melhor' : ''}">${v}</td>`;
   let corpo = '';
   if (categoria === 'todos'){
     ['renda', 'consumo', 'folha'].forEach(c => {
-      corpo += `<tr><th scope="row">${P.CATEGORIAS[c].nome}</th>` + ks.map(k => cel(k, fmtBRL.format(Motor.regimes.porCategoria(res.regimes[k])[c]))).join('') + '</tr>';
+      corpo += `<tr><th scope="row">${P.CATEGORIAS[c].nome}</th>` + ks.map(k => cel(k, k === 'simplesFora' && futuro ? '' : fmtBRL.format(Motor.regimes.porCategoria(res.regimes[k])[c]))).join('') + '</tr>';
     });
   } else {
     const cods = [];
-    ks.forEach(k => res.regimes[k].tributos.forEach(t => { if (t.categoria === categoria && !cods.includes(t.codigo)) cods.push(t.codigo); }));
+    ks.forEach(k => (res.regimes[k].tributos || []).forEach(t => { if (t.categoria === categoria && !cods.includes(t.codigo)) cods.push(t.codigo); }));
     if (!cods.length) corpo += `<tr><td colspan="${ks.length + 1}" class="na">Nenhum tributo desta categoria no ano escolhido.</td></tr>`;
     cods.forEach(c => {
       corpo += `<tr><th scope="row">${esc(c)}</th>` + ks.map(k => {
-        const t = res.regimes[k].tributos.filter(x => x.codigo === c).reduce((s, x) => s + x.valor, 0);
+        const t = (res.regimes[k].tributos || []).filter(x => x.codigo === c).reduce((s, x) => s + x.valor, 0);
         return cel(k, t ? fmtBRL.format(t) : '—');
       }).join('') + '</tr>';
     });
-    corpo += `<tr class="sub"><th scope="row">Subtotal ${P.CATEGORIAS[categoria].nome.toLowerCase()}</th>` + ks.map(k => cel(k, fmtBRL.format(Motor.regimes.porCategoria(res.regimes[k])[categoria]))).join('') + '</tr>';
+    corpo += `<tr class="sub"><th scope="row">Subtotal ${P.CATEGORIAS[categoria].nome.toLowerCase()}</th>` + ks.map(k => cel(k, (futuro && k === 'simplesFora') ? '' : fmtBRL.format(Motor.regimes.porCategoria(res.regimes[k])[categoria]))).join('') + '</tr>';
   }
-  corpo += '<tr class="total"><th scope="row">Total de tributos</th>' + ks.map(k => cel(k, fmtBRL.format(res.regimes[k].total))).join('') + '</tr>';
-  corpo += '<tr><th scope="row">Carga sobre o faturamento</th>' + ks.map(k => cel(k, fmtPct(res.regimes[k].efetiva))).join('') + '</tr>';
-  corpo += '<tr><th scope="row">Sobra na empresa</th>' + ks.map(k => cel(k, fmtBRL.format(res.regimes[k].sobra))).join('') + '</tr>';
-  const fora = ORDEM.filter(k => !res.regimes[k].elegivel && !(k === 'ret'));
+  corpo += '<tr class="total"><th scope="row">Total de tributos</th>' + ks.map(k => cel(k, (futuro && k === 'simplesFora') ? '' : fmtBRL.format(res.regimes[k].total))).join('') + '</tr>';
+  corpo += '<tr><th scope="row">Carga sobre o faturamento</th>' + ks.map(k => cel(k, (futuro && k === 'simplesFora') ? '' : fmtPct(res.regimes[k].efetiva))).join('') + '</tr>';
+  corpo += '<tr><th scope="row">Sobra na empresa</th>' + ks.map(k => cel(k, (futuro && k === 'simplesFora') ? '' : fmtBRL.format(res.regimes[k].sobra))).join('') + '</tr>';
+  const fora = ORDEM.filter(k => !res.regimes[k].elegivel && k !== 'ret' && !res.regimes[k].futuro);
   let nota = '';
   if (fora.length) nota = '<caption class="hint" style="caption-side:bottom;text-align:left">' + fora.map(k => esc(NOMES[k]) + ': não se aplica (' + esc(res.regimes[k].motivo) + ').').join(' ') + '</caption>';
   $('tbl-trib').innerHTML = head + '<tbody>' + corpo + '</tbody>' + nota;
@@ -430,7 +432,10 @@ function renderComparativo(res, e){
       if (d.isento) h += '<p class="na">Dividendos do Simples tratados como isentos (LC 123, art. 14).</p>';
     }
     return h + '</article>';
-  }).join('');
+  }).join('') + ((res.regimes.simplesFora && res.regimes.simplesFora.futuro)
+    ? '<article class="reg futuro"><h3>Simples Híbrido</h3><p class="na">CBS e IBS fora do DAS, pelo regime regular. A opção existe a partir de 2027 (LC 214/2025, art. 41, § 3º).</p><button type="button" class="btn-secundario" id="ver-2027">Ver em 2027</button></article>' : '');
+  const b27 = $('ver-2027');
+  if (b27) b27.addEventListener('click', () => { $('ano').value = '2027'; atualizar(); salvarRascunhoDepois(); $('ano').focus(); });
 }
 
 function renderInsights(res, e){
@@ -534,6 +539,7 @@ function coletarCampos(semIdentificacao){
   d.distribuir = radio('distribuir');
   d.travado = enquadramentoTravado;
   d.passo = passoAtual;
+  d.modo = 'regimes';
   return d;
 }
 function aplicarCampos(d){
@@ -571,16 +577,40 @@ function salvarRascunhoDepois(){
 
 function renderHistorico(){
   const lista = window.Armazenamento.listarHistorico();
-  $('historico').innerHTML = lista.length ? lista.map(i => `<li><div class="info"><b>${esc(i.titulo)}</b><small>${esc(i.resumo || '')} · ${new Date(i.criadoEm).toLocaleString('pt-BR', {dateStyle: 'short', timeStyle: 'short'})}</small></div><button type="button" class="btn-secundario" data-abrir="${esc(i.id)}">Abrir</button><button type="button" class="btn-secundario" data-excluir="${esc(i.id)}" aria-label="Excluir ${esc(i.titulo)}">Excluir</button></li>`).join('')
+  const html = lista.length ? lista.map(i => `<li><div class="info"><b>${esc(i.titulo)}</b><small>${esc(i.resumo || '')} · ${new Date(i.criadoEm).toLocaleString('pt-BR', {dateStyle: 'short', timeStyle: 'short'})}</small></div><button type="button" class="btn-secundario" data-abrir="${esc(i.id)}">Abrir</button><button type="button" class="btn-secundario" data-excluir="${esc(i.id)}" aria-label="Excluir ${esc(i.titulo)}">Excluir</button></li>`).join('')
     : '<li><div class="info"><small>Nenhuma simulação salva. Use "Salvar no histórico".</small></div></li>';
+  document.querySelectorAll('.historico').forEach(ul => { ul.innerHTML = html; });
 }
-$('historico').addEventListener('click', ev => {
-  const b = ev.target.closest('button');
+window.renderHistorico = renderHistorico;
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('.historico button');
   if (!b) return;
   if (b.dataset.excluir){ window.Armazenamento.removerDoHistorico(b.dataset.excluir); renderHistorico(); return; }
   const item = window.Armazenamento.listarHistorico().find(i => i.id === b.dataset.abrir);
-  if (item){ aplicarCampos(item.dados); irPara(5); focarEtapa(); msg('Simulação aberta: ' + item.titulo + '.', 'ok'); }
+  if (!item) return;
+  if (item.dados && item.dados.modo === 'imob'){ mostrarModo('imob'); window.ImobUI.abrir(item.dados, 'Simulação aberta: ' + item.titulo + '.'); return; }
+  mostrarModo('regimes'); aplicarCampos(item.dados); irPara(5); focarEtapa(); msg('Simulação aberta: ' + item.titulo + '.', 'ok');
 });
+
+/* ===== Escolha da calculadora ===== */
+function mostrarModo(m){
+  $('escolha').hidden = m !== null;
+  $('main-regimes').hidden = m !== 'regimes';
+  $('main-imob').hidden = m !== 'imob';
+  $('btn-trocar').hidden = !m;
+  $('rascunho').textContent = '';
+  document.querySelector('.topo .sub').textContent = m === 'imob'
+    ? 'Imobiliário: venda e locação por pessoa física ou empresa, de 2026 a 2033.'
+    : 'Simples, Simples Híbrido, Presumido e Real, com a transição da reforma de 2026 a 2033.';
+  if (m) window.Armazenamento.salvarModo(m);
+  window.scrollTo(0, 0);
+  if (m === 'regimes'){ irPara(passoAtual); focarEtapa(); }
+  if (m === 'imob' && window.ImobUI) window.ImobUI.entrar();
+  if (m === null){ renderHistorico(); const c = document.querySelector('.escolha-card'); if (c) c.focus(); }
+}
+window.mostrarModo = mostrarModo;
+document.querySelectorAll('.escolha-card').forEach(b => b.addEventListener('click', () => mostrarModo(b.dataset.modo)));
+$('btn-trocar').addEventListener('click', () => mostrarModo(null));
 function msg(t, tipo){ $('acao-msg').className = 'status' + (tipo ? ' ' + tipo : ''); $('acao-msg').textContent = t; }
 $('btn-salvar').addEventListener('click', () => {
   const e = entradas();
@@ -780,7 +810,7 @@ function gerarPdfBytes(){
 
   titulo('Projeção 2026 a 2033: tributos da empresa ' + suf);
   const colsP = ORDEM.filter(k => P.ANOS.some(a => todos[a].regimes[k].elegivel));
-  const curtos = {simples: 'Simples (DAS)', simplesFora: 'Simples CBS/IBS fora', presumido: 'Presumido', real: 'Real', ret: 'RET'};
+  const curtos = {simples: 'Simples (DAS)', simplesFora: 'Simples Híbrido', presumido: 'Presumido', real: 'Real', ret: 'RET'};
   const largP = [0.12].concat(colsP.map(() => 0.88 / colsP.length));
   tabela(['Ano'].concat(colsP.map(k => curtos[k])).concat([]), P.ANOS.map(a => [String(a)].concat(colsP.map(k => {
     const r = todos[a].regimes[k];
@@ -843,8 +873,8 @@ $('btn-pdf').addEventListener('click', () => {
   }
 });
 
-/* ===== Início ===== */
-(function iniciar(){
+/* ===== Início (depois que todos os scripts carregaram) ===== */
+document.addEventListener('DOMContentLoaded', function iniciar(){
   const compartilhado = lerLinkCompartilhado();
   const rascunho = window.Armazenamento.lerRascunho();
   const intro = $('intro'), app = $('app');
@@ -852,8 +882,12 @@ $('btn-pdf').addEventListener('click', () => {
   if (compartilhado){
     aplicarCampos(compartilhado);
     abrirApp();
+    mostrarModo('regimes');
     irPara(5);
     msg('Simulação aberta por link compartilhado.', 'ok');
+  } else if (/^#i=/.test(location.hash) && window.ImobUI){
+    abrirApp();
+    mostrarModo('imob');
   } else {
     if (rascunho && rascunho.dados){
       aplicarCampos(rascunho.dados);
@@ -863,9 +897,9 @@ $('btn-pdf').addEventListener('click', () => {
     irPara(rascunho && rascunho.dados ? (rascunho.dados.passo || 1) : 1);
     $('btn-entrar').addEventListener('click', () => {
       intro.classList.add('saindo');
-      setTimeout(() => { abrirApp(); window.scrollTo(0, 0); focarEtapa(); }, 450);
+      setTimeout(() => { abrirApp(); mostrarModo(null); }, 450);
     });
   }
   renderHistorico();
   atualizar();
-})();
+});

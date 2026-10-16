@@ -25,12 +25,16 @@
     try { if (armazenamento) armazenamento.removeItem(chave); } catch (e) { /* sem armazenamento */ }
   }
 
-  function salvarRascunho(dados) {
+  // "nome" separa o rascunho de cada calculadora (vazio = regimes; 'imob' = imobiliário)
+  function salvarRascunho(dados, nome) {
     const quando = new Date().toISOString();
-    return gravar(CHAVE_RASCUNHO, {quando, dados}) ? new Date(quando) : null;
+    return gravar(CHAVE_RASCUNHO + (nome ? ':' + nome : ''), {quando, dados}) ? new Date(quando) : null;
   }
-  function lerRascunho() { return ler(CHAVE_RASCUNHO); }
-  function limparRascunho() { apagar(CHAVE_RASCUNHO); }
+  function lerRascunho(nome) { return ler(CHAVE_RASCUNHO + (nome ? ':' + nome : '')); }
+  function limparRascunho(nome) { apagar(CHAVE_RASCUNHO + (nome ? ':' + nome : '')); }
+  // Última calculadora usada
+  function lerModo() { return ler('calc-regimes:modo:v1'); }
+  function salvarModo(m) { gravar('calc-regimes:modo:v1', m); }
 
   function listarHistorico() {
     const l = ler(CHAVE_HISTORICO);
@@ -46,5 +50,5 @@
     gravar(CHAVE_HISTORICO, listarHistorico().filter(i => i.id !== id));
   }
 
-  return {salvarRascunho, lerRascunho, limparRascunho, listarHistorico, salvarNoHistorico, removerDoHistorico};
+  return {salvarRascunho, lerRascunho, limparRascunho, lerModo, salvarModo, listarHistorico, salvarNoHistorico, removerDoHistorico};
 });

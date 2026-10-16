@@ -1,39 +1,48 @@
-# Calculadora de regimes tributários (Simples, Presumido, Real e Simples híbrido 2027)
+# Calculadora de regimes tributários (Simples, Presumido e Real, 2026 a 2033)
 
-Ferramenta de estimativa para comparar regimes tributários de clientes, com base na legislação de Guarulhos/SP. Roda no navegador.
+Ferramenta de estimativa para comparar regimes tributários de clientes (legislação de Guarulhos/SP). Roda inteira no navegador, sem servidor e sem build.
 
-## Uso
-Informe o CNPJ (a razão social preenche sozinha quando a consulta funciona), o faturamento, a atividade e os percentuais de margem, compras, ICMS e ISS. Gere o PDF da análise.
+## Estrutura
 
-## Atividades e anexos
-- CNAE principal: ao digitar o CNAE (ou ao consultar o CNPJ), a calculadora escolhe a atividade e marca o Fator R pela tabela `cnae.js` (1.181 CNAEs, lista da Contabilizei, Tabela Simples Nacional 2026). CNAEs de locação de imóveis próprios, loteamento, incorporação e holdings são tratados como vedados no Simples. Construção (divisões 41 a 43) entra como "mão de obra"; se for empreitada total com materiais, troque a atividade.
-- Comércio (Anexo I) e indústria (Anexo II).
-- Serviços (Anexo III), para atividades que não estão nos Anexos IV e V.
-- Serviços de limpeza, vigilância, obras e paisagismo (Anexo IV), com CPP de 20% sobre a folha fora do DAS.
-- Serviços do Anexo V, com Fator R apenas quando a atividade estiver marcada como da lista do Fator R.
-- Construção civil (Anexo IV no Simples). No Presumido: empreitada total com materiais, 8% (IRPJ) e 12% (CSLL); mão de obra ou materiais parciais, 32%.
-- Locação de imóveis próprios, incluindo holding patrimonial: vedada no Simples (LC 123, art. 17, XV); Presumido com 32%, sem ISS.
-- Holding de participações (receitas de administração): vedada no Simples (LC 123, art. 3º, § 4º, VII); Presumido com 32%. Dividendos recebidos não entram no cálculo.
-- Incorporação e loteamento: vedados no Simples (LC 123, art. 17, XIV); Presumido com 8% e 12%; RET de 4% (Lei 10.931/2004) para incorporação com patrimônio de afetação.
+```
+index.html              tela: stepper de 5 etapas e resultado em camadas
+estilo.css              visual (off-white, azul-marinho, dourado)
+calculadora.js          só tela: lê campos, desenha, PDF e compartilhar
+motor/parametros.js     parâmetros legais, cada um com a fonte; "PREMISSA" = falta confirmar
+motor/simples.js        faixa, alíquota efetiva e partilha do DAS por ano
+motor/regimes.js        Simples, Simples com CBS/IBS fora do DAS, Presumido, Real e RET, por ano
+motor/renda-pf.js       IRPF 2026 (Lei 15.270), retenção de dividendos, IRPFM e redutor
+motor/insights.js       leituras automáticas e avisos de dado faltante
+motor/ganho-capital.js  IR na venda de imóvel por pessoa física (sem tela)
+dados/armazenamento.js  rascunho automático e histórico (localStorage, só neste navegador)
+testes/                 testes do motor (node --test)
+cnae.js                 tabela de CNAEs → anexo e Fator R
+worker/                 proxy de consulta de CNPJ para Cloudflare Worker (não publicado)
+```
 
-## Comprador e crédito de IBS/CBS (cenário 2027)
-- Identifica quem compra: pessoa física, PJ no Lucro Real, PJ no Lucro Presumido, PJ no Simples (DAS) ou PJ no Simples com IBS/CBS no regime regular.
-- PF e PJ no DAS não tomam crédito. PJ do regime regular toma crédito integral do IBS/CBS destacado, ou só do IBS/CBS pago no DAS quando o fornecedor recolhe no DAS (LC 214/2025, art. 47, § 9º).
-- Compara, pelo mesmo preço final, fornecedor no DAS, fornecedor no Simples híbrido da reforma (IBS/CBS fora do DAS, LC 214, art. 41, § 3º) e fornecedor no Presumido/Real.
-- A CBS de 2027 ainda não foi fixada; o campo é editável (padrão 9,11%, estimativa). A fatia de IBS/CBS no DAS assume a fatia atual de PIS e COFINS de cada faixa.
-- Simples híbrido (a partir de 2027): IBS e CBS fora do DAS, opcional para qualquer optante do Simples, inclusive serviços. O bloco compara o imposto do cliente no DAS e no híbrido (DAS sem a fatia de IBS/CBS + IBS/CBS pelo regime regular, com crédito das compras).
-- Não existe opção de tirar o ICMS do DAS: ICMS e ISS só saem do DAS acima do sublimite de R$ 3,6 milhões, o que a calculadora já trata na 6ª faixa.
+O motor não toca no DOM: o mesmo arquivo roda no navegador e no Node.
 
-## Simplificações
-- Fator R usa a folha do mês como aproximação da média de 12 meses.
-- PIS e COFINS no Lucro Real são apuração simplificada, com crédito sobre as compras informadas.
-- Presunção de serviços: 32% para IRPJ e CSLL. Atividades com presunção diferente não estão modeladas.
-- Não considera desoneração da folha (CPRB) da construção, RET de 1% para habitação de interesse social, nem regras cumulativas específicas de PIS/COFINS no Real para construção e incorporação.
-- Não considera MEI, substituição tributária, DIFAL, RAT, contribuições a terceiros, compensação de prejuízo nem regimes específicos de ICMS.
+## Testes
 
-## Limitações
-- Os valores são estimativas e não substituem a apuração do contador.
-- A consulta de CNPJ depende de um serviço externo, que pode ser bloqueado pelo navegador.
+```
+npm test
+```
+
+Cobrem: o IR de imóvel adquirido em 1980 (R$ 13.712,28, com a redução do art. 18 aplicada uma vez), cada faixa de cada anexo do Simples, a partilha 2026–2033, o cronograma CBS/IBS, IRPF 2026, retenção de dividendos, IRPFM, LC 224/2025 e o rascunho/histórico.
+
+## O que a tela faz
+
+- Etapas: empresa (CNPJ e CNAE travam o enquadramento), faturamento, compras e impostos, sócios e clientes, resultado. "Próximo" só avança com os dados obrigatórios e diz o que falta.
+- Avisos de consequência: campo sem dado mostra se o imposto sai maior ou menor.
+- Rascunho salvo a cada alteração; histórico de simulações no navegador.
+- Resultado: indicadores, tributos por categoria (renda, consumo, folha), comparativo lado a lado sem e com distribuição aos sócios, leituras, crédito do cliente, memória de cálculo com fórmula e fundamento.
+- Slider de ano 2026–2033 e período mensal, bimestral, semestral ou anual.
+- PDF com projeção 2026–2033 e memória de cálculo. Compartilhar envia o PDF (celular) ou copia um link com os números, sem CNPJ e sem razão social.
+
+## Premissas que dependem de confirmação
+
+Estão marcadas com `PREMISSA` em `motor/parametros.js` e listadas na tela, em "Premissas e pontos a confirmar".
 
 ## Publicação
-Repositório público com GitHub Pages ativado na branch `main`, pasta raiz. A pasta `worker/` contém o código do proxy de consulta de CNPJ para o Cloudflare Worker.
+
+GitHub Pages na branch `main`, pasta raiz. Ao publicar, troque a versão em `version.json` e no `index.html` (script de atualização, `?v=` e rodapé).

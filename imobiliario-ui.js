@@ -348,6 +348,7 @@
     focar();
   }
   function abrir(d, texto) { iniciado = true; aplicar(d); irPara(5); focar(); msg(texto, 'ok'); }
-  window.ImobUI = {entrar, abrir, calcularPdf: pdf};
+  window.ImobUI = {entrar, abrir, calcularPdf: pdf, entradas, faltas: () => [1, 2, 3, 4].flatMap(faltas), passo: () => passo,
+    atualizar: () => { atualizar(); salvarDepois(); }, irPara};
   visibilidade();
 })();

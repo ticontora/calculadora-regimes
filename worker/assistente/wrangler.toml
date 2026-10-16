@@ -1,0 +1,16 @@
+name = "assistente-tributario"
+main = "assistente-proxy.js"
+compatibility_date = "2026-10-01"
+
+# Limite de chamadas por IP: 20 por minuto. Cada pergunta gera de 1 a 5 chamadas (uma por rodada de ferramenta).
+[[ratelimits]]
+name = "LIMITE"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 20
+  period = 60
+
+# Segredos (NUNCA escreva aqui; rode no seu computador):
+#   npx wrangler secret put ANTHROPIC_API_KEY
+#   npx wrangler secret put CODIGO_ACESSO      (opcional)

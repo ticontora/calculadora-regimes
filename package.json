@@ -3,6 +3,6 @@
   "private": true,
   "description": "Calculadora de regimes tributários. Sem build: os arquivos rodam direto no navegador.",
   "scripts": {
-    "test": "node --test testes/*.test.js"
+    "test": "node --test testes/*.test.js testes/*.test.mjs"
   }
 }

@@ -10,9 +10,11 @@ estilo.css              visual (off-white, azul-marinho, dourado)
 calculadora.js          tela dos regimes da empresa e escolha da calculadora
 imobiliario-ui.js       tela imobiliária (venda e locação)
 pdf-base.js             peças comuns do PDF
+assistente.js           Assistente IA: painel de conversa com ferramentas que usam o motor
+assistente-config.js    endereço do Worker do assistente (vazio = botão escondido)
 motor/parametros.js     parâmetros legais, cada um com a fonte; "PREMISSA" = falta confirmar
 motor/simples.js        faixa, alíquota efetiva e partilha do DAS por ano
-motor/regimes.js        Simples, Simples com CBS/IBS fora do DAS, Presumido, Real e RET, por ano
+motor/regimes.js        Simples, Simples Híbrido, Presumido, Real e RET, por ano
 motor/renda-pf.js       IRPF 2026 (Lei 15.270), retenção de dividendos, IRPFM e redutor
 motor/insights.js       leituras automáticas e avisos de dado faltante
 motor/ganho-capital.js  IR na venda de imóvel por pessoa física
@@ -22,6 +24,7 @@ dados/armazenamento.js  rascunho automático e histórico (localStorage, só nes
 testes/                 testes do motor (node --test)
 cnae.js                 tabela de CNAEs → anexo e Fator R
 worker/                 proxy de consulta de CNPJ para Cloudflare Worker (não publicado)
+worker/assistente/      Worker do Assistente IA (chave da API só lá); como publicar em LEIA-ME.md
 ```
 
 O motor não toca no DOM: o mesmo arquivo roda no navegador e no Node.

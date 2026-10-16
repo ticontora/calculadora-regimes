@@ -104,3 +104,13 @@ test('memória: a soma das linhas de tributo é o total de cada regime', () => {
     assert.ok(perto(soma, g.total, 1e-6), k);
   }
 });
+
+test('trimestral: 3 × mensal e adicional de IRPJ acima de R$ 60 mil no trimestre', () => {
+  const e = {receita: 400000, atividade: 'comercio', folha: 0, margem: 0.1, compras: 0, icms: 0, ano: 2027, referencia: ref};
+  const m = M.calcular(Object.assign({}, e, {meses: 1})).regimes.presumido;
+  const t = M.calcular(Object.assign({}, e, {meses: 3})).regimes.presumido;
+  assert.ok(perto(t.total, 3 * m.total, 1e-6));
+  const baseTri = t.memoria.find(l => l.etapa === 'IRPJ 15%').valor / 0.15;
+  const adicional = t.memoria.find(l => l.etapa === 'IRPJ adicional 10%').valor;
+  assert.ok(perto(adicional, 0.10 * (baseTri - 60000), 1e-6));
+});

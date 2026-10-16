@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%2314213D%22/><rect x=%2212%22 y=%2232%22 width=%2210%22 height=%2220%22 rx=%223%22 fill=%22%23E9DDB8%22/><rect x=%2227%22 y=%2218%22 width=%2210%22 height=%2234%22 rx=%223%22 fill=%22%23C9A227%22/><rect x=%2242%22 y=%2226%22 width=%2210%22 height=%2226%22 rx=%223%22 fill=%22%23E9DDB8%22/></svg>">
 <title>Calculadora de Regimes Tributários</title>
-<link rel="stylesheet" href="estilo.css?v=2026-10-16.1">
+<link rel="stylesheet" href="estilo.css?v=2026-10-16.2">
 <script>
 /* Atualização automática: se houver versão nova publicada, recarrega sem precisar de Ctrl+F5 */
 (function(){
-  var VERSAO = '2026-10-16.1';
+  var VERSAO = '2026-10-16.2';
   if (location.protocol.indexOf('http') !== 0 || !window.fetch) return;
   fetch('version.json?t=' + Date.now(), {cache: 'no-store'})
     .then(function(r){ return r.ok ? r.json() : null; })
@@ -232,7 +232,7 @@
           <label for="periodo">Período</label>
           <select id="periodo">
             <option value="1" selected>Mensal</option>
-            <option value="2">Bimestral</option>
+            <option value="3">Trimestral</option>
             <option value="6">Semestral</option>
             <option value="12">Anual</option>
           </select>
@@ -322,18 +322,18 @@
     </details>
   </section>
 </main>
-<footer class="rodape-app">By Italo Govêa · versão 2026-10-16.1</footer>
+<footer class="rodape-app">By Italo Govêa · versão 2026-10-16.2</footer>
 </div>
 
 <script src="lib/jspdf.umd.min.js"></script>
-<script src="cnae.js?v=2026-10-16.1"></script>
-<script src="motor/parametros.js?v=2026-10-16.1"></script>
-<script src="motor/simples.js?v=2026-10-16.1"></script>
-<script src="motor/renda-pf.js?v=2026-10-16.1"></script>
-<script src="motor/regimes.js?v=2026-10-16.1"></script>
-<script src="motor/insights.js?v=2026-10-16.1"></script>
-<script src="motor/ganho-capital.js?v=2026-10-16.1"></script>
-<script src="dados/armazenamento.js?v=2026-10-16.1"></script>
-<script src="calculadora.js?v=2026-10-16.1"></script>
+<script src="cnae.js?v=2026-10-16.2"></script>
+<script src="motor/parametros.js?v=2026-10-16.2"></script>
+<script src="motor/simples.js?v=2026-10-16.2"></script>
+<script src="motor/renda-pf.js?v=2026-10-16.2"></script>
+<script src="motor/regimes.js?v=2026-10-16.2"></script>
+<script src="motor/insights.js?v=2026-10-16.2"></script>
+<script src="motor/ganho-capital.js?v=2026-10-16.2"></script>
+<script src="dados/armazenamento.js?v=2026-10-16.2"></script>
+<script src="calculadora.js?v=2026-10-16.2"></script>
 </body>
 </html>

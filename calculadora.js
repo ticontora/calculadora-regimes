@@ -255,8 +255,8 @@ function entradas(){
     }
   };
 }
-const SUFIXO = {1: 'por mês', 2: 'por bimestre', 6: 'por semestre', 12: 'por ano'};
-const NOME_PERIODO = {1: 'Mensal', 2: 'Bimestral', 6: 'Semestral', 12: 'Anual'};
+const SUFIXO = {1: 'por mês', 3: 'por trimestre', 6: 'por semestre', 12: 'por ano'};
+const NOME_PERIODO = {1: 'Mensal', 3: 'Trimestral', 6: 'Semestral', 12: 'Anual'};
 
 /* ===== Etapas ===== */
 let passoAtual = 1;
@@ -547,6 +547,8 @@ function aplicarCampos(d){
     const r = document.querySelector('input[name="' + n + '"][value="' + d[n] + '"]');
     if (r) r.checked = true;
   });
+  // Rascunhos antigos podem ter o período bimestral, que saiu da tela
+  if (!$('periodo').value) $('periodo').value = '1';
   const atividade = d.atividade;
   const fatorr = d.fatorr;
   if ((d.cnae || '').replace(/\D/g, '').length === 7) aplicarCnae();

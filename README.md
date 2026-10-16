@@ -36,7 +36,7 @@ Cobrem: o IR de imóvel adquirido em 1980 (R$ 13.712,28, com a redução do art.
 - Avisos de consequência: campo sem dado mostra se o imposto sai maior ou menor.
 - Rascunho salvo a cada alteração; histórico de simulações no navegador.
 - Resultado: indicadores, tributos por categoria (renda, consumo, folha), comparativo lado a lado sem e com distribuição aos sócios, leituras, crédito do cliente, memória de cálculo com fórmula e fundamento.
-- Slider de ano 2026–2033 e período mensal, bimestral, semestral ou anual.
+- Slider de ano 2026–2033 e período mensal, trimestral, semestral ou anual.
 - PDF com projeção 2026–2033 e memória de cálculo. Compartilhar envia o PDF (celular) ou copia um link com os números, sem CNPJ e sem razão social.
 
 ## Premissas que dependem de confirmação

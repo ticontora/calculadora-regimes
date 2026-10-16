@@ -3,332 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%230E1320%22/><rect x=%2212%22 y=%2232%22 width=%2210%22 height=%2220%22 rx=%223%22 fill=%22%239AAEFF%22/><rect x=%2227%22 y=%2218%22 width=%2210%22 height=%2234%22 rx=%223%22 fill=%22%23B5F5D4%22/><rect x=%2242%22 y=%2226%22 width=%2210%22 height=%2226%22 rx=%223%22 fill=%22%239AAEFF%22/></svg>">
-<title>Calculadora de Regimes Tributários | Web</title>
-<style>
-:root{--bg:#FAFAFA;--surface:#fff;--ink:#12141A;--muted:#5B6270;--line:#E4E6EC;--accent:#2F4BFF;--accent-soft:#E8ECFF;--ok:#1B8A5A;--ok-bg:#E7F5EE;--warn:#C48A00;--warn-bg:#FCF2DC;--bad:#C4362F;--bad-bg:#FBE9E7}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
-.wrap{max-width:1000px;margin:0 auto;padding:28px 18px}
-h1{font-size:22px;font-weight:600;margin:0 0 4px}
-.sub{margin:0 0 20px;color:var(--muted)}
-.grid{display:grid;gap:16px;grid-template-columns:1fr}
-@media (min-width:820px){.grid{grid-template-columns:330px 1fr}}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;min-width:0}
-.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 12px;font-weight:600}
-.full{grid-column:1 / -1}
-label{display:block;font-size:13px;color:var(--muted);margin:12px 0 4px}
-label:first-of-type{margin-top:0}
-input,select{width:100%;font:inherit;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 10px}
-input.mono{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace}
-input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
-.hint{font-size:12px;color:var(--muted);margin:4px 0 0}
-.status{font-size:12px;margin:6px 0 0;color:var(--muted)}
-.status.ok{color:var(--ok)} .status.bad{color:var(--bad)}
-.situacao{display:inline-block;margin-top:6px;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--ok-bg);color:var(--ok)}
-.situacao.warn{background:var(--warn-bg);color:var(--warn)}
-.situacao.bad{background:var(--bad-bg);color:var(--bad)}
-.row{display:grid;gap:10px;grid-template-columns:1fr 1fr}
-.banner{padding:14px 16px;border-radius:10px;background:var(--accent-soft);color:var(--accent)}
-.banner strong{display:block;font-size:20px;letter-spacing:-.01em}
-.banner span{font-size:13px}
-.banner.none{background:var(--warn-bg);color:var(--warn)}
-.tablewrap{overflow-x:auto;margin-top:14px}
-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-th,td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-th:first-child,td:first-child{text-align:left}
-th{font-size:12px;color:var(--muted);font-weight:600}
-tr.best td{background:var(--accent-soft)}
-tr.current td{font-weight:650}
-.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:99px;background:var(--accent);color:#fff;margin-left:6px;vertical-align:middle}
-.na{color:var(--muted);font-style:italic;text-align:left;white-space:normal}
-.btn{margin-top:14px;font:inherit;font-weight:600;padding:11px 16px;border-radius:8px;border:0;background:var(--accent);color:#fff;cursor:pointer}
-.btn:disabled{background:#B7C0FF;cursor:default}
-.limits{font-size:13px;color:var(--muted);padding-left:18px}
-.limits li{margin-bottom:6px}
-
-[hidden]{display:none!important}
-/* Fundo da calculadora */
-body{background:radial-gradient(1100px 480px at 88% -12%,#E3E9FF,transparent 60%),radial-gradient(900px 420px at -8% 112%,#E2F3EB,transparent 60%),var(--bg);min-height:100%}
-/* Tela de introdução */
-.intro{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px 56px;color:#F3F5FA;overflow:hidden;background:radial-gradient(circle at 18% 12%,rgba(47,75,255,.38),transparent 55%),radial-gradient(circle at 88% 88%,rgba(27,138,90,.28),transparent 50%),#0E1320;transition:opacity .45s ease}
-.intro::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(circle at 50% 42%,#000 25%,transparent 72%);mask-image:radial-gradient(circle at 50% 42%,#000 25%,transparent 72%)}
-.intro.saindo{opacity:0;pointer-events:none}
-.intro-inner{position:relative;width:100%;max-width:440px;text-align:center}
-.grafico{display:flex;align-items:flex-end;justify-content:center;gap:18px;height:200px;margin-bottom:30px}
-.barra{flex:0 0 56px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
-.barra i{display:block;width:100%;height:var(--h);border-radius:10px 10px 3px 3px;background:linear-gradient(180deg,#9AAEFF,#2F4BFF);transform-origin:50% 100%;animation:crescer .9s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d)}
-.barra.melhor i{background:linear-gradient(180deg,#B5F5D4,#1B8A5A);box-shadow:0 0 28px rgba(27,138,90,.45)}
-.barra span{margin-top:10px;font-size:12px;color:#AEB7CC;white-space:nowrap;animation:surgir .5s ease both;animation-delay:calc(var(--d) + .45s)}
-.barra.melhor span{color:#B5F5D4}
-.intro h1{font-size:26px;line-height:1.2;margin:0 0 10px;letter-spacing:-.02em;text-wrap:balance;animation:subir .6s ease .15s both}
-.intro-sub{margin:0 0 30px;color:#AEB7CC;font-size:15px;text-wrap:balance;animation:subir .6s ease .3s both}
-.btn-entrar{font:inherit;font-weight:600;font-size:16px;padding:13px 48px;border-radius:999px;border:0;background:#2F4BFF;color:#fff;cursor:pointer;box-shadow:0 10px 30px rgba(47,75,255,.35);transition:background .2s ease;animation:subir .6s ease 1.5s both}
-.btn-entrar:hover{background:#4A64FF}
-.btn-entrar:focus-visible{outline:2px solid #fff;outline-offset:3px}
-.rodape-intro{position:absolute;left:0;right:0;bottom:18px;text-align:center;font-size:12px;color:#7D87A3;letter-spacing:.03em}
-.rodape-app{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
-@keyframes crescer{from{transform:scaleY(0)}to{transform:scaleY(1)}}
-@keyframes surgir{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-@keyframes subir{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
-
-/* Área da calculadora: faixa escura no topo com grade e fundo claro abaixo */
-body{position:relative;background:#F4F6FB;min-height:100%}
-body::before{content:"";position:absolute;left:0;right:0;top:0;height:400px;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(700px 300px at 92% -20%,rgba(47,75,255,.55),transparent 70%),
-    radial-gradient(520px 240px at -4% 118%,rgba(27,138,90,.32),transparent 70%),
-    linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px) 0 0/34px 34px,
-    linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px) 0 0/34px 34px,
-    linear-gradient(180deg,#0E1320,#18245E);
-  -webkit-mask-image:linear-gradient(#000 72%,transparent);mask-image:linear-gradient(#000 72%,transparent)}
-.wrap{position:relative;z-index:1}
-.cabecalho{display:flex;align-items:center;gap:14px;margin-bottom:18px}
-.marca{flex:0 0 auto;display:block;width:46px;height:46px;border-radius:14px;box-shadow:0 8px 22px rgba(0,0,0,.35)}
-.marca svg{display:block;width:100%;height:100%}
-.cabecalho h1{color:#F3F5FA;margin:0}
-.cabecalho .sub{color:#B9C2DA;margin:2px 0 0}
-.card{box-shadow:0 14px 36px -16px rgba(14,19,32,.28)}
-.btn{box-shadow:0 8px 20px -8px rgba(47,75,255,.6)}
-
-/* Celular: tabelas cabem na largura da tela sem rolagem */
-@media (max-width:520px){
-  th,td{padding:8px 3px;font-size:12px}
-  th{white-space:normal;line-height:1.25}
-  td:first-child{white-space:normal}
-  td:not(:first-child),th:not(:first-child){white-space:nowrap}
-  .tag{margin-left:4px;font-size:10px;padding:0 5px}
-  table:has(#tbl-regimes) th:nth-child(3),table:has(#tbl-regimes) td:nth-child(3){display:none}
-}
-
-/* ===== Redesign da área da calculadora ===== */
-:root{
-  --bg:#EEF2F5; --surface:#FFFFFF; --ink:#0E1320; --muted:#5A6B7D; --line:#C9D3DD;
-  --accent:#2F4BFF; --accent-soft:#E7EBFF; --ok:#1B8A5A; --ok-bg:#E3F4EC;
-  --warn:#8A5A00; --warn-bg:#FBF1DC; --bad:#C4362F; --bad-bg:#FBE9E7;
-}
-body{
-  position:relative; min-height:100%; background-color:#EEF2F5;
-  background-image:linear-gradient(rgba(14,19,32,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(14,19,32,.05) 1px,transparent 1px);
-  background-size:28px 28px;
-}
-/* Faixa de título sólida, sem degradê */
-body::before{
-  content:""; position:absolute; left:0; right:0; top:0; height:136px; z-index:0; pointer-events:none;
-  background:#0E1320; border-bottom:3px solid #2F4BFF;
-  -webkit-mask-image:none; mask-image:none;
-}
-.wrap{position:relative; z-index:1; max-width:1040px; padding-top:26px}
-.cabecalho{align-items:flex-start; margin-bottom:22px}
-.marca{width:52px; height:52px; border-radius:0; box-shadow:none}
-.cabecalho h1{
-  font-family:Georgia,"Times New Roman",serif; font-weight:700; font-size:30px;
-  letter-spacing:-.01em; color:#F4F7FA; line-height:1.1;
-}
-.cabecalho .sub{color:#A9B8C6; font-size:14px; margin-top:6px}
-/* Cartões: sóbrios, com filete escuro no topo */
-.card{
-  border-radius:4px; border:1px solid var(--line); border-top:3px solid var(--ink);
-  box-shadow:0 1px 0 rgba(14,19,32,.04); padding:20px;
-}
-.card h2{color:var(--ink); font-size:11px; font-weight:700; letter-spacing:.14em}
-label{color:var(--muted); font-size:12px; font-weight:600; letter-spacing:.02em}
-input,select{border-radius:4px; border-color:#B8C4D0; background:#FBFCFD}
-input:focus,select:focus{outline:2px solid var(--accent); outline-offset:0; border-color:var(--accent)}
-.hint{color:var(--muted)}
-/* Destaque do resultado */
-.banner{
-  border-radius:4px; background:var(--accent); color:#fff; padding:18px 20px;
-  border-left:0; box-shadow:0 10px 24px -14px rgba(47,75,255,.7);
-}
-.banner strong{font-family:Georgia,"Times New Roman",serif; font-size:28px; font-weight:700; color:#fff; margin:4px 0}
-.banner span{color:rgba(255,255,255,.88); font-size:13px}
-.banner.none{background:var(--warn-bg); color:var(--warn); box-shadow:none}
-.banner.none strong{color:var(--warn); font-size:20px}
-.banner.none span{color:var(--warn)}
-/* Tabelas */
-th{text-transform:uppercase; letter-spacing:.07em; font-size:10.5px; color:var(--muted); border-bottom:1px solid var(--ink)}
-td{border-bottom:1px solid #E1E7ED}
-tbody tr:last-child td{border-bottom:0}
-tr.best td{background:var(--ok-bg)}
-tr.current td{font-weight:700}
-.tag{background:var(--ok); border-radius:2px; letter-spacing:.04em; text-transform:uppercase; font-size:10px; padding:2px 6px}
-.situacao{border-radius:2px; text-transform:uppercase; letter-spacing:.06em; font-size:11px}
-/* Botão principal */
-.btn{background:var(--ink); color:#fff; border-radius:4px; box-shadow:none; letter-spacing:.02em; padding:12px 18px}
-.btn:hover{background:#1C2B45}
-.btn:disabled{background:#9AA7B6}
-.limits{color:var(--muted)}
-.rodape-app{color:var(--muted); letter-spacing:.04em; font-size:11px; border-top:1px solid var(--line); margin-top:8px; padding-top:16px}
-@media (max-width:520px){
-  .wrap{padding-top:22px}
-  .cabecalho h1{font-size:24px}
-  .card{padding:16px}
-}
-
-.acoes{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-.acoes .btn{margin-top:0}
-.btn-secundario{font:inherit;font-weight:600;padding:12px 18px;border-radius:4px;border:1px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer}
-.btn-secundario:hover{background:#F1F4F8}
-.btn-secundario:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-
-/* Faixa do topo acompanha a altura do cabeçalho: os quadros ficam sempre abaixo */
-body::before{display:none}
-.wrap{padding-top:0}
-.cabecalho{position:relative; padding:26px 0 24px; margin:0 0 24px;
-  border-image:conic-gradient(#0E1320 0 0) fill 0 // 0 100vmax}
-.cabecalho::after{content:""; position:absolute; left:0; right:0; bottom:0; height:3px;
-  border-image:conic-gradient(#2F4BFF 0 0) fill 0 // 0 100vmax}
-
-/* Quadro de regimes: nada cortado. No computador a tabela cabe inteira; no celular cada regime vira um bloco */
-table:has(#tbl-regimes){table-layout:fixed}
-table:has(#tbl-regimes) th:first-child{width:40%}
-table:has(#tbl-regimes) th{white-space:normal;line-height:1.25}
-table:has(#tbl-regimes) #tbl-regimes td:first-child{white-space:normal;text-align:left}
-.tablewrap:has(#tbl-regimes){overflow-x:visible}
-#memoria td, #memoria th{white-space:normal}
-#memoria td:nth-child(2), #memoria td:nth-child(4){white-space:nowrap}
-.card:has(#tbl-regimes){container-type:inline-size}
-@container (max-width:600px){
-  table:has(#tbl-regimes) thead{display:none}
-  table:has(#tbl-regimes) #tbl-regimes tr{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 10px;padding:12px 6px;border-bottom:1px solid #E1E7ED}
-  table:has(#tbl-regimes) #tbl-regimes td{display:block;border:0;padding:0;text-align:left;white-space:normal}
-  table:has(#tbl-regimes) #tbl-regimes td:first-child{grid-column:1/-1;font-weight:600}
-  table:has(#tbl-regimes) #tbl-regimes td.na{grid-column:1/-1}
-  table:has(#tbl-regimes) #tbl-regimes tr.best{background:var(--ok-bg)}
-  table:has(#tbl-regimes) #tbl-regimes tr.best td{background:transparent}
-  table:has(#tbl-regimes) #tbl-regimes td[data-label]::before{content:attr(data-label);display:block;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
-}
-
-/* Organização: passos, campos por atividade e seções recolhidas */
-[hidden]{display:none !important}
-.card h2.passo{margin-top:26px;padding-top:18px;border-top:1px solid #E1E7ED}
-.opc{font-weight:400;color:var(--muted);font-size:11px;margin-left:4px;text-transform:none;letter-spacing:0}
-.cab-res{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-.cab-res h2{margin:0}
-.cab-res select{width:auto;min-width:130px}
-details.secao > summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px}
-details.secao > summary::-webkit-details-marker{display:none}
-details.secao > summary h2{margin:0}
-details.secao > summary::after{content:"+";font-size:20px;line-height:1;color:var(--muted)}
-details.secao[open] > summary::after{content:"\2212"}
-details.secao[open] > summary{margin-bottom:14px}
-p.hint.so-com{margin-bottom:12px}
-@media (min-width:820px){.grid > .card:has(#tbl-regimes){position:sticky;top:16px;align-self:start}}
-
-/* Fundo: papel quadriculado de livro contábil (linhas finas e linhas-mestras), com brilho suave do tema */
-body{background-color:#EDF1F6; background-image:none}
-body::before{
-  display:block; content:""; position:fixed; top:0; left:0; right:0; bottom:0; height:auto; border:0; z-index:0; pointer-events:none;
-  background:
-    radial-gradient(820px 380px at 82% -80px, rgba(47,75,255,.16), transparent 70%),
-    radial-gradient(680px 460px at -8% 104%, rgba(27,138,90,.10), transparent 70%);
-  -webkit-mask-image:none; mask-image:none;
-}
-body::after{
-  content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
-  background-image:
-    linear-gradient(rgba(14,19,32,.075) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14,19,32,.075) 1px, transparent 1px),
-    linear-gradient(rgba(14,19,32,.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14,19,32,.035) 1px, transparent 1px);
-  background-size:120px 120px, 120px 120px, 24px 24px, 24px 24px;
-  background-position:-1px -1px;
-  -webkit-mask-image:radial-gradient(ellipse 130% 95% at 50% 0%, #000 35%, rgba(0,0,0,.25) 75%, transparent 100%);
-  mask-image:radial-gradient(ellipse 130% 95% at 50% 0%, #000 35%, rgba(0,0,0,.25) 75%, transparent 100%);
-}
-.rodape-app{position:relative; z-index:1}
-.card{box-shadow:0 1px 0 rgba(14,19,32,.04), 0 18px 40px -22px rgba(14,19,32,.35)}
-
-/* Fundo com mais presença: área azulada sob o cabeçalho, brilhos em movimento lento e pontos na grade */
-body{background-color:#EDF1F6; background-image:linear-gradient(180deg, #D6DEF5 0, #E4E9F6 260px, #EDF1F6 560px); background-repeat:no-repeat}
-body::before{
-  background:
-    radial-gradient(900px 520px at 85% -120px, rgba(47,75,255,.30), transparent 65%),
-    radial-gradient(720px 540px at -10% 110%, rgba(27,138,90,.18), transparent 65%),
-    radial-gradient(620px 420px at 108% 72%, rgba(124,92,255,.13), transparent 70%);
-  animation:deriva 26s ease-in-out infinite alternate;
-}
-@keyframes deriva{
-  0%{transform:translate3d(0,0,0) scale(1)}
-  50%{transform:translate3d(-2.5%,1.5%,0) scale(1.05)}
-  100%{transform:translate3d(2%,-1%,0) scale(1.02)}
-}
-body::after{
-  background-image:
-    radial-gradient(circle at 0 0, rgba(47,75,255,.45) 1.6px, transparent 2.2px),
-    linear-gradient(rgba(14,19,32,.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14,19,32,.08) 1px, transparent 1px),
-    linear-gradient(rgba(14,19,32,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14,19,32,.04) 1px, transparent 1px);
-  background-size:120px 120px, 120px 120px, 120px 120px, 24px 24px, 24px 24px;
-  background-position:0 0, -1px -1px, -1px -1px, -1px -1px, -1px -1px;
-  -webkit-mask-image:radial-gradient(ellipse 140% 100% at 50% 0%, #000 45%, rgba(0,0,0,.35) 85%, transparent 100%);
-  mask-image:radial-gradient(ellipse 140% 100% at 50% 0%, #000 45%, rgba(0,0,0,.35) 85%, transparent 100%);
-}
-@media (prefers-reduced-motion: reduce){ body::before{animation:none} }
-
-/* Ajuste de intensidade do fundo */
-body{background-image:linear-gradient(180deg, #BFCBF2 0, #D3DBF5 220px, #E6EBF7 480px, #EDF1F6 720px)}
-body::before{
-  background:
-    radial-gradient(1000px 560px at 88% -140px, rgba(47,75,255,.42), transparent 62%),
-    radial-gradient(820px 600px at -12% 112%, rgba(27,138,90,.26), transparent 62%),
-    radial-gradient(700px 460px at 112% 70%, rgba(124,92,255,.20), transparent 68%),
-    radial-gradient(520px 360px at 8% 18%, rgba(47,75,255,.14), transparent 70%);
-}
-body::after{
-  background-image:
-    radial-gradient(circle at 0 0, rgba(47,75,255,.65) 1.8px, transparent 2.4px),
-    linear-gradient(rgba(14,19,32,.10) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14,19,32,.10) 1px, transparent 1px),
-    linear-gradient(rgba(14,19,32,.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14,19,32,.045) 1px, transparent 1px);
-}
-
-.caixa-atividade{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-left:3px solid var(--accent);background:#F6F8FD;border-radius:4px}
-.caixa-atividade .rotulo{display:block;font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
-.caixa-atividade p{margin:0;font-size:14px;line-height:1.35;color:var(--ink)}
-
-/* Resultado um pouco mais à direita: mais espaço entre as colunas, mesma largura do quadro */
-@media (min-width:820px){ .wrap{max-width:1064px} .grid{column-gap:40px} }
-
-/* Enquadramento travado pelo CNAE */
-select:disabled{opacity:1;background:#EEF1F7;color:var(--ink);cursor:not-allowed}
-.link-mini{border:0;background:none;padding:0;margin-left:4px;font:inherit;font-weight:600;color:var(--accent);text-decoration:underline;cursor:pointer}
-/* Sufixo de porcentagem dentro do campo */
-.campo-pct{position:relative}
-.campo-pct input{padding-right:34px}
-.campo-pct.longo input{padding-right:138px}
-.campo-pct .sufixo{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;font-weight:600;pointer-events:none}
-.campo-pct input[type=number]{-moz-appearance:textfield;appearance:textfield}
-.campo-pct input::-webkit-outer-spin-button,.campo-pct input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-/* Seções do final em bloco próprio: o resultado não passa por cima delas */
-.extras{display:grid;gap:16px;margin-top:16px}
-.extras .card{margin:0}
-
-h3.sub{font-size:13px;font-weight:700;margin:20px 0 4px;color:var(--ink)}
-
-.tag.tag-2027{background:var(--accent)}
-#tbl-regimes tr.futuro td{color:#3B4A63;background:#F5F7FD}
-#tbl-regimes tr.futuro .hint{margin:2px 0 0;font-size:11.5px}
-
-/* ===== Acessibilidade (WCAG 2.1 AA) ===== */
-:root{--ok:#157148}
-input,select{border-color:#7D8A9C}
-::placeholder{color:#6B7280;opacity:1}
-select.travado{background:#EEF1F7;cursor:not-allowed}
-p.hint > label{display:inline-flex !important;align-items:center;gap:8px;min-height:28px}
-input[type=checkbox]{width:20px;height:20px;flex:0 0 auto}
-.link-mini{display:inline-block;padding:4px 2px;min-height:24px}
-details > summary{padding:10px 0}
-details.secao > summary{padding:6px 0}
-</style>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%2314213D%22/><rect x=%2212%22 y=%2232%22 width=%2210%22 height=%2220%22 rx=%223%22 fill=%22%23E9DDB8%22/><rect x=%2227%22 y=%2218%22 width=%2210%22 height=%2234%22 rx=%223%22 fill=%22%23C9A227%22/><rect x=%2242%22 y=%2226%22 width=%2210%22 height=%2226%22 rx=%223%22 fill=%22%23E9DDB8%22/></svg>">
+<title>Calculadora de Regimes Tributários</title>
+<link rel="stylesheet" href="estilo.css?v=2026-10-16.1">
 <script>
 /* Atualização automática: se houver versão nova publicada, recarrega sem precisar de Ctrl+F5 */
 (function(){
-  var VERSAO = '2026-10-15.4';
+  var VERSAO = '2026-10-16.1';
   if (location.protocol.indexOf('http') !== 0 || !window.fetch) return;
   fetch('version.json?t=' + Date.now(), {cache: 'no-store'})
     .then(function(r){ return r.ok ? r.json() : null; })
@@ -348,209 +29,311 @@ details.secao > summary{padding:6px 0}
   <div class="intro-inner">
     <div class="grafico" aria-hidden="true">
       <div class="barra melhor" style="--h:150px;--d:.2s"><i></i><span>Simples</span></div>
-      <div class="barra" style="--h:92px;--d:.34s"><i></i><span>Híbrido</span></div>
-      <div class="barra" style="--h:118px;--d:.48s"><i></i><span>Presumido</span></div>
-      <div class="barra" style="--h:64px;--d:.62s"><i></i><span>Real</span></div>
+      <div class="barra" style="--h:118px;--d:.34s"><i></i><span>Presumido</span></div>
+      <div class="barra" style="--h:92px;--d:.48s"><i></i><span>Real</span></div>
     </div>
     <h1 id="intro-title">Calculadora de Regimes Tributários</h1>
-    <p class="intro-sub">Compare Simples, híbrido, Presumido e Real e veja qual deixa mais sobra.</p>
+    <p class="intro-sub">Compare Simples, Presumido e Real, de 2026 a 2033, e veja quanto sobra para a empresa e para o sócio.</p>
     <button id="btn-entrar" class="btn-entrar" type="button">Entrar</button>
   </div>
   <div class="rodape-intro">By Italo Govêa</div>
 </section>
+
 <div id="app" hidden>
+<header class="topo">
+  <div class="topo-in">
+    <span class="marca" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#14213D"/><rect x="12" y="32" width="10" height="20" rx="3" fill="#E9DDB8"/><rect x="27" y="18" width="10" height="34" rx="3" fill="#C9A227"/><rect x="42" y="26" width="10" height="26" rx="3" fill="#E9DDB8"/></svg></span>
+    <div class="titulo">
+      <h1>Calculadora de Regimes Tributários</h1>
+      <p class="sub">Simples, Presumido e Real, com a transição da reforma de 2026 a 2033.</p>
+    </div>
+    <p class="rascunho" id="rascunho" role="status" aria-live="polite"></p>
+  </div>
+</header>
+
 <main class="wrap">
-  <div class="cabecalho"><span class="marca" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#0E1320"/><rect x="12" y="32" width="10" height="20" rx="3" fill="#9AAEFF"/><rect x="27" y="18" width="10" height="34" rx="3" fill="#B5F5D4"/><rect x="42" y="26" width="10" height="26" rx="3" fill="#9AAEFF"/></svg></span><div><h1>Calculadora de Regimes Tributários</h1>
-  <p class="sub">Informe o CNPJ e o faturamento. Veja qual regime deixa mais sobra e gere o PDF para o cliente.</p></div></div>
+  <nav class="stepper" aria-label="Etapas da simulação">
+    <ol>
+      <li><button type="button" class="passo" data-passo="1"><span class="num" aria-hidden="true">1</span><span class="rot">Empresa</span></button></li>
+      <li><button type="button" class="passo" data-passo="2"><span class="num" aria-hidden="true">2</span><span class="rot">Faturamento</span></button></li>
+      <li><button type="button" class="passo" data-passo="3"><span class="num" aria-hidden="true">3</span><span class="rot">Compras e impostos</span></button></li>
+      <li><button type="button" class="passo" data-passo="4"><span class="num" aria-hidden="true">4</span><span class="rot">Sócios e clientes</span></button></li>
+      <li><button type="button" class="passo" data-passo="5"><span class="num" aria-hidden="true">5</span><span class="rot">Resultado</span></button></li>
+    </ol>
+  </nav>
 
-  <div class="grid">
-    <section class="card" aria-labelledby="h-in">
-      <h2 id="h-in">1. Empresa</h2>
-      <label for="cnpj">CNPJ</label>
-      <input id="cnpj" aria-describedby="cnpj-msg" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="00.000.000/0000-00">
-      <p class="status" id="cnpj-msg" role="status">Digite os 14 números do CNPJ.</p>
-
-      <label for="nome">Razão social</label>
-      <input id="nome" type="text" autocomplete="off" placeholder="Preenchida ao consultar o CNPJ">
-      <span class="situacao" id="situacao" hidden></span>
-
-      <label for="cnae">CNAE principal <span class="opc">opcional</span></label>
-      <input id="cnae" aria-describedby="cnae-info" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="0000-0/00">
-      <p class="status" id="cnae-info" role="status">Define a atividade e o Fator R automaticamente.</p>
-      <div id="caixa-atividade" class="caixa-atividade" hidden>
-        <span class="rotulo">Atividade</span>
-        <p id="cnae-atividade"></p>
+  <form id="form" novalidate onsubmit="return false">
+  <!-- 1. Empresa -->
+  <section class="card etapa" data-etapa="1" aria-labelledby="t1">
+    <h2 id="t1">Empresa</h2>
+    <div class="grade2">
+      <div>
+        <label for="cnpj">CNPJ <span class="opc">opcional</span></label>
+        <input id="cnpj" aria-describedby="cnpj-msg" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="00.000.000/0000-00">
+        <p class="status" id="cnpj-msg" role="status">Preenche razão social e atividade.</p>
       </div>
+      <div>
+        <label for="nome">Razão social <span class="opc">opcional</span></label>
+        <input id="nome" type="text" autocomplete="off" placeholder="Preenchida ao consultar o CNPJ">
+        <span class="situacao" id="situacao" hidden></span>
+      </div>
+    </div>
+    <label for="cnae">CNAE principal <span class="opc">opcional</span></label>
+    <input id="cnae" aria-describedby="cnae-info" class="mono curto" type="text" inputmode="numeric" autocomplete="off" placeholder="0000-0/00">
+    <p class="status" id="cnae-info" role="status">Define a atividade e o Fator R automaticamente.</p>
+    <div id="caixa-atividade" class="caixa-atividade" hidden>
+      <span class="rotulo">Atividade</span>
+      <p id="cnae-atividade"></p>
+    </div>
 
-      <h2 class="passo">2. Atividade e faturamento</h2>
-      <label for="atividade">Enquadramento para o cálculo</label>
-      <select id="atividade" aria-describedby="linha-trava">
-        <option value="comercio" selected>Comércio (venda de produtos)</option>
-        <option value="industria">Indústria (fabricação)</option>
-        <option value="servicos">Serviços (Anexo III)</option>
-        <option value="servicos4">Serviços de limpeza, vigilância, obras e paisagismo (Anexo IV)</option>
-        <option value="servicos5">Serviços do Anexo V (intelectuais e técnicos)</option>
-        <option value="construcao_total">Construção civil: empreitada total com materiais (Anexo IV)</option>
-        <option value="construcao_mo">Construção civil: mão de obra ou materiais parciais (Anexo IV)</option>
-        <option value="locacao">Locação de imóveis próprios (inclui holding patrimonial)</option>
-        <option value="holding">Holding de participações: receitas de administração</option>
-        <option value="incorporacao">Imobiliário: incorporação e loteamento</option>
-      </select>
-      <p class="hint" id="linha-trava" hidden>Preenchido pelo CNAE. <button type="button" id="btn-destravar" class="link-mini">Alterar manualmente</button></p>
-      <p class="hint" id="linha-fatorr" hidden><label for="fatorr" style="display:inline;margin:0"><input id="fatorr" type="checkbox" disabled style="width:auto"> Atividade da lista do Fator R</label></p>
+    <label for="atividade">Enquadramento para o cálculo</label>
+    <select id="atividade" aria-describedby="linha-trava">
+      <option value="comercio" selected>Comércio (venda de produtos)</option>
+      <option value="industria">Indústria (fabricação)</option>
+      <option value="servicos">Serviços (Anexo III)</option>
+      <option value="servicos4">Serviços de limpeza, vigilância, obras e paisagismo (Anexo IV)</option>
+      <option value="servicos5">Serviços do Anexo V (intelectuais e técnicos)</option>
+      <option value="construcao_total">Construção civil: empreitada total com materiais (Anexo IV)</option>
+      <option value="construcao_mo">Construção civil: mão de obra ou materiais parciais (Anexo IV)</option>
+      <option value="locacao">Locação de imóveis próprios (inclui holding patrimonial)</option>
+      <option value="holding">Holding de participações: receitas de administração</option>
+      <option value="incorporacao">Imobiliário: incorporação e loteamento</option>
+    </select>
+    <p class="hint" id="linha-trava" hidden>Preenchido pelo CNAE. <button type="button" id="btn-destravar" class="link-mini">Alterar manualmente</button></p>
+    <p class="hint" id="linha-fatorr" hidden><label for="fatorr" class="check"><input id="fatorr" type="checkbox" disabled> Atividade da lista do Fator R</label></p>
+  </section>
 
-      <label for="receita">Faturamento mensal</label>
-      <input id="receita" type="text" inputmode="numeric" autocomplete="off" value="R$ 0,00">
+  <!-- 2. Faturamento -->
+  <section class="card etapa" data-etapa="2" aria-labelledby="t2" hidden>
+    <h2 id="t2">Faturamento e custos</h2>
+    <div class="grade2">
+      <div>
+        <label for="receita">Faturamento mensal</label>
+        <div class="campo-moeda"><span aria-hidden="true">R$</span><input id="receita" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00"></div>
+      </div>
+      <div>
+        <label for="folha">Folha de pagamento mensal</label>
+        <div class="campo-moeda"><span aria-hidden="true">R$</span><input id="folha" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00" aria-describedby="dica-folha aviso-folha"></div>
+        <p class="hint" id="dica-folha">Salários e pró-labore. Digite 0 se não houver.</p>
+        <p class="aviso" id="aviso-folha" hidden></p>
+      </div>
+    </div>
+    <label for="margem">Lucro antes dos impostos</label>
+    <div class="campo-pct longo"><input id="margem" type="number" min="0" max="100" step="0.5" placeholder="0" aria-describedby="dica-margem aviso-margem"><span class="sufixo" aria-hidden="true">% do faturamento</span></div>
+    <p class="hint" id="dica-margem">O que sobra depois de todos os custos, antes dos impostos.</p>
+    <p class="aviso" id="aviso-margem" hidden></p>
+    <details class="saiba"><summary>Saiba mais</summary>
+      <p>Exemplo: fatura R$ 20.000 e gasta R$ 16.000 com mercadoria, aluguel e salários: a margem é 20%. O faturamento mensal vezes 12 define a faixa do Simples.</p>
+    </details>
+  </section>
 
-      <label for="margem">Lucro antes dos impostos</label>
-      <div class="campo-pct longo"><input id="margem" type="number" min="0" max="100" step="0.5" value="0"><span class="sufixo" aria-hidden="true">% do faturamento</span></div>
-      <p class="hint">O que sobra após todos os custos, antes dos impostos. Ex.: fatura R$ 20.000 e gasta R$ 16.000 = 20%.</p>
-
-      <label for="folha">Folha de pagamento mensal</label>
-      <input id="folha" type="text" inputmode="numeric" autocomplete="off" value="R$ 0,00">
-      <p class="hint">Salários, pró-labore e encargos.</p>
-
-      <h2 class="passo">3. Compras e impostos</h2>
-      <label for="compras">Compras com crédito</label>
-      <div class="campo-pct longo"><input id="compras" type="number" min="0" max="100" step="1" value="0"><span class="sufixo" aria-hidden="true">% do faturamento</span></div>
-      <p class="hint so-com"><label for="semcompras" style="display:inline;margin:0"><input id="semcompras" type="checkbox" style="width:auto"> Não há compras com crédito</label></p>
-
+  <!-- 3. Compras e impostos -->
+  <section class="card etapa" data-etapa="3" aria-labelledby="t3" hidden>
+    <h2 id="t3">Compras e impostos</h2>
+    <label for="compras">Compras com crédito</label>
+    <div class="campo-pct longo"><input id="compras" type="number" min="0" max="100" step="1" placeholder="0" aria-describedby="aviso-compras"><span class="sufixo" aria-hidden="true">% do faturamento</span></div>
+    <p class="hint so-com"><label for="semcompras" class="check"><input id="semcompras" type="checkbox"> Não há compras com crédito</label></p>
+    <p class="aviso" id="aviso-compras" hidden></p>
+    <div class="grade2">
       <div class="so-com">
         <label for="icms">ICMS de SP</label>
-        <div class="campo-pct"><input id="icms" type="number" min="0" max="30" step="0.5" value="0"><span class="sufixo" aria-hidden="true">%</span></div>
-        <p class="hint">18% em geral; 7% ou 12% para alguns alimentos.</p>
+        <div class="campo-pct"><input id="icms" type="number" min="0" max="30" step="0.5" placeholder="18" aria-describedby="dica-icms aviso-icms"><span class="sufixo" aria-hidden="true">%</span></div>
+        <p class="hint" id="dica-icms">18% em geral; 7% ou 12% para alguns alimentos.</p>
+        <p class="aviso" id="aviso-icms" hidden></p>
       </div>
-
       <div class="so-iss">
         <label for="iss">ISS de Guarulhos</label>
-        <div class="campo-pct"><input id="iss" type="number" min="0" max="5" step="0.1" value="0"><span class="sufixo" aria-hidden="true">%</span></div>
-        <p class="hint">Entre 2% e 5%; a maioria dos serviços paga 5%.</p>
+        <div class="campo-pct"><input id="iss" type="number" min="0" max="5" step="0.1" placeholder="5" aria-describedby="dica-iss aviso-iss"><span class="sufixo" aria-hidden="true">%</span></div>
+        <p class="hint" id="dica-iss">Entre 2% e 5%.</p>
+        <p class="aviso" id="aviso-iss" hidden></p>
       </div>
-    </section>
+    </div>
+    <details class="saiba"><summary>Saiba mais</summary>
+      <p>Compras com crédito são mercadorias e insumos comprados de empresas fora do Simples. Elas reduzem o ICMS, o PIS/COFINS do Lucro Real e, a partir de 2027, a CBS e o IBS de quem está no regime regular.</p>
+    </details>
+  </section>
 
-    <section class="card" aria-labelledby="h-out">
-      <div class="cab-res">
-        <h2 id="h-out">Resultado</h2>
-        <select id="periodo" aria-label="Período do resultado">
-          <option value="1" selected>Mensal</option>
-          <option value="2">Bimestral</option>
-          <option value="6">Semestral</option>
-          <option value="12">Anual</option>
-        </select>
+  <!-- 4. Sócios e clientes -->
+  <section class="card etapa" data-etapa="4" aria-labelledby="t4" hidden>
+    <h2 id="t4">Sócios e clientes</h2>
+    <fieldset class="cards-escolha">
+      <legend>Quem compra da empresa</legend>
+      <label class="cartao"><input type="radio" name="comprador" value="pf" checked><span><b>Consumidor final</b><small>Pessoa física. Não toma crédito de CBS/IBS.</small></span></label>
+      <label class="cartao"><input type="radio" name="comprador" value="pj_real"><span><b>Empresa no Lucro Real</b><small>Toma crédito de CBS/IBS a partir de 2027.</small></span></label>
+      <label class="cartao"><input type="radio" name="comprador" value="pj_presumido"><span><b>Empresa no Presumido</b><small>Toma crédito de CBS/IBS a partir de 2027.</small></span></label>
+      <label class="cartao"><input type="radio" name="comprador" value="pj_simples"><span><b>Empresa no Simples</b><small>Recolhe no DAS e não toma crédito.</small></span></label>
+    </fieldset>
+
+    <fieldset class="cards-escolha">
+      <legend>Lucro da empresa</legend>
+      <label class="cartao"><input type="radio" name="distribuir" value="sim" checked><span><b>Distribuir aos sócios</b><small>Inclui o IR sobre dividendos da Lei 15.270/2025.</small></span></label>
+      <label class="cartao"><input type="radio" name="distribuir" value="nao"><span><b>Manter na empresa</b><small>Compara só os tributos da empresa.</small></span></label>
+    </fieldset>
+
+    <div class="so-distribuir">
+      <div class="grade3">
+        <div>
+          <label for="socios">Número de sócios</label>
+          <input id="socios" type="number" min="1" max="20" step="1" value="1">
+        </div>
+        <div>
+          <label for="percentual">Parte do lucro distribuída</label>
+          <div class="campo-pct"><input id="percentual" type="number" min="0" max="100" step="5" value="100"><span class="sufixo" aria-hidden="true">%</span></div>
+        </div>
+        <div>
+          <label for="prolabore">Pró-labore por sócio, mensal</label>
+          <div class="campo-moeda"><span aria-hidden="true">R$</span><input id="prolabore" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00"></div>
+        </div>
       </div>
-      <div class="banner" id="banner" aria-live="polite" aria-atomic="true"></div>
-      <div class="tablewrap">
-        <table>
-          <thead><tr><th>Regime</th><th>Impostos</th><th>Alíquota efetiva</th><th>Sobra após impostos</th></tr></thead>
-          <tbody id="tbl-regimes"></tbody>
-        </table>
+      <div class="grade2">
+        <div>
+          <label for="outras">Outras rendas de cada sócio no ano <span class="opc">opcional</span></label>
+          <div class="campo-moeda"><span aria-hidden="true">R$</span><input id="outras" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00" aria-describedby="dica-outras"></div>
+          <p class="hint" id="dica-outras">Salários, aluguéis, aplicações. Contam para o limite de R$ 600 mil da tributação mínima.</p>
+        </div>
+        <div>
+          <label for="irOutras">IR já pago sobre essas rendas <span class="opc">opcional</span></label>
+          <div class="campo-moeda"><span aria-hidden="true">R$</span><input id="irOutras" type="text" inputmode="numeric" autocomplete="off" placeholder="0,00"></div>
+        </div>
       </div>
-      <p class="status bad" id="alerta-compras" role="alert" hidden>Em comércio e indústria, informe as compras com crédito ou marque que não há. Sem elas, Presumido e Real ficam subestimados e o PDF não é gerado.</p>
-      <details class="memo-calc">
-        <summary>Memória de cálculo (todos os regimes), mensal</summary>
-        <div id="memoria"></div>
-      </details>
-      <div class="acoes"><button id="btn-pdf" class="btn" type="button">Baixar análise em PDF</button><button id="btn-limpar" class="btn-secundario" type="button">Limpar Consulta</button></div>
-      <p class="status" id="pdf-msg" role="status"></p>
-    </section>
+      <p class="hint"><label for="divsimples" class="check"><input id="divsimples" type="checkbox" checked> Aplicar a Lei 15.270 também aos dividendos do Simples (posição da Receita; há decisões em contrário)</label></p>
+    </div>
 
+    <details class="saiba"><summary>Alíquotas de referência da reforma</summary>
+      <div class="grade2">
+        <div>
+          <label for="refcbs">CBS de referência</label>
+          <div class="campo-pct"><input id="refcbs" type="number" min="0" max="30" step="0.01" value="9.21"><span class="sufixo" aria-hidden="true">%</span></div>
+        </div>
+        <div>
+          <label for="refibs">IBS de referência</label>
+          <div class="campo-pct"><input id="refibs" type="number" min="0" max="40" step="0.01" value="18.7"><span class="sufixo" aria-hidden="true">%</span></div>
+        </div>
+      </div>
+      <p class="hint">Estimativa do Comitê Gestor (Resolução CGIBS nº 14/2026). A CBS de 2027 será fixada pelo Senado até 15/12/2026. Em 2027–2028 a CBS é a referência menos 0,1 ponto e o IBS é 0,1%.</p>
+    </details>
+  </section>
 
+  <div class="nav-etapas" id="nav-etapas">
+    <p class="falta" id="falta" role="status" aria-live="polite"></p>
+    <div class="botoes">
+      <button type="button" class="btn-secundario" id="btn-voltar">Voltar</button>
+      <button type="button" class="btn" id="btn-proximo">Próximo</button>
+    </div>
   </div>
-  <div class="extras">
-    <section class="card full" aria-labelledby="h-comp">
-      <details class="secao">
-        <summary><h2 id="h-comp">Reforma 2027: Simples híbrido e crédito do comprador</h2></summary>
-      <label for="comprador">Quem compra do seu cliente</label>
-      <select id="comprador">
-        <option value="pf" selected>Pessoa física (consumidor final)</option>
-        <option value="pj_real">PJ no Lucro Real</option>
-        <option value="pj_presumido">PJ no Lucro Presumido</option>
-        <option value="pj_simples">PJ no Simples (recolhe no DAS)</option>
-        <option value="pj_simples_regular">PJ no Simples com IBS/CBS no regime regular</option>
-      </select>
-      <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div>
-          <label for="cbs27">CBS 2027</label>
-          <div class="campo-pct"><input id="cbs27" type="number" min="0" max="30" step="0.01" value="9.11"><span class="sufixo" aria-hidden="true">%</span></div>
+  </form>
+
+  <!-- 5. Resultado -->
+  <section class="resultado" id="resultado" data-etapa="5" aria-labelledby="t5" hidden>
+    <div class="barra-res card">
+      <h2 id="t5">Resultado</h2>
+      <div class="controles">
+        <div class="ctl">
+          <label for="periodo">Período</label>
+          <select id="periodo">
+            <option value="1" selected>Mensal</option>
+            <option value="2">Bimestral</option>
+            <option value="6">Semestral</option>
+            <option value="12">Anual</option>
+          </select>
         </div>
-        <div>
-          <label for="ibs27">IBS 2027</label>
-          <div class="campo-pct"><input id="ibs27" type="number" min="0" max="30" step="0.01" value="0.1"><span class="sufixo" aria-hidden="true">%</span></div>
+        <div class="ctl ctl-ano">
+          <label for="ano">Ano da simulação: <output id="ano-saida" for="ano">2026</output></label>
+          <input id="ano" type="range" min="2026" max="2033" step="1" value="2026" aria-describedby="ano-fase">
+          <div class="marcas" aria-hidden="true"><span>2026</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>2033</span></div>
+          <p class="hint" id="ano-fase"></p>
         </div>
       </div>
-      <p class="hint">CBS de 2027 ainda não fixada (Senado até 15/12/2026); 9,11% é estimativa. Mesmo preço final em todos os casos; crédito das compras supõe fornecedores do regime regular.</p>
-      <h3 class="sub">Seu cliente: Simples no DAS ou Simples híbrido</h3>
-      <div class="tablewrap">
-        <table>
-          <thead><tr><th>Opção</th><th>DAS</th><th>IBS/CBS fora do DAS</th><th>Total de imposto</th></tr></thead>
-          <tbody id="tbl-hibrido27"></tbody>
-        </table>
+    </div>
+
+    <div class="kpis" id="kpis" aria-live="polite" aria-atomic="true"></div>
+
+    <section class="card" aria-labelledby="h-trib">
+      <div class="cab">
+        <h2 id="h-trib">Tributos por regime</h2>
+        <div class="segmentado" role="group" aria-label="Filtrar por categoria">
+          <button type="button" data-cat="todos" aria-pressed="true">Consolidado</button>
+          <button type="button" data-cat="renda" aria-pressed="false">Renda</button>
+          <button type="button" data-cat="consumo" aria-pressed="false">Consumo</button>
+          <button type="button" data-cat="folha" aria-pressed="false">Folha</button>
+        </div>
       </div>
-      <p class="status" id="hibrido27-resumo"></p>
-      <h3 class="sub">Comprador: custo com o crédito</h3>
-      <div class="tablewrap">
-        <table>
-          <thead><tr><th>Fornecedor</th><th>Valor pago</th><th>Crédito do comprador</th><th>Custo líquido</th></tr></thead>
-          <tbody id="tbl-comprador"></tbody>
-        </table>
-      </div>
-      <p class="status" id="comprador-resumo"></p>
-      </details>
+      <div class="tablewrap"><table class="tbl-trib" id="tbl-trib"></table></div>
     </section>
 
-    <section class="card full" aria-labelledby="h-faixa">
-      <details class="secao">
-        <summary><h2 id="h-faixa">Simulação: qual regime ganha em cada faturamento</h2></summary>
-      <p class="hint">Mesmas entradas, mudando só o faturamento. A linha destacada é o valor atual.</p>
-      <div class="tablewrap">
-        <table>
-          <thead><tr><th>Faturamento mensal</th><th>Melhor regime</th><th>Sobra no melhor</th></tr></thead>
-          <tbody id="tbl-faixa"></tbody>
-        </table>
-      </div>
-      </details>
+    <section class="card" aria-labelledby="h-comp">
+      <h2 id="h-comp">Comparativo lado a lado</h2>
+      <p class="hint" id="comp-dica"></p>
+      <div class="comparativo" id="comparativo"></div>
     </section>
 
-    <section class="card full" aria-labelledby="h-lim">
-      <details class="secao">
-        <summary><h2 id="h-lim">Premissas e limites</h2></summary>
+    <section class="card" aria-labelledby="h-ins">
+      <h2 id="h-ins">Leituras do resultado</h2>
+      <ul class="insights" id="insights"></ul>
+    </section>
+
+    <details class="card secao" id="secao-comprador">
+      <summary><h2>Seu cliente e o crédito de CBS/IBS</h2></summary>
+      <p class="hint" id="comprador-dica"></p>
+      <div class="tablewrap"><table><thead><tr><th>Se a empresa estiver no</th><th>Cliente paga</th><th>Crédito do cliente</th><th>Custo para o cliente</th></tr></thead><tbody id="tbl-comprador"></tbody></table></div>
+    </details>
+
+    <details class="card secao">
+      <summary><h2>Qual regime ganha em cada faturamento</h2></summary>
+      <p class="hint">Mesmas entradas e mesmo ano, mudando só o faturamento mensal.</p>
+      <div class="tablewrap"><table><thead><tr><th>Faturamento mensal</th><th>Melhor regime</th><th>Sobra no melhor</th></tr></thead><tbody id="tbl-faixa"></tbody></table></div>
+    </details>
+
+    <details class="card secao">
+      <summary><h2 id="h-memo">Memória de cálculo</h2></summary>
+      <div id="memoria"></div>
+    </details>
+
+    <details class="card secao">
+      <summary><h2>Premissas e pontos a confirmar</h2></summary>
       <ul class="limits">
-        <li>Regras de 2026. A partir de 2027, PIS e COFINS saem e entra a CBS, e esta tela não modela essa transição.</li>
-        <li>Simples Nacional: faixa pelo faturamento dos últimos 12 meses, com a tabela do Anexo I (comércio), II (indústria), III, IV ou V (serviços). ICMS dentro do DAS, sem crédito. CPP dentro do DAS nos Anexos III e V.</li>
-        <li>Simples híbrido (a partir de 2027): IBS e CBS fora do DAS, pelo regime regular, opcional para qualquer optante do Simples, inclusive serviços (LC 214/2025, art. 41, § 3º). Aparece no bloco da reforma. Não existe opção de tirar o ICMS do DAS: ICMS e ISS só saem do DAS acima do sublimite de R$ 3,6 milhões.</li>
-        <li>Lucro Presumido: presunção de IRPJ de 8% (comércio e indústria) ou 32% (serviços), e de CSLL de 12% (comércio e indústria) ou 32% (serviços). IRPJ de 15% com adicional de 10% acima de R$ 20 mil no mês, CSLL de 9%, PIS de 0,65% e COFINS de 3%.</li>
-        <li>Lucro Real: IRPJ de 15% com adicional de 10%, CSLL de 9%, PIS de 1,65% e COFINS de 7,6%, com crédito sobre as compras informadas (apuração simplificada). Não considera prejuízo fiscal.</li>
-        <li>Fator R: só para atividades da lista do Anexo V, marcadas na tela. Folha dos últimos 12 meses ÷ receita dos últimos 12 meses, com 28% como limite. A tela usa a folha do mês como aproximação.</li>
-        <li>CPP de 20% sobre a folha: no Anexo IV, e nos regimes sem DAS (Presumido e Real), é custo à parte. RAT e terceiros não são considerados.</li>
-        <li>Simplificações: não considera substituição tributária, DIFAL, RAT, regimes específicos de ICMS do estado nem presunções de serviços abaixo de 32%.</li>
-        <li>Imobiliário, locação, holding e construção: locação de imóveis próprios, holding de participações e incorporação/loteamento não podem optar pelo Simples. Construção usa o Anexo IV; no Presumido, empreitada total com materiais usa 8% (IRPJ) e 12% (CSLL), e os demais casos 32%. Locação e holding usam 32%; incorporação, 8% e 12%. RET de 4% só para incorporação com patrimônio de afetação. Dividendos da holding não entram no cálculo.</li>
-        <li>Cenário 2027 (comprador): comprador PF ou no Simples recolhendo no DAS não toma crédito de IBS/CBS. Comprador do regime regular toma crédito integral do IBS/CBS destacado, ou só do IBS/CBS pago no DAS quando o fornecedor está no DAS (LC 214/2025, art. 47, § 9º). A fatia de IBS/CBS no DAS assume a fatia atual de PIS e COFINS de cada faixa.</li>
-        <li>Períodos: bimestral, semestral e anual multiplicam o resultado mensal, supondo o mesmo faturamento e margem em todos os meses.</li>
-        <li>Estimativa. Confirme com o contador responsável antes de decidir a troca de regime.</li>
+        <li>Mesmo preço total ao cliente: a partir de 2027 a CBS e o IBS estão dentro do faturamento informado. No regime regular, isso reduz a receita da empresa.</li>
+        <li>Crédito de CBS/IBS e de ICMS sobre as compras supõe fornecedores do regime regular e a mesma alíquota de ICMS da venda.</li>
+        <li>Simples 2027–2033: alíquotas e partilha dos Anexos XVIII a XXII da LC 214/2025. Na 6ª faixa de 2027–2028, só a fatia da CBS veio da tabela; os demais tributos foram redistribuídos na proporção de 2026.</li>
+        <li>IBS de 2029 a 2032 a 10%, 20%, 30% e 40% da referência. As alíquotas reais serão fixadas ano a ano.</li>
+        <li>Acima do sublimite (6ª faixa), ICMS, ISS e IBS saem do DAS e seguem as regras normais.</li>
+        <li>LC 224/2025: acréscimo de 10% lido como relativo (8% vira 8,8%). Em 2026 a CSLL só aumenta a partir de abril; no período anual de 2026 entram 9 meses.</li>
+        <li>Lucro Real simplificado: sem adições, exclusões nem prejuízo a compensar.</li>
+        <li>Distribuição: lucro dividido igualmente entre os sócios. O IR retido de 10% é antecipação do IRPFM e volta no ajuste se passar do devido. A dedução de IRPF no IRPFM considera só o pró-labore e o IR informado.</li>
+        <li>Dividendos do Simples: a Receita aplica a Lei 15.270; há decisões judiciais afastando a retenção pela LC 123, art. 14. Desmarque a opção na etapa 4 para ver o outro cenário.</li>
+        <li>Fator R usa a folha do mês como aproximação da média de 12 meses. A folha inclui o pró-labore.</li>
+        <li>Não considera substituição tributária, DIFAL, RAT, contribuições a terceiros nem regimes específicos.</li>
+        <li>Estimativa. Confirme com o contador responsável antes de trocar de regime.</li>
       </ul>
-      </details>
-    </section>
-  </div>
+    </details>
+
+    <div class="acoes">
+      <button id="btn-pdf" class="btn" type="button">Exportar PDF</button>
+      <button id="btn-compartilhar" class="btn-secundario" type="button">Compartilhar</button>
+      <button id="btn-salvar" class="btn-secundario" type="button">Salvar no histórico</button>
+      <button id="btn-editar" class="btn-secundario" type="button">Editar dados</button>
+      <button id="btn-limpar" class="btn-secundario" type="button">Nova simulação</button>
+    </div>
+    <p class="status" id="acao-msg" role="status" aria-live="polite"></p>
+
+    <details class="card secao" id="secao-historico">
+      <summary><h2>Histórico neste navegador</h2></summary>
+      <ul class="historico" id="historico"></ul>
+    </details>
+  </section>
 </main>
-<footer class="rodape-app">By Italo Govêa · versão 2026-10-15.4</footer>
+<footer class="rodape-app">By Italo Govêa · versão 2026-10-16.1</footer>
 </div>
+
 <script src="lib/jspdf.umd.min.js"></script>
-<script src="cnae.js?v=2026-10-15.4"></script>
-<script src="calculadora.js?v=2026-10-15.4"></script>
-<script>
-(function(){
-  var intro = document.getElementById('intro');
-  var app = document.getElementById('app');
-  document.getElementById('btn-entrar').addEventListener('click', function(){
-    intro.classList.add('saindo');
-    setTimeout(function(){
-      intro.hidden = true;
-      app.hidden = false;
-      window.scrollTo(0, 0);
-      var campo = document.getElementById('cnpj'); if (campo) campo.focus();
-    }, 450);
-  });
-})();
-</script>
+<script src="cnae.js?v=2026-10-16.1"></script>
+<script src="motor/parametros.js?v=2026-10-16.1"></script>
+<script src="motor/simples.js?v=2026-10-16.1"></script>
+<script src="motor/renda-pf.js?v=2026-10-16.1"></script>
+<script src="motor/regimes.js?v=2026-10-16.1"></script>
+<script src="motor/insights.js?v=2026-10-16.1"></script>
+<script src="motor/ganho-capital.js?v=2026-10-16.1"></script>
+<script src="dados/armazenamento.js?v=2026-10-16.1"></script>
+<script src="calculadora.js?v=2026-10-16.1"></script>
 </body>
 </html>

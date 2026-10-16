@@ -1,0 +1,8 @@
+{
+  "name": "calculadora-regimes",
+  "private": true,
+  "description": "Calculadora de regimes tributários. Sem build: os arquivos rodam direto no navegador.",
+  "scripts": {
+    "test": "node --test testes/*.test.js"
+  }
+}

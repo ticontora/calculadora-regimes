@@ -233,7 +233,7 @@
     const e = entradas();
     const res = IM.calcular(e);
     const titulo = (e.operacao === 'venda' ? 'Venda de imóvel de ' + fmtBRL.format(e.venda.valor) : 'Locação de ' + fmtBRL.format(e.locacao.aluguel) + '/mês');
-    const ok = window.Armazenamento.salvarNoHistorico({titulo, resumo: 'Imobiliário · melhor: ' + res.perfis[res.ranking[0]].nome + ' · ' + e.ano, dados: coletar()});
+    const ok = window.Armazenamento.salvarNoHistorico({titulo, resumo: 'Calculadora Imobiliária · melhor: ' + res.perfis[res.ranking[0]].nome + ' · ' + e.ano, dados: coletar()});
     window.renderHistorico();
     msg(ok ? 'Salvo no histórico deste navegador.' : 'Este navegador bloqueou o armazenamento; a simulação não foi salva.', ok ? 'ok' : 'bad');
   });

@@ -36,11 +36,11 @@ Cobrem: o IR de imóvel adquirido em 1980 (R$ 13.712,28, com a redução do art.
 
 ## O que a tela faz
 
-Ao entrar, a pessoa escolhe a calculadora: **Regimes da empresa** ou **Imobiliário**.
+Ao entrar, a pessoa escolhe a calculadora: **Calculadora Geral Tributária** ou **Calculadora Imobiliária**.
 
-Imobiliário: operação (venda ou locação), proprietário (PF, Presumido, Real, Simples), valores, regime de transição (art. 487 para contratos de locação antigos) e resultado com comparação PF × empresa, já com o IR na distribuição de lucros. Cessão de direitos, permuta, incorporação (art. 485), parcelamento do solo (art. 486), art. 488 e Lei 14.973 ficam sob consulta.
+Calculadora Imobiliária: operação (venda ou locação), proprietário (PF, Presumido, Real, Simples), valores, regime de transição (art. 487 para contratos de locação antigos) e resultado com comparação PF × empresa, já com o IR na distribuição de lucros. Cessão de direitos, permuta, incorporação (art. 485), parcelamento do solo (art. 486), art. 488 e Lei 14.973 ficam sob consulta.
 
-Regimes da empresa:
+Calculadora Geral Tributária:
 
 - Etapas: empresa (CNPJ e CNAE travam o enquadramento), faturamento, compras e impostos, sócios e clientes, resultado. "Próximo" só avança com os dados obrigatórios e diz o que falta.
 - Avisos de consequência: campo sem dado mostra se o imposto sai maior ou menor.

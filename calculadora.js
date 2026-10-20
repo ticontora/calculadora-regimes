@@ -600,7 +600,7 @@ function mostrarModo(m){
   $('btn-trocar').hidden = !m;
   $('rascunho').textContent = '';
   document.querySelector('.topo .sub').textContent = m === 'imob'
-    ? 'Imobiliário: venda e locação por pessoa física ou empresa, de 2026 a 2033.'
+    ? 'Calculadora Imobiliária: venda e locação por pessoa física ou empresa, de 2026 a 2033.'
     : 'Simples, Simples Híbrido, Presumido e Real, com a transição da reforma de 2026 a 2033.';
   if (m) window.Armazenamento.salvarModo(m);
   window.scrollTo(0, 0);

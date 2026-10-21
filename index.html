@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%2314213D%22/><rect x=%2212%22 y=%2232%22 width=%2210%22 height=%2220%22 rx=%223%22 fill=%22%23E9DDB8%22/><rect x=%2227%22 y=%2218%22 width=%2210%22 height=%2234%22 rx=%223%22 fill=%22%23C9A227%22/><rect x=%2242%22 y=%2226%22 width=%2210%22 height=%2226%22 rx=%223%22 fill=%22%23E9DDB8%22/></svg>">
 <title>Calculadora de Regimes Tributários</title>
-<link rel="stylesheet" href="estilo.css?v=2026-10-20.1">
+<link rel="stylesheet" href="estilo.css?v=2026-10-21.1">
 <script>
 /* Atualização automática: se houver versão nova publicada, recarrega sem precisar de Ctrl+F5 */
 (function(){
-  var VERSAO = '2026-10-20.1';
+  var VERSAO = '2026-10-21.1';
   if (location.protocol.indexOf('http') !== 0 || !window.fetch) return;
   fetch('version.json?t=' + Date.now(), {cache: 'no-store'})
     .then(function(r){ return r.ok ? r.json() : null; })
@@ -26,15 +26,25 @@
 </head>
 <body>
 <section id="intro" class="intro" aria-labelledby="intro-title">
+  <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="particulas" id="particulas" aria-hidden="true"></div>
   <div class="intro-inner">
     <div class="grafico" aria-hidden="true">
-      <div class="barra melhor" style="--h:150px;--d:.2s"><i></i><span>Simples</span></div>
-      <div class="barra" style="--h:118px;--d:.34s"><i></i><span>Presumido</span></div>
-      <div class="barra" style="--h:92px;--d:.48s"><i></i><span>Real</span></div>
+      <div class="barras">
+        <div class="barra melhor" style="--h:150px;--d:.25s"><b class="valor" data-alvo="4455">R$ 0</b><i></i></div>
+        <div class="barra" style="--h:104px;--d:.4s"><b class="valor" data-alvo="2704">R$ 0</b><i></i></div>
+        <div class="barra" style="--h:66px;--d:.55s"><b class="valor" data-alvo="1144">R$ 0</b><i></i></div>
+        <div class="barra" style="--h:34px;--d:.7s"><b class="valor" data-alvo="252">R$ 0</b><i></i></div>
+      </div>
+      <svg class="tendencia" viewBox="0 0 266 160" preserveAspectRatio="none">
+        <path d="M28 -18 L98 28 L168 66 L238 98"/>
+        <circle cx="28" cy="-18" r="5"/>
+      </svg>
+      <div class="rotulos"><span class="melhor">Simples</span><span>Híbrido</span><span>Real</span><span>Presumido</span></div>
     </div>
-    <h1 id="intro-title">Calculadora de Regimes Tributários</h1>
-    <p class="intro-sub">Compare Simples, Presumido e Real, de 2026 a 2033, e veja quanto sobra para a empresa e para o sócio.</p>
-    <button id="btn-entrar" class="btn-entrar" type="button">Entrar</button>
+    <h1 id="intro-title"><span class="brilho">Calculadora de Regimes Tributários</span></h1>
+    <p class="intro-sub">Compare Simples, Simples Híbrido, Presumido e Real de 2026 a 2033, e simule a venda ou o aluguel de imóveis.</p>
+    <button id="btn-entrar" class="btn-entrar" type="button">Entrar <span class="seta" aria-hidden="true">→</span></button>
   </div>
   <div class="rodape-intro">By Italo Govêa</div>
 </section>
@@ -549,22 +559,23 @@
     <p class="status" id="im-msg" role="status" aria-live="polite"></p>
   </section>
 </main>
-<footer class="rodape-app">By Italo Govêa · versão 2026-10-20.1</footer>
+<footer class="rodape-app">By Italo Govêa · versão 2026-10-21.1</footer>
 </div>
 
+<script src="intro.js?v=2026-10-21.1"></script>
 <script src="lib/jspdf.umd.min.js"></script>
-<script src="cnae.js?v=2026-10-20.1"></script>
-<script src="motor/parametros.js?v=2026-10-20.1"></script>
-<script src="motor/simples.js?v=2026-10-20.1"></script>
-<script src="motor/renda-pf.js?v=2026-10-20.1"></script>
-<script src="motor/regimes.js?v=2026-10-20.1"></script>
-<script src="motor/insights.js?v=2026-10-20.1"></script>
-<script src="motor/ganho-capital.js?v=2026-10-20.1"></script>
-<script src="motor/ipca.js?v=2026-10-20.1"></script>
-<script src="motor/imobiliario.js?v=2026-10-20.1"></script>
-<script src="dados/armazenamento.js?v=2026-10-20.1"></script>
-<script src="pdf-base.js?v=2026-10-20.1"></script>
-<script src="calculadora.js?v=2026-10-20.1"></script>
-<script src="imobiliario-ui.js?v=2026-10-20.1"></script>
+<script src="cnae.js?v=2026-10-21.1"></script>
+<script src="motor/parametros.js?v=2026-10-21.1"></script>
+<script src="motor/simples.js?v=2026-10-21.1"></script>
+<script src="motor/renda-pf.js?v=2026-10-21.1"></script>
+<script src="motor/regimes.js?v=2026-10-21.1"></script>
+<script src="motor/insights.js?v=2026-10-21.1"></script>
+<script src="motor/ganho-capital.js?v=2026-10-21.1"></script>
+<script src="motor/ipca.js?v=2026-10-21.1"></script>
+<script src="motor/imobiliario.js?v=2026-10-21.1"></script>
+<script src="dados/armazenamento.js?v=2026-10-21.1"></script>
+<script src="pdf-base.js?v=2026-10-21.1"></script>
+<script src="calculadora.js?v=2026-10-21.1"></script>
+<script src="imobiliario-ui.js?v=2026-10-21.1"></script>
 </body>
 </html>

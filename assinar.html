@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calculadora Tributária Pro</title>
+<meta name="description" content="Simulação de regimes tributários e da Reforma 2026–2033 para escritórios de contabilidade, com relatório na marca do escritório.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%2314213D%22/><rect x=%2212%22 y=%2232%22 width=%2210%22 height=%2220%22 rx=%223%22 fill=%22%23E9DDB8%22/><rect x=%2227%22 y=%2218%22 width=%2210%22 height=%2234%22 rx=%223%22 fill=%22%23C9A227%22/><rect x=%2242%22 y=%2226%22 width=%2210%22 height=%2226%22 rx=%223%22 fill=%22%23E9DDB8%22/></svg>">
+<style>
+:root{--bg:#f6f4ee;--card:#fff;--ink:#14213d;--ink2:#2b3a5c;--mut:#5a6374;--line:#e3ddcf;--gold:#c9a227;--gold-ink:#7f6210;--gold-soft:#f8f0d9;--ok:#157148;--ok-soft:#e5f2ea;--bad:#b42318;--bad-soft:#fdecea;--foco:#1f4fbf}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+a{color:var(--ink2)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+header.topo{background:var(--ink);color:#fff}
+header.topo .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px}
+.marca{font-weight:700;letter-spacing:.2px}
+.marca b{color:var(--gold)}
+.topo a{color:#e9ddb8;font-size:.95rem}
+.hero{background:linear-gradient(160deg,#14213d 0%,#22335b 100%);color:#fff;padding:56px 0 64px}
+.selo{display:inline-block;background:rgba(201,162,39,.16);color:#f1d98a;border:1px solid rgba(201,162,39,.45);border-radius:99px;padding:4px 12px;font-size:.85rem;font-weight:600}
+.hero h1{font-size:clamp(1.9rem,4.6vw,3rem);line-height:1.15;margin:16px 0 12px;max-width:760px}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero p.sub{font-size:1.12rem;color:#d7deeb;max-width:680px;margin:0 0 28px}
+.acoes{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;padding:13px 22px;font-weight:700;font-size:1rem;text-decoration:none;border:0;cursor:pointer;min-height:48px}
+.btn-ouro{background:var(--gold);color:#14213d}
+.btn-ouro:hover{background:#d8b23a}
+.btn-claro{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.45)}
+.btn-claro:hover{border-color:#fff}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--foco);outline-offset:2px}
+section{padding:56px 0}
+h2{font-size:clamp(1.45rem,3vw,2rem);margin:0 0 8px}
+.lead{color:var(--mut);margin:0 0 28px;max-width:680px}
+.grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+.card h3{margin:0 0 6px;font-size:1.06rem}
+.card p{margin:0;color:var(--mut);font-size:.96rem}
+.ico{width:38px;height:38px;border-radius:10px;background:var(--gold-soft);color:var(--gold-ink);display:grid;place-items:center;margin-bottom:12px;font-weight:800}
+.dor{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.dor ul{margin:0;padding-left:20px;color:var(--ink2)}
+.dor li{margin:6px 0}
+.precos{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;align-items:stretch}
+.plano{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px;display:flex;flex-direction:column}
+.plano.destaque{border:2px solid var(--gold);box-shadow:0 10px 30px rgba(20,33,61,.08);position:relative}
+.plano .tag{position:absolute;top:-13px;left:22px;background:var(--gold);color:#14213d;font-weight:700;font-size:.8rem;padding:3px 10px;border-radius:99px}
+.plano h3{margin:0;font-size:1.15rem}
+.valor{font-size:2.3rem;font-weight:800;margin:10px 0 0}
+.valor small{font-size:1rem;font-weight:500;color:var(--mut)}
+.riscado{color:var(--mut);text-decoration:line-through;font-size:.95rem}
+.plano ul{list-style:none;padding:0;margin:18px 0 22px;flex:1}
+.plano li{padding:6px 0 6px 26px;position:relative;font-size:.97rem}
+.plano li::before{content:"✓";position:absolute;left:0;color:var(--ok);font-weight:800}
+.plano li.nao{color:var(--mut)}
+.plano li.nao::before{content:"–";color:var(--mut)}
+.plano .btn{width:100%}
+.btn-escuro{background:var(--ink);color:#fff}
+.btn-linha{background:#fff;color:var(--ink);border:1.5px solid var(--ink)}
+.nota{font-size:.88rem;color:var(--mut);margin-top:14px}
+.form-box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px;max-width:720px}
+.campos{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.campo{display:flex;flex-direction:column;gap:5px}
+.campo.cheio{grid-column:1/-1}
+label{font-weight:600;font-size:.93rem}
+input,select,textarea{font:inherit;color:var(--ink);background:#fff;border:1.5px solid #7d8a9c;border-radius:9px;padding:11px 12px;min-height:46px;width:100%}
+textarea{min-height:90px;resize:vertical}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:.92rem;color:var(--ink2)}
+.check input{width:20px;height:20px;min-height:0;margin-top:2px;flex:none}
+.oculto{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.msg{border-radius:10px;padding:14px 16px;margin-top:16px;display:none}
+.msg.ok{display:block;background:var(--ok-soft);color:#0d4d30;border:1px solid #b7dcc6}
+.msg.erro{display:block;background:var(--bad-soft);color:#8a1a12;border:1px solid #f2c4bf}
+.faq details{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:10px}
+.faq summary{cursor:pointer;font-weight:700}
+.faq p{color:var(--ink2);margin:10px 0 0}
+footer{background:var(--ink);color:#cbd3e1;padding:26px 0;font-size:.9rem}
+footer a{color:#e9ddb8}
+@media (max-width:640px){.campos{grid-template-columns:1fr}.hero{padding:40px 0 48px}section{padding:44px 0}.form-box{padding:20px}.acoes .btn{width:100%}}
+</style>
+</head>
+<body>
+<header class="topo"><div class="wrap">
+  <span class="marca">Calculadora Tributária <b>Pro</b></span>
+  <a href="./">Usar a versão grátis →</a>
+</div></header>
+
+<main>
+<div class="hero"><div class="wrap">
+  <span class="selo">Pré-venda para escritórios de contabilidade</span>
+  <h1>Mostre ao seu cliente <em>quanto ele paga em cada regime</em> e o que muda com a Reforma até 2033.</h1>
+  <p class="sub">Simples, Simples Híbrido, Presumido e Real lado a lado, com CBS/IBS ano a ano, distribuição de lucros pela Lei 15.270 e operações com imóveis. Relatório em PDF com a marca do seu escritório, pronto para enviar.</p>
+  <div class="acoes">
+    <a class="btn btn-ouro" href="#lista">Quero ser assinante fundador</a>
+    <a class="btn btn-claro" href="./">Testar agora, grátis</a>
+  </div>
+</div></div>
+
+<section class="dor"><div class="wrap">
+  <h2>A pergunta que todo cliente vai fazer em 2027</h2>
+  <p class="lead">“Continuo no Simples ou vou para o Híbrido? Quanto vou pagar a mais?” Responder isso na planilha leva horas por empresa.</p>
+  <ul>
+    <li>A transição CBS/IBS muda a carga todo ano de 2027 a 2033.</li>
+    <li>Clientes B2B podem perder venda se o comprador não aproveitar crédito do Simples.</li>
+    <li>A retenção de 10% sobre dividendos e o IRPF mínimo mudaram a conta do pró-labore × lucros.</li>
+  </ul>
+</div></section>
+
+<section><div class="wrap">
+  <h2>O que a ferramenta faz</h2>
+  <p class="lead">Os cálculos seguem a lei, com fundamento citado em cada linha da memória de cálculo.</p>
+  <div class="grade">
+    <div class="card"><div class="ico">1</div><h3>Comparativo de regimes</h3><p>Simples (com Fator R e sublimite), Simples Híbrido, Presumido (com a LC 224) e Real, ranqueados pelo custo total.</p></div>
+    <div class="card"><div class="ico">2</div><h3>Reforma 2026–2033</h3><p>CBS e IBS ano a ano pela LC 214, incluindo a partilha do DAS e o crédito que o comprador aproveita.</p></div>
+    <div class="card"><div class="ico">3</div><h3>Lucro no bolso do sócio</h3><p>IRPF 2026, retenção de dividendos e IRPFM: quanto sobra para a pessoa física em cada cenário.</p></div>
+    <div class="card"><div class="ico">4</div><h3>Calculadora Imobiliária</h3><p>Venda e locação de imóveis por PF ou PJ, ganho de capital com reduções e redutores da LC 214.</p></div>
+    <div class="card"><div class="ico">5</div><h3>Relatório com a sua marca <span style="font-size:.78rem;color:var(--gold-ink);background:var(--gold-soft);padding:2px 8px;border-radius:99px">em breve</span></h3><p>PDF com logo, nome e contato do escritório, pronto para mandar ao cliente ou usar como proposta.</p></div>
+    <div class="card"><div class="ico">6</div><h3>Histórico por cliente <span style="font-size:.78rem;color:var(--gold-ink);background:var(--gold-soft);padding:2px 8px;border-radius:99px">em breve</span></h3><p>Simulações salvas na nuvem e organizadas por empresa, acessíveis de qualquer computador.</p></div>
+  </div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+  <h2>Planos</h2>
+  <p class="lead">O plano Profissional está em pré-venda. Os assinantes fundadores travam o preço e ajudam a decidir o que entra primeiro.</p>
+  <div class="precos">
+    <div class="plano">
+      <h3>Grátis</h3>
+      <p class="valor">R$ 0</p>
+      <ul>
+        <li>Comparativo de regimes</li>
+        <li>Projeção da Reforma</li>
+        <li>Calculadora Imobiliária</li>
+        <li class="nao">PDF com a marca do escritório</li>
+        <li class="nao">Histórico na nuvem por cliente</li>
+      </ul>
+      <a class="btn btn-linha" href="./">Usar agora</a>
+    </div>
+    <div class="plano destaque">
+      <span class="tag">Fundador · vagas limitadas</span>
+      <h3>Profissional</h3>
+      <p class="valor"><span id="preco-fundador">R$ 49</span><small>/mês</small></p>
+      <p class="riscado">Preço normal: <span id="preco-normal">R$ 79</span>/mês</p>
+      <ul>
+        <li>Tudo do Grátis</li>
+        <li>PDF com logo e dados do escritório</li>
+        <li>Histórico na nuvem por cliente</li>
+        <li>Atualização quando a lei mudar</li>
+        <li>Suporte direto por WhatsApp</li>
+      </ul>
+      <a class="btn btn-ouro" href="#lista">Garantir preço de fundador</a>
+    </div>
+  </div>
+  <p class="nota">Nada é cobrado agora. Entramos em contato para confirmar o interesse antes de abrir as assinaturas.</p>
+</div></section>
+
+<section id="lista" style="padding-top:0"><div class="wrap">
+  <h2>Entrar na lista de fundadores</h2>
+  <p class="lead">Leva 1 minuto. Suas respostas definem o preço final e as próximas funções.</p>
+  <form class="form-box" id="form" novalidate>
+    <div class="campos">
+      <div class="campo"><label for="nome">Nome</label><input id="nome" name="nome" autocomplete="name" required maxlength="120"></div>
+      <div class="campo"><label for="escritorio">Escritório</label><input id="escritorio" name="escritorio" autocomplete="organization" required maxlength="160"></div>
+      <div class="campo"><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="160"></div>
+      <div class="campo"><label for="whatsapp">WhatsApp</label><input id="whatsapp" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel" placeholder="(11) 91234-5678" required maxlength="20"></div>
+      <div class="campo"><label for="clientes">Empresas que o escritório atende</label>
+        <select id="clientes" name="clientes" required>
+          <option value="">Selecione</option><option>Até 30</option><option>31 a 100</option><option>101 a 300</option><option>Mais de 300</option>
+        </select></div>
+      <div class="campo"><label for="preco">Quanto pagaria por mês?</label>
+        <select id="preco" name="preco" required>
+          <option value="">Selecione</option><option>Não pagaria</option><option>Até R$ 49</option><option>R$ 79</option><option>R$ 100 a R$ 150</option><option>Mais de R$ 150</option>
+        </select></div>
+      <div class="campo cheio"><label for="interesse">O que faria você assinar hoje? <span style="font-weight:400;color:var(--mut)">(opcional)</span></label>
+        <textarea id="interesse" name="interesse" maxlength="1000" placeholder="Ex.: relatório para enviar ao cliente, simular o Simples Híbrido, vários usuários no escritório…"></textarea></div>
+      <div class="campo cheio"><label class="check"><input type="checkbox" id="pagar" name="pagar"> Topo pagar o primeiro mês adiantado por Pix para garantir o preço de fundador.</label></div>
+      <div class="campo cheio"><label class="check"><input type="checkbox" id="lgpd" name="lgpd" required> Autorizo o contato por e-mail e WhatsApp sobre esta ferramenta. Meus dados não serão compartilhados com terceiros.</label></div>
+      <div class="oculto" aria-hidden="true"><label for="site">Não preencha</label><input id="site" name="site" tabindex="-1" autocomplete="off"></div>
+    </div>
+    <div style="margin-top:20px"><button class="btn btn-escuro" type="submit" id="enviar">Quero ser assinante fundador</button></div>
+    <div class="msg" id="msg" role="status" aria-live="polite"></div>
+  </form>
+</div></section>
+
+<section class="faq" style="padding-top:0"><div class="wrap">
+  <h2>Perguntas frequentes</h2>
+  <details><summary>Os valores substituem a apuração oficial?</summary><p>Não. É uma ferramenta de planejamento e simulação. As premissas de cada cálculo ficam visíveis, e a apuração oficial continua no PGDAS-D, na DCTFWeb e nas demais obrigações.</p></details>
+  <details><summary>Preciso informar CNPJ ou dados sigilosos do cliente?</summary><p>Não. A simulação usa só faturamento, folha, atividade e margens. Você identifica o cliente com o apelido que quiser.</p></details>
+  <details><summary>E quando a lei mudar?</summary><p>Os parâmetros legais ficam separados do cálculo e são atualizados quando sai norma nova, como a alíquota de referência da CBS para 2027.</p></details>
+  <details><summary>Já posso pagar?</summary><p>Ainda não. Primeiro confirmamos o interesse dos fundadores. Quem marcou o Pix adiantado é chamado primeiro, com o preço travado.</p></details>
+</div></section>
+</main>
+
+<footer><div class="wrap">Calculadora Tributária Pro · Simulações para fins de planejamento · <a href="./">Versão grátis</a></div></footer>
+
+<script>
+/* CONFIGURAÇÃO: preencha para ativar o envio.
+   SUPABASE_URL e SUPABASE_CHAVE: URL do projeto e chave publicável (pode ficar no site; a tabela só aceita inserção).
+   WHATSAPP: número com DDI e DDD, só dígitos (ex.: 5511912345678). Opcional. */
+var CONFIG = {
+  SUPABASE_URL: '',
+  SUPABASE_CHAVE: '',
+  WHATSAPP: '',
+  PRECO_FUNDADOR: 'R$ 49',
+  PRECO_NORMAL: 'R$ 79'
+};
+(function(){
+  document.getElementById('preco-fundador').textContent = CONFIG.PRECO_FUNDADOR;
+  document.getElementById('preco-normal').textContent = CONFIG.PRECO_NORMAL;
+  var form = document.getElementById('form'), msg = document.getElementById('msg'), btn = document.getElementById('enviar');
+  function mostrar(tipo, html){ msg.className = 'msg ' + tipo; msg.innerHTML = html; }
+  function val(id){ return document.getElementById(id).value.trim(); }
+  form.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    if (val('site')) return; // robô
+    var faltando = ['nome','escritorio','email','whatsapp','clientes','preco'].filter(function(id){ return !val(id); });
+    if (faltando.length){ mostrar('erro', 'Preencha todos os campos obrigatórios.'); document.getElementById(faltando[0]).focus(); return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val('email'))){ mostrar('erro', 'Confira o e-mail.'); document.getElementById('email').focus(); return; }
+    if (val('whatsapp').replace(/\D/g,'').length < 10){ mostrar('erro', 'Confira o WhatsApp com DDD.'); document.getElementById('whatsapp').focus(); return; }
+    if (!document.getElementById('lgpd').checked){ mostrar('erro', 'Marque a autorização de contato para continuar.'); return; }
+    var dados = {
+      nome: val('nome'), escritorio: val('escritorio'), email: val('email').toLowerCase(),
+      whatsapp: val('whatsapp').replace(/\D/g,''), clientes: val('clientes'), preco: val('preco'),
+      interesse: val('interesse') || null, pagaria_pix: document.getElementById('pagar').checked,
+      origem: (new URLSearchParams(location.search).get('origem') || document.referrer || 'direto').slice(0,200)
+    };
+    var zap = CONFIG.WHATSAPP ? 'https://wa.me/' + CONFIG.WHATSAPP + '?text=' + encodeURIComponent('Olá! Sou ' + dados.nome + ' (' + dados.escritorio + ') e entrei na lista de fundadores da Calculadora Tributária Pro.') : '';
+    function sucesso(){
+      form.querySelectorAll('input,select,textarea,button').forEach(function(el){ el.disabled = true; });
+      mostrar('ok', '<strong>Pronto, você está na lista.</strong> Vamos falar com você em breve' + (dados.pagaria_pix ? ' para confirmar o preço de fundador.' : '.') +
+        (zap ? '<br><a class="btn btn-escuro" style="margin-top:12px" href="' + zap + '" target="_blank" rel="noopener">Falar agora no WhatsApp</a>' : ''));
+    }
+    if (!CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_CHAVE){
+      if (zap){ sucesso(); window.open(zap, '_blank', 'noopener'); }
+      else mostrar('erro', 'O cadastro ainda não está ativo. Tente novamente mais tarde.');
+      return;
+    }
+    btn.disabled = true; btn.textContent = 'Enviando…';
+    fetch(CONFIG.SUPABASE_URL + '/rest/v1/lista_espera', {
+      method: 'POST',
+      headers: {'apikey': CONFIG.SUPABASE_CHAVE, 'Authorization': 'Bearer ' + CONFIG.SUPABASE_CHAVE, 'Content-Type': 'application/json', 'Prefer': 'return=minimal'},
+      body: JSON.stringify(dados)
+    }).then(function(r){
+      if (r.ok || r.status === 409) sucesso();
+      else throw new Error(r.status);
+    }).catch(function(){
+      btn.disabled = false; btn.textContent = 'Quero ser assinante fundador';
+      mostrar('erro', 'Não foi possível enviar agora. Tente de novo em instantes' + (zap ? ' ou <a href="' + zap + '" target="_blank" rel="noopener">fale pelo WhatsApp</a>.' : '.'));
+    });
+  });
+})();
+</script>
+</body>
+</html>

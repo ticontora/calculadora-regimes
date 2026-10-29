@@ -448,3 +448,11 @@ td.futuro{color:var(--gold-ink);font-style:italic;text-align:right !important;wh
 .aa-nota select{width:auto;min-height:32px;padding:3px 8px;display:inline-block}
 .aa-tbl .aa-seg{flex-wrap:nowrap}
 .aa-tbl .aa-seg button{padding:4px 8px;font-size:12px;white-space:nowrap}
+
+/* Gestor: no celular a tabela rola de lado em vez de espremer as colunas */
+@media (max-width:700px){
+  .tablewrap .aa-tbl{min-width:820px}
+  .tablewrap .aa-tbl td{min-width:130px}
+  .tablewrap .aa-tbl td:has(> input[type=checkbox]){min-width:0}
+  .aa-abas{overflow-x:auto;scrollbar-width:thin}
+}

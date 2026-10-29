@@ -18,6 +18,8 @@ motor/insights.js       leituras automáticas e avisos de dado faltante
 motor/ganho-capital.js  IR na venda de imóvel por pessoa física
 motor/imobiliario.js    venda e locação: PF, Presumido, Real, Simples e Simples Híbrido, CBS/IBS com redutores
 motor/ipca.js           IPCA mensal (BCB, série 433) para os redutores da LC 214
+motor/apuracao.js       Gestor de Apuração Assistida: leitura de XML/CSV, conciliação 3 vias, regras, fila e travas da RAD
+apuracao-ui.js          tela do Gestor de Apuração Assistida
 dados/armazenamento.js  rascunho automático e histórico (localStorage, só neste navegador)
 testes/                 testes do motor (node --test)
 cnae.js                 tabela de CNAEs → anexo e Fator R
@@ -33,6 +35,16 @@ npm test
 ```
 
 Cobrem: o IR de imóvel adquirido em 1980 (R$ 13.712,28, com a redução do art. 18 aplicada uma vez), cada faixa de cada anexo do Simples, a partilha 2026–2033, o cronograma CBS/IBS, IRPF 2026, retenção de dividendos, IRPFM, LC 224/2025 e o rascunho/histórico.
+
+## Gestor de Apuração Assistida
+
+Terceira opção na tela inicial. Acompanha crédito e débito de CBS/IBS nota a nota para uma carteira de empresas clientes.
+
+- Não consulta a Receita. Trabalha com arquivos importados: XMLs das NF-e (grupo IBSCBS), extrato da apuração assistida (CSV, layout próprio com modelo para baixar) e exportação do ERP (opcional). Tudo fica no navegador.
+- Abas: Visão geral (saldo da apuração reconstituído, carteira de clientes, baldes de crédito, top fornecedores, aging, farol de conciliação, projeção, competências), Créditos e débitos, Conciliação (sua base × Fisco e ERP × Fisco), Automações (fila), Configurações (regras com editor em 4 passos, empresas e fornecedores com RAD, prazos e avisos) e Importar dados.
+- Regras em modo observação (alguém decide) ou automação (entra na fila como pronta). A calculadora não emite RAD nem lança no ERP: gera os CSVs para você executar.
+- Travas da RAD (LC 214, art. 36): só empresa do regime regular, só fornecedor autorizado, teto por empresa e competência (padrão R$ 0, ou seja, desligada até alguém definir).
+- Premissas: tags da NT 2025.002; layout do extrato próprio (o oficial não foi verificado); prazo de recolhimento do fornecedor e último dia de ajuste configuráveis.
 
 ## O que a tela faz
 

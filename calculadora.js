@@ -597,15 +597,19 @@ function mostrarModo(m){
   $('escolha').hidden = m !== null;
   $('main-regimes').hidden = m !== 'regimes';
   $('main-imob').hidden = m !== 'imob';
+  if ($('main-apuracao')) $('main-apuracao').hidden = m !== 'apuracao';
   $('btn-trocar').hidden = !m;
   $('rascunho').textContent = '';
   document.querySelector('.topo .sub').textContent = m === 'imob'
     ? 'Calculadora Imobiliária: venda e locação por pessoa física ou empresa, de 2026 a 2033.'
+    : m === 'apuracao'
+    ? 'Gestor de Apuração Assistida: crédito e débito de CBS/IBS por nota, da carteira de clientes.'
     : 'Simples, Simples Híbrido, Presumido e Real, com a transição da reforma de 2026 a 2033.';
   if (m) window.Armazenamento.salvarModo(m);
   window.scrollTo(0, 0);
   if (m === 'regimes'){ irPara(passoAtual); focarEtapa(); }
   if (m === 'imob' && window.ImobUI) window.ImobUI.entrar();
+  if (m === 'apuracao' && window.ApuracaoUI) window.ApuracaoUI.entrar();
   if (m === null){ renderHistorico(); const c = document.querySelector('.escolha-card'); if (c) c.focus(); }
 }
 window.mostrarModo = mostrarModo;

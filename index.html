@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%2314213D%22/><rect x=%2212%22 y=%2232%22 width=%2210%22 height=%2220%22 rx=%223%22 fill=%22%23E9DDB8%22/><rect x=%2227%22 y=%2218%22 width=%2210%22 height=%2234%22 rx=%223%22 fill=%22%23C9A227%22/><rect x=%2242%22 y=%2226%22 width=%2210%22 height=%2226%22 rx=%223%22 fill=%22%23E9DDB8%22/></svg>">
 <title>Calculadora de Regimes Tributários</title>
-<link rel="stylesheet" href="estilo.css?v=2026-10-21.1">
+<link rel="stylesheet" href="estilo.css?v=2026-10-29.1">
 <script>
 /* Atualização automática: se houver versão nova publicada, recarrega sem precisar de Ctrl+F5 */
 (function(){
-  var VERSAO = '2026-10-21.1';
+  var VERSAO = '2026-10-29.1';
   if (location.protocol.indexOf('http') !== 0 || !window.fetch) return;
   fetch('version.json?t=' + Date.now(), {cache: 'no-store'})
     .then(function(r){ return r.ok ? r.json() : null; })
@@ -72,6 +72,10 @@
     <button type="button" class="escolha-card" data-modo="imob">
       <b>Calculadora Imobiliária</b>
       <span>Venda ou locação de imóvel por pessoa física ou empresa: IR, CBS/IBS com redutores e comparação PF × PJ.</span>
+    </button>
+    <button type="button" class="escolha-card" data-modo="apuracao">
+      <b>Gestor de Apuração Assistida</b>
+      <span>Crédito e débito de CBS/IBS nota a nota: concilia XML, extrato do Fisco e ERP, aponta o que está travado e monta a fila de ações da carteira.</span>
     </button>
   </div>
   <details class="card secao">
@@ -559,23 +563,58 @@
     <p class="status" id="im-msg" role="status" aria-live="polite"></p>
   </section>
 </main>
-<footer class="rodape-app">By Italo Govêa · versão 2026-10-21.1</footer>
+<main class="wrap aa" id="main-apuracao" hidden>
+  <div class="aa-cab">
+    <div class="aa-cab-tit">
+      <h2>Gestor de Apuração Assistida</h2>
+      <p class="aa-sub" id="aa-sub"></p>
+    </div>
+    <div class="aa-cab-ctrl">
+      <label class="aa-ctrl">Competência <select id="aa-comp"></select></label>
+      <label class="aa-ctrl">Tributo
+        <select id="aa-trib"><option value="cbs">CBS</option><option value="ibs">IBS</option><option value="total">CBS + IBS</option></select>
+      </label>
+      <button type="button" class="btn-secundario aa-btn-filtro" id="aa-btn-filtro" aria-controls="aa-filtro" aria-expanded="false">Filtros <span id="aa-nfiltro"></span></button>
+    </div>
+  </div>
+  <div id="aa-chips" class="aa-chips"></div>
+  <div id="aa-alertas" class="aa-alertas" role="status" aria-live="polite"></div>
+  <nav class="aa-abas" role="tablist" aria-label="Áreas do gestor">
+    <button type="button" role="tab" data-aba="visao">Visão geral</button>
+    <button type="button" role="tab" data-aba="docs">Créditos e débitos</button>
+    <button type="button" role="tab" data-aba="conc">Conciliação</button>
+    <button type="button" role="tab" data-aba="fila">Automações</button>
+    <button type="button" role="tab" data-aba="config">Configurações</button>
+    <button type="button" role="tab" data-aba="importar">Importar dados</button>
+  </nav>
+  <div id="aa-conteudo" class="aa-conteudo" role="tabpanel"></div>
+  <p class="status" id="aa-msg" role="status" aria-live="polite"></p>
+
+  <aside id="aa-filtro" class="aa-gaveta" hidden aria-label="Filtros">
+    <div class="aa-gaveta-in" id="aa-filtro-in"></div>
+  </aside>
+  <dialog id="aa-dlg" class="aa-dlg"><div id="aa-dlg-in"></div></dialog>
+</main>
+
+<footer class="rodape-app">By Italo Govêa · versão 2026-10-29.1</footer>
 </div>
 
-<script src="intro.js?v=2026-10-21.1"></script>
+<script src="intro.js?v=2026-10-29.1"></script>
 <script src="lib/jspdf.umd.min.js"></script>
-<script src="cnae.js?v=2026-10-21.1"></script>
-<script src="motor/parametros.js?v=2026-10-21.1"></script>
-<script src="motor/simples.js?v=2026-10-21.1"></script>
-<script src="motor/renda-pf.js?v=2026-10-21.1"></script>
-<script src="motor/regimes.js?v=2026-10-21.1"></script>
-<script src="motor/insights.js?v=2026-10-21.1"></script>
-<script src="motor/ganho-capital.js?v=2026-10-21.1"></script>
-<script src="motor/ipca.js?v=2026-10-21.1"></script>
-<script src="motor/imobiliario.js?v=2026-10-21.1"></script>
-<script src="dados/armazenamento.js?v=2026-10-21.1"></script>
-<script src="pdf-base.js?v=2026-10-21.1"></script>
-<script src="calculadora.js?v=2026-10-21.1"></script>
-<script src="imobiliario-ui.js?v=2026-10-21.1"></script>
+<script src="cnae.js?v=2026-10-29.1"></script>
+<script src="motor/parametros.js?v=2026-10-29.1"></script>
+<script src="motor/simples.js?v=2026-10-29.1"></script>
+<script src="motor/renda-pf.js?v=2026-10-29.1"></script>
+<script src="motor/regimes.js?v=2026-10-29.1"></script>
+<script src="motor/insights.js?v=2026-10-29.1"></script>
+<script src="motor/ganho-capital.js?v=2026-10-29.1"></script>
+<script src="motor/ipca.js?v=2026-10-29.1"></script>
+<script src="motor/imobiliario.js?v=2026-10-29.1"></script>
+<script src="dados/armazenamento.js?v=2026-10-29.1"></script>
+<script src="pdf-base.js?v=2026-10-29.1"></script>
+<script src="calculadora.js?v=2026-10-29.1"></script>
+<script src="imobiliario-ui.js?v=2026-10-29.1"></script>
+<script src="motor/apuracao.js?v=2026-10-29.1"></script>
+<script src="apuracao-ui.js?v=2026-10-29.1"></script>
 </body>
 </html>

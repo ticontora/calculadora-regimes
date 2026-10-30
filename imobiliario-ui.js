@@ -25,6 +25,7 @@
     return {
       operacao: op(), ano: parseInt($('im-ano').value, 10) || 2026, meses: venda ? 1 : (parseInt($('im-periodo').value, 10) || 1),
       referencia: {cbs: lerNum('im-refcbs') / 100, ibs: lerNum('im-refibs') / 100},
+      corrigirRedutorSocial: $('im-corrsocial').checked,
       perfil: radio('im-perfil') || 'pf',
       venda: {
         valor: parseBRL($('im-valor').value), custo: parseBRL($('im-custo').value), aquisicao: aquisicao() || {ano: 2026, mes: 1},
@@ -208,7 +209,7 @@
   /* ----- Rascunho, histórico, compartilhar ----- */
   const CAMPOS = ['im-vendasAnt', 'im-constrAnt', 'im-vendasAtual', 'im-constrAtual', 'im-locAnt', 'im-imoveisAnt', 'im-socios', 'im-prolabore', 'im-outras', 'im-divsimples',
     'im-valor', 'im-custo', 'im-aquisicao', 'im-mes', 'im-tipo', 'im-corretagem', 'im-unico', 'im-reinvest', 'im-usou', 'im-natureza', 'im-rbt12', 'im-despvenda', 'im-itbi', 'im-contrap',
-    'im-aluguel', 'im-imoveis', 'im-despesas', 'im-outrasMes', 'im-despPJ', 'im-residencial', 'im-temporada', 'im-simplificado', 'im-finalidade', 'im-refcbs', 'im-refibs', 'im-ano', 'im-periodo'];
+    'im-aluguel', 'im-imoveis', 'im-despesas', 'im-outrasMes', 'im-despPJ', 'im-residencial', 'im-temporada', 'im-simplificado', 'im-finalidade', 'im-refcbs', 'im-refibs', 'im-corrsocial', 'im-ano', 'im-periodo'];
   function coletar() {
     const d = {modo: 'imob', passo};
     CAMPOS.forEach(id => { const el = $(id); d[id] = el.type === 'checkbox' ? el.checked : el.value; });

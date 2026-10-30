@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%2314213D%22/><rect x=%2212%22 y=%2232%22 width=%2210%22 height=%2220%22 rx=%223%22 fill=%22%23E9DDB8%22/><rect x=%2227%22 y=%2218%22 width=%2210%22 height=%2234%22 rx=%223%22 fill=%22%23C9A227%22/><rect x=%2242%22 y=%2226%22 width=%2210%22 height=%2226%22 rx=%223%22 fill=%22%23E9DDB8%22/></svg>">
 <title>Calculadora de Regimes Tributários</title>
-<link rel="stylesheet" href="estilo.css?v=2026-10-29.2">
+<link rel="stylesheet" href="estilo.css?v=2026-10-30.1">
 <script>
 /* Atualização automática: se houver versão nova publicada, recarrega sem precisar de Ctrl+F5 */
 (function(){
-  var VERSAO = '2026-10-29.2';
+  var VERSAO = '2026-10-30.1';
   if (location.protocol.indexOf('http') !== 0 || !window.fetch) return;
   fetch('version.json?t=' + Date.now(), {cache: 'no-store'})
     .then(function(r){ return r.ok ? r.json() : null; })
@@ -483,6 +483,8 @@
         <div><label for="im-refibs">IBS de referência</label><div class="campo-pct"><input id="im-refibs" type="number" min="0" max="40" step="0.01" value="18.7"><span class="sufixo" aria-hidden="true">%</span></div></div>
       </div>
       <p class="hint">Estimativa do Comitê Gestor (Resolução CGIBS nº 14/2026). A CBS de 2027 será fixada pelo Senado até 15/12/2026.</p>
+      <p class="hint"><label for="im-corrsocial" class="check"><input id="im-corrsocial" type="checkbox" checked> Corrigir o redutor social pelo IPCA (LC 214/2025, art. 259, § 3º, e art. 260, parágrafo único)</label></p>
+      <p class="hint">Desmarque só para conferir com calculadoras que usam o valor nominal (R$ 100 mil, R$ 30 mil e R$ 600). Sem a correção, a CBS/IBS sai um pouco maior.</p>
     </details>
   </section>
 
@@ -596,25 +598,25 @@
   <dialog id="aa-dlg" class="aa-dlg"><div id="aa-dlg-in"></div></dialog>
 </main>
 
-<footer class="rodape-app">By Italo Govêa · versão 2026-10-29.2</footer>
+<footer class="rodape-app">By Italo Govêa · versão 2026-10-30.1</footer>
 </div>
 
-<script src="intro.js?v=2026-10-29.2"></script>
+<script src="intro.js?v=2026-10-30.1"></script>
 <script src="lib/jspdf.umd.min.js"></script>
-<script src="cnae.js?v=2026-10-29.2"></script>
-<script src="motor/parametros.js?v=2026-10-29.2"></script>
-<script src="motor/simples.js?v=2026-10-29.2"></script>
-<script src="motor/renda-pf.js?v=2026-10-29.2"></script>
-<script src="motor/regimes.js?v=2026-10-29.2"></script>
-<script src="motor/insights.js?v=2026-10-29.2"></script>
-<script src="motor/ganho-capital.js?v=2026-10-29.2"></script>
-<script src="motor/ipca.js?v=2026-10-29.2"></script>
-<script src="motor/imobiliario.js?v=2026-10-29.2"></script>
-<script src="dados/armazenamento.js?v=2026-10-29.2"></script>
-<script src="pdf-base.js?v=2026-10-29.2"></script>
-<script src="calculadora.js?v=2026-10-29.2"></script>
-<script src="imobiliario-ui.js?v=2026-10-29.2"></script>
-<script src="motor/apuracao.js?v=2026-10-29.2"></script>
-<script src="apuracao-ui.js?v=2026-10-29.2"></script>
+<script src="cnae.js?v=2026-10-30.1"></script>
+<script src="motor/parametros.js?v=2026-10-30.1"></script>
+<script src="motor/simples.js?v=2026-10-30.1"></script>
+<script src="motor/renda-pf.js?v=2026-10-30.1"></script>
+<script src="motor/regimes.js?v=2026-10-30.1"></script>
+<script src="motor/insights.js?v=2026-10-30.1"></script>
+<script src="motor/ganho-capital.js?v=2026-10-30.1"></script>
+<script src="motor/ipca.js?v=2026-10-30.1"></script>
+<script src="motor/imobiliario.js?v=2026-10-30.1"></script>
+<script src="dados/armazenamento.js?v=2026-10-30.1"></script>
+<script src="pdf-base.js?v=2026-10-30.1"></script>
+<script src="calculadora.js?v=2026-10-30.1"></script>
+<script src="imobiliario-ui.js?v=2026-10-30.1"></script>
+<script src="motor/apuracao.js?v=2026-10-30.1"></script>
+<script src="apuracao-ui.js?v=2026-10-30.1"></script>
 </body>
 </html>

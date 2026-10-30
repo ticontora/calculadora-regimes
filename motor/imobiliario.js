@@ -78,9 +78,14 @@
     const base = (v.custo || 0) + (v.itbiLaudemio || 0) + (v.contrapartidas || 0);
     return {valor: base * f, fator: f, base, antes1994: de.ano * 12 + de.mes < 1994 * 12 + 7};
   }
-  function redutorSocialVenda(tipo, dataOperacao) {
+  // LC 214, arts. 259, § 3º, e 260, parágrafo único: o redutor social é corrigido mensalmente pelo IPCA.
+  // corrigir === false reproduz quem usa o valor nominal (ex.: ImobIA), só para conferência.
+  function fatorSocial(dataOperacao, corrigir) {
+    return corrigir === false ? 1 : IPCA.fator(I.inicioCorrecao, mesAnterior(dataOperacao));
+  }
+  function redutorSocialVenda(tipo, dataOperacao, corrigir) {
     const nominal = tipo === 'residencial_novo' ? I.redutorSocialNovo : tipo === 'lote' ? I.redutorSocialLote : 0;
-    return nominal * IPCA.fator(I.inicioCorrecao, mesAnterior(dataOperacao));
+    return nominal * fatorSocial(dataOperacao, corrigir);
   }
 
   // CBS/IBS de uma operação com imóvel por contribuinte do regime regular
@@ -105,7 +110,7 @@
     }
     if (social > 0) {
       const usado = Math.min(base, social);
-      linhas.push(linha('(−) Redutor social', operacao === 'venda' ? brl(social) + ' por imóvel (corrigido pelo IPCA)' : brl(social / Math.max(1, loc.imoveis || 1)) + ' por mês × ' + (loc.imoveis || 1) + ' imóvel(is)', -usado, operacao === 'venda' ? 'LC 214/2025, art. 259' : 'LC 214/2025, art. 260'));
+      linhas.push(linha('(−) Redutor social', operacao === 'venda' ? brl(social) + ' por imóvel' + (ctx.socialNominal ? ' (valor nominal, sem IPCA)' : ' (corrigido pelo IPCA)') : brl(social / Math.max(1, loc.imoveis || 1)) + ' por mês × ' + (loc.imoveis || 1) + ' imóvel(is)', -usado, operacao === 'venda' ? 'LC 214/2025, art. 259' : 'LC 214/2025, art. 260'));
       base -= usado;
     }
     const aCbs = ali.cbs * (1 - reducao), aIbs = ali.ibs * (1 - reducao);
@@ -147,7 +152,7 @@
     const corretagem = Math.max(0, v.corretagem || 0);
     const custo = Math.max(0, v.custo || 0);
     const rAj = redutorAjuste(v, data);
-    const rSoc = redutorSocialVenda(v.tipo, data);
+    const rSoc = redutorSocialVenda(v.tipo, data, e.corrigirRedutorSocial);
     out.redutores = {ajuste: rAj, social: rSoc};
     const reforma = ano >= P.INICIO_OPCAO_FORA_DAS;
     const pfc = pfContribuinte(e, ano);
@@ -167,7 +172,7 @@
       notaIsencao = pct(fr) + ' do ganho isento por reinvestimento em imóvel residencial em 180 dias (Lei 11.196/2005, art. 39)';
     }
     lf.push(linha('IRPF sobre o ganho de capital', notaIsencao || 'alíquotas de 15% a 22,5% por faixa de ganho', ir, notaIsencao ? 'Lei 9.250/1995, art. 23; Lei 11.196/2005, art. 39' : 'Lei 8.981/1995, art. 21', 'IRPF'));
-    if (pfc.sim) cbsIbsImovel({ano, ali, operacao: 'venda', valor, linhas: lf, redutorAj: rAj, redutorSoc: rSoc});
+    if (pfc.sim) cbsIbsImovel({ano, ali, operacao: 'venda', valor, linhas: lf, redutorAj: rAj, redutorSoc: rSoc, socialNominal: e.corrigirRedutorSocial === false});
     else lf.push(linha('CBS/IBS', 'não contribuinte: abaixo dos limites do art. 251', 0, 'LC 214/2025, art. 251'));
     out.perfis.pf = montar('pf', lf, valor, resultadoAntes);
     out.perfis.pf.gc = gc;
@@ -187,7 +192,7 @@
       irpjLucro(lp, ganho, 60000, ' (limite do trimestre)', {formula: 'ganho somado à base do trimestre', fundamento: 'Lei 9.430/1996, art. 25, II'});
       if (!reforma) lp.push(linha('PIS/COFINS', 'não incidem na venda de bem do ativo', 0, 'Lei 9.718/1998, art. 3º, § 2º, IV'));
     }
-    cbsIbsImovel({ano, ali, operacao: 'venda', valor, linhas: lp, redutorAj: rAj, redutorSoc: rSoc});
+    cbsIbsImovel({ano, ali, operacao: 'venda', valor, linhas: lp, redutorAj: rAj, redutorSoc: rSoc, socialNominal: e.corrigirRedutorSocial === false});
     out.perfis.pjPresumido = montar('pjPresumido', lp, valor, resultadoAntes);
 
     /* Empresa: Real */
@@ -201,7 +206,7 @@
     const despPJ = Math.max(0, (e.pj && e.pj.despesas) || 0);
     const lucroR = valor - custo - corretagem - despPJ - pc;
     irpjLucro(lr, lucroR, 60000, ' (limite do trimestre)', {formula: 'venda − custo − corretagem − despesas' + (pc ? ' − PIS/COFINS' : ''), fundamento: 'Decreto-Lei 1.598/1977, art. 6º'});
-    cbsIbsImovel({ano, ali, operacao: 'venda', valor, linhas: lr, redutorAj: rAj, redutorSoc: rSoc});
+    cbsIbsImovel({ano, ali, operacao: 'venda', valor, linhas: lr, redutorAj: rAj, redutorSoc: rSoc, socialNominal: e.corrigirRedutorSocial === false});
     out.perfis.pjReal = montar('pjReal', lr, valor, resultadoAntes - despPJ);
 
     /* Empresa: Simples (Anexo I para compra e venda de imóveis próprios; ganho de capital fora do DAS para o ativo) */
@@ -235,7 +240,7 @@
         delete semCbsIbs.cbs; delete semCbsIbs.ibs;
         const lh = [ls[0], ls[1], linha('DAS sem a fatia de CBS/IBS', brl(valor) + ' × ' + pct(efe.efetiva) + ' × (1 − ' + tirada.toLocaleString('pt-BR', {maximumFractionDigits: 2}) + '%)', valor * efe.efetiva * (1 - tirada / 100), 'LC 214/2025, art. 41, § 3º')];
         S.repartirDas(valor * efe.efetiva, valor, semCbsIbs).forEach(p => lh.push(linha('  ' + p.codigo + ' dentro do DAS', 'DAS × ' + p.fatia.toLocaleString('pt-BR', {maximumFractionDigits: 2}) + '%', p.valor, 'Partilha do DAS', p.codigo)));
-        cbsIbsImovel({ano, ali, operacao: 'venda', valor, linhas: lh, redutorAj: rAj, redutorSoc: rSoc});
+        cbsIbsImovel({ano, ali, operacao: 'venda', valor, linhas: lh, redutorAj: rAj, redutorSoc: rSoc, socialNominal: e.corrigirRedutorSocial === false});
         out.perfis.pjHibrido = montar('pjHibrido', lh, valor, resultadoAntes);
       }
     }
@@ -250,7 +255,7 @@
     const D = Math.max(0, L.despesas || 0);
     const nImoveis = Math.max(1, Math.round(L.imoveis || 1));
     const data = {ano, mes: 1};
-    const social = (L.residencial && !L.temporada) ? I.redutorSocialLocacaoMes * nImoveis * IPCA.fator(I.inicioCorrecao, mesAnterior(data)) : 0;
+    const social = (L.residencial && !L.temporada) ? I.redutorSocialLocacaoMes * nImoveis * fatorSocial(data, e.corrigirRedutorSocial) : 0;
     out.redutores = {social};
     const reforma = ano >= P.INICIO_OPCAO_FORA_DAS;
     const pfc = pfContribuinte(e, ano);
@@ -268,7 +273,7 @@
     lf.push(linha('IRPF com o aluguel', 'tabela mensal 2026 sobre ' + brl(outras + rend) + (usarSimpl ? ' (com desconto simplificado)' : '') + ', menos a redução da Lei 15.270', comAluguel.imposto, 'Lei 9.250/1995, arts. 3º-A e 4º; Lei 15.270/2025'));
     if (outras > 0) lf.push(linha('(−) IRPF sem o aluguel', 'mesmo cálculo só com as outras rendas de ' + brl(outras), -semAluguel.imposto, 'Imposto que já seria devido'));
     lf.push(linha('IRPF do aluguel (carnê-leão e ajuste)', 'diferença atribuível ao aluguel', irAluguel, 'Lei 7.713/1988, art. 8º', 'IRPF'));
-    if (pfc.sim) cbsIbsImovel({ano, ali, operacao: 'locacao', valor: A, linhas: lf, redutorSoc: social, loc: L});
+    if (pfc.sim) cbsIbsImovel({ano, ali, operacao: 'locacao', valor: A, linhas: lf, redutorSoc: social, loc: L, socialNominal: e.corrigirRedutorSocial === false});
     else lf.push(linha('CBS/IBS', 'não contribuinte: abaixo dos limites do art. 251', 0, 'LC 214/2025, art. 251'));
     out.perfis.pf = montar('pf', lf, A, A - D);
 
@@ -279,7 +284,7 @@
       lp.push(linha('PIS 0,65%', brl(A) + ' × 0,65%', A * 0.0065, 'Lei 9.715/1998', 'PIS'));
       lp.push(linha('COFINS 3%', brl(A) + ' × 3%', A * 0.03, 'Lei 9.718/1998, art. 8º', 'COFINS'));
     }
-    cbsIbsImovel({ano, ali, operacao: 'locacao', valor: A, linhas: lp, redutorSoc: social, loc: L});
+    cbsIbsImovel({ano, ali, operacao: 'locacao', valor: A, linhas: lp, redutorSoc: social, loc: L, socialNominal: e.corrigirRedutorSocial === false});
     const despPJ = Math.max(0, (e.pj && e.pj.despesas) || 0);
     out.perfis.pjPresumido = montar('pjPresumido', lp, A, A - D - despPJ);
 
@@ -292,7 +297,7 @@
       lr.push(linha('COFINS 7,6%', brl(A) + ' × 7,6% (sem créditos)', A * 0.076, 'Lei 10.833/2003; PREMISSA: sem créditos', 'COFINS'));
     }
     irpjLucro(lr, A - D - despPJ - pc, 20000, ' (limite do mês)', {formula: 'aluguel − despesas' + (pc ? ' − PIS/COFINS' : ''), fundamento: 'Decreto-Lei 1.598/1977, art. 6º; PREMISSA: sem depreciação'});
-    cbsIbsImovel({ano, ali, operacao: 'locacao', valor: A, linhas: lr, redutorSoc: social, loc: L});
+    cbsIbsImovel({ano, ali, operacao: 'locacao', valor: A, linhas: lr, redutorSoc: social, loc: L, socialNominal: e.corrigirRedutorSocial === false});
     out.perfis.pjReal = montar('pjReal', lr, A, A - D - despPJ);
 
     out.perfis.pjSimples = inelegivel('pjSimples', 'locação de imóveis próprios é vedada no Simples (LC 123/2006, art. 17, XV)');

@@ -514,6 +514,8 @@ function atualizar(){
   renderComprador(res, e);
   renderFaixas(e);
   renderMemoria(res, e);
+  // Dashboard comercial (pacotes)
+  if (window.DashboardUI) DashboardUI.render('dashboard-resultado', e);
 }
 $('form').addEventListener('input', () => { atualizar(); salvarRascunhoDepois(); });
 $('form').addEventListener('change', () => { atualizar(); salvarRascunhoDepois(); });

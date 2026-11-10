@@ -68,3 +68,18 @@ Estão marcadas com `PREMISSA` em `motor/parametros.js` e listadas na tela, em "
 ## Publicação
 
 GitHub Pages na branch `main`, pasta raiz. Ao publicar, troque a versão em `version.json` e no `index.html` (script de atualização, `?v=` e rodapé).
+
+## Calculadora Societária (importada em 10/11/2026)
+
+Abas trazidas da calculadora do Departamento Societário e de Legalização (repositório `societario-cmd/calculadora-regimes-co`, de Adão Vicente), com o mesmo resultado, conferido aba por aba contra a página original:
+
+- **Construção e Incorporação** (`co/construcao.js`): RET 4%/1% e RET de transição (LC 214, art. 485), Presumido e Real com redutores, INSS da obra por aferição no Sero, retenções e CPRB da construtora.
+- **Venda de imóveis** (`co/venda.js`): vários imóveis, PF × Presumido × Real, estoque × ativo, permuta com e sem torna, corretagem, venda a prazo, prejuízo fiscal no Real, ITBI do comprador, arts. 486 e 488.
+- **Ganho de capital PF** (`co/gcap.js`): formato do GCAP com benfeitorias datadas, herança e doação, condomínio, reinvestimento, venda a prazo e DARF 4600 com vencimento e acréscimos.
+- **ITBI** (`co/itbi.js`, `co/docs.js`): compra e venda, integralização (STF, Tema 1.348), fusão/incorporação/cisão com atividade preponderante, custas de cartório SP 2026 e leitura da matrícula e da certidão de valor venal em PDF (pdf.js carregado só quando se envia um arquivo).
+- **ITCMD** (`co/itcmd.js`): doação e herança, SP e outros estados, usufruto, quotas e projeção do PL 409/2025.
+- **ICMS** (`co/icms.js`): 27 estados, interestadual, DIFAL, FCP, ST com MVA ajustada e previsão com a reforma até 2033.
+
+Os motores ficam em `co/` com os nomes globais `MotorCO` e `IpcaCO`, para não colidir com o motor desta calculadora. `co/portar.py` gerou `co/co.css`, `co/co-ui.js` e o bloco entre `CO:INICIO` e `CO:FIM` do `index.html`. Testes: `testes/co-*.test.js`.
+
+Na Calculadora Geral Tributária entraram também: redução de CBS/IBS da atividade (30%, 50%, 60% ou 70%, sugerida pelo CNAE), encargos além da CPP de 20% e a CBS de referência de 11,3% (cálculo do TCU de 28/10/2026).

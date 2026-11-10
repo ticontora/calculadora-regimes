@@ -1,0 +1,509 @@
+<!-- CO:INICIO (gerado por co/portar.py) -->
+<main id="main-co" hidden>
+<div class="co-cab"><h2>Calculadora Societária</h2><p>Construção e incorporação, venda de imóveis, ganho de capital, ITBI, ITCMD e ICMS.</p></div>
+<nav class="abas co-abas" role="tablist" aria-label="Áreas da calculadora societária">
+  <button type="button" role="tab" data-aba="obra" aria-selected="true">Construção e Incorporação</button>
+  <button type="button" role="tab" data-aba="venda" aria-selected="false">Venda de imóveis</button>
+  <button type="button" role="tab" data-aba="gcap" aria-selected="false">Ganho de capital PF</button>
+  <button type="button" role="tab" data-aba="itbi" aria-selected="false">ITBI</button>
+  <button type="button" role="tab" data-aba="itcmd" aria-selected="false">ITCMD</button>
+  <button type="button" role="tab" data-aba="icms" aria-selected="false">ICMS</button>
+</nav>
+<section class="co-aba" id="aba-obra" role="tabpanel">
+  <form class="painel" id="form-obra" autocomplete="off">
+    <h2>Construção e incorporação (valores por ano)</h2>
+    <div class="grupo">
+      <h3>Tipo de operação</h3>
+      <label for="o-tipo">O que a empresa faz</label>
+      <select id="o-tipo">
+        <option value="incorporacao">Incorporação / venda de unidades (empreendimento)</option>
+        <option value="construtora">Construtora — obras por empreitada para terceiros</option>
+      </select>
+      <label for="o-cliente">Cliente / empreendimento (opcional)</label>
+      <input id="o-cliente" type="text" placeholder="Nome">
+    </div>
+    <div class="grupo" data-tipo="incorporacao">
+      <h3>Empreendimento (no ano)</h3>
+      <label for="o-receita-i">Receita recebida no ano (R$)</label>
+      <input id="o-receita-i" type="number" min="0" step="1000" value="10000000">
+      <div class="dica">Parcelas recebidas dos compradores no ano (CBS/IBS e RET incidem a cada recebimento).</div>
+      <label for="o-terreno">Custo do terreno correspondente (R$)</label>
+      <input id="o-terreno" type="number" min="0" step="1000" value="1500000">
+      <label for="o-obra">Custo da obra correspondente (R$)</label>
+      <input id="o-obra" type="number" min="0" step="1000" value="5000000">
+      <div class="linha2">
+        <div><label for="o-ate2026">Obra incorrida até 2026 (%)</label><input id="o-ate2026" type="number" min="0" max="100" step="5" value="30"></div>
+        <div><label for="o-credito">Insumos com crédito (%)</label><input id="o-credito" type="number" min="0" max="100" step="5" value="70"></div>
+      </div>
+      <div class="dica">A obra até 2026 entra no redutor de ajuste; a partir de 2027 os insumos comprados de fornecedores do regime regular geram crédito.</div>
+      <label for="o-ipca">IPCA acumulado da aquisição até a venda (%) — atualização até 31/12/2026 e, depois, até o fato gerador (LC 214, arts. 257 e 258, § 4º)</label>
+      <input id="o-ipca" type="number" min="0" max="200" step="0.5" value="0">
+      <div class="dica">Corrige o redutor de ajuste (LC 214, art. 258).</div>
+      <label for="o-despesas">Outras despesas (comercial, administrativo) (R$)</label>
+      <input id="o-despesas" type="number" min="0" step="1000" value="800000">
+      <div class="linha2">
+        <div><label for="o-unidades">Unidades residenciais novas vendidas</label><input id="o-unidades" type="number" min="0" step="1" value="20"></div>
+        <div><label for="o-lotes">Lotes residenciais vendidos</label><input id="o-lotes" type="number" min="0" step="1" value="0"></div>
+        <div><label for="o-rsun">Redutor social por imóvel novo (R$, valor do mês — art. 259, § 3º)</label><input id="o-rsun" type="number" min="0" step="0.01" value="108211.06"></div>
+        <div><label for="o-ded488">Custos de 2027–2032 com ICMS/ISS (R$/ano; deduz só o IBS a partir de 2029 — art. 488)</label><input id="o-ded488" type="number" min="0" step="1000" value="0"></div>
+        <div><label for="o-rslote">Redutor social por lote (R$, valor do mês)</label><input id="o-rslote" type="number" min="0" step="0.01" value="32463.32"></div>
+      </div>
+      <div class="dica">Redutor social de R$ 100 mil por unidade e R$ 30 mil por lote (LC 214, art. 259).</div>
+      <label class="co-check"><input id="o-social" type="checkbox"> Empreendimento de interesse social (RET 1% / 0,53% de CBS/IBS)</label>
+ <label class="co-check"><input id="o-semtrib" type="checkbox"> A receita/preço informado não inclui CBS/IBS (tributo cobrado por fora, além do preço)</label>
+      <label class="co-check"><input id="o-loteamento" type="checkbox"> Loteamento com registro pedido até 31/12/2028 — comparar com a opção de 3,65% (LC 214, art. 486)</label>
+    </div>
+    <div class="grupo" data-tipo="incorporacao">
+      <h3>INSS da obra — aferição no Sero (opcional)</h3>
+      <div class="linha2">
+        <div><label for="o-area">Área principal (m²)</label><input id="o-area" type="number" min="0" step="10" value="0"></div>
+        <div><label for="o-equiv">Equivalência (%)</label><input id="o-equiv" type="number" min="0" max="100" step="1" value="80"></div>
+      </div>
+      <div class="dica">Preencha a área para calcular. A equivalência depende da destinação e da área (IN RFB 2.021/2021, art. 25, parágrafo 6º): confira no Sero.</div>
+      <div class="linha2">
+        <div><label for="o-vau">VAU (R$/m²)</label><input id="o-vau" type="number" min="0" step="10" value="2400"></div>
+        <div><label for="o-tipoobra">Tipo da obra</label><select id="o-tipoobra"><option value="alvenaria">Alvenaria (20%)</option><option value="madeira">Madeira ou mista (15%)</option><option value="social">Alvenaria — interesse social (12%)</option></select></div>
+      </div>
+      <div class="dica">VAU da Tabela VAU da Receita para a destinação e a UF, no mês da aferição.</div>
+      <div class="linha2">
+        <div><label for="o-folhaobra">Remuneração declarada no CNO (R$)</label><input id="o-folhaobra" type="number" min="0" step="1000" value="0"></div>
+        <div><label for="o-notas">Mão de obra em notas de empreiteiros (R$)</label><input id="o-notas" type="number" min="0" step="1000" value="0"></div>
+      </div>
+      <label for="o-aliqaf">Alíquota sobre a diferença (%)</label>
+      <input id="o-aliqaf" type="number" min="0" max="50" step="0.1" value="36.8">
+      <div class="dica">20% patronal + 3% RAT + 5,8% terceiros + 8% segurado. Ajuste ao RAT/FAP da empresa.</div>
+    </div>
+    <div class="grupo" data-tipo="construtora" hidden>
+      <h3>Obras (no ano)</h3>
+      <label for="o-receita-c">Receita de obras no ano (R$)</label>
+      <input id="o-receita-c" type="number" min="0" step="1000" value="6000000">
+      <label for="o-folha">Folha anual (R$)</label>
+      <input id="o-folha" type="number" min="0" step="1000" value="1800000">
+      <label for="o-margem">Lucro antes de todos os tributos (% da receita)</label>
+      <input id="o-margem" type="number" min="0" max="100" step="0.5" value="25">
+      <label class="co-check"><input id="o-commaterial" type="checkbox" checked> Empreitada com fornecimento de material (presunção de 8%/12%)</label>
+      <label for="o-material">Materiais aplicados (% da receita)</label>
+      <input id="o-material" type="number" min="0" max="100" step="1" value="35">
+      <div class="linha2">
+        <div><label for="o-iss">ISS (%)</label><input id="o-iss" type="number" min="0" max="5" step="0.5" value="3"></div>
+        <div><label for="o-rat">RAT + terceiros (%)</label><input id="o-rat" type="number" min="0" max="15" step="0.1" value="8.8"></div>
+      </div>
+      <label class="co-check"><input id="o-dediss" type="checkbox" checked> Deduzir materiais da base do ISS (LC 116/2003, art. 7º, parágrafo 2º, I — conforme o município)</label>
+      <label class="co-check"><input id="o-cprb" type="checkbox" checked> Optante pela CPRB (desoneração da folha, em transição até 2027)</label>
+      <label class="co-check"><input id="o-issret" type="checkbox" checked> Tomadores retêm o ISS</label>
+    </div>
+    <div class="grupo">
+      <h3>Alíquotas de referência</h3>
+      <div class="linha2">
+        <div><label for="o-cbsRef">CBS de referência (%)</label><input id="o-cbsRef" type="number" min="0" max="30" step="0.01" value="11.3"></div>
+        <div><label for="o-ibsRef">IBS de referência (%)</label><input id="o-ibsRef" type="number" min="0" max="30" step="0.01" value="18.7"></div>
+      </div>
+    </div>
+  </form>
+
+  <section>
+    <div class="anos" id="o-anos" role="group" aria-label="Ano da simulação"></div>
+    <div class="co-cartoes" id="o-cartoes"></div>
+    <div class="co-avisos" id="o-avisos"></div>
+    <div class="co-secao painel" id="o-extra" hidden></div>
+    <div class="co-secao painel">
+      <h2 id="o-titulo-tabela">Tributos por regime</h2>
+      <div class="tabela-wrap"><table id="o-tabela"></table></div>
+    </div>
+    <div class="co-secao painel">
+      <h2>Carga anual por regime, 2026 a 2033</h2>
+      <div class="tabela-wrap" id="o-proj"></div>
+    </div>
+    <div class="co-secao">
+      <h2>Memória de cálculo do ano selecionado</h2>
+      <div id="o-memoria"></div>
+    </div>
+    <div class="co-secao">
+      <h2>Premissas do módulo</h2>
+      <details>
+        <summary>Como o módulo trabalha</summary>
+        <ul>
+          <li>RET (Lei 10.931/2004): 4% sobre a receita recebida (IRPJ 1,26%, CSLL 0,66%, PIS 0,37%, COFINS 1,71%), ou 1% no interesse social. A partir de 2027, PIS/COFINS dão lugar a 2,08% de CBS/IBS unificados (0,53% no interesse social), mantendo o total (LC 214/2025, art. 485, com a redação da LC 227/2026). Exige patrimônio de afetação e opção pelo RET efetivada até 31/12/2028.</li>
+          <li>Venda de imóveis no regime regular (Presumido e Real, a partir de 2027): CBS/IBS com redução de 50% (art. 261), devidos a cada recebimento (art. 262). Base = recebido − redutor de ajuste (terreno + obra incorrida até 2026, corrigidos pelo IPCA informado, art. 258) − redutor social (R$ 100 mil por unidade residencial nova, R$ 30 mil por lote, art. 259). Crédito dos insumos da obra comprados a partir de 2027.</li>
+          <li>Presumido de venda de imóveis: presunção de 8% (IRPJ) e 12% (CSLL), com o acréscimo da LC 224/2025 acima de R$ 5 milhões. Real: lucro = receita − terreno − obra − despesas − tributos sobre consumo.</li>
+          <li>Construtora: CBS/IBS com redução de 50% para a construção civil (arts. 252 e 261) e crédito dos materiais; presunção de 8%/12% na empreitada com material e de 32% só com mão de obra; ISS reduzido a 90/80/70/60% de 2029 a 2032 e extinto em 2033.</li>
+          <li>CPRB da construção civil: 4,5% da receita (Lei 12.546/2011). Transição da Lei 14.973/2024: 2026 = 60% da CPRB (2,7%) + 10% de CPP sobre a folha; 2027 = 40% (1,8%) + 15%; a partir de 2028, CPP cheia de 20%. RAT e terceiros continuam sobre a folha.</li>
+          <li>Simples (Anexo IV) calculado pelo motor geral: CPP fora do DAS e sem CPRB.</li>
+          <li>INSS da obra (IN RFB 2.021/2021): RMT = área × equivalência × VAU × 20% (alvenaria), 15% (madeira ou mista) ou 12% (interesse social); sobre a diferença entre a RMT e a remuneração comprovada incide a alíquota informada (padrão 36,8%). Não aplica decadência, fator social de pessoa física nem a redução de 70% de pré-moldados.</li>
+          <li>Retenções da construtora: INSS de 11% (3,5% para optante da CPRB até 2027) sobre a nota menos os materiais, e ISS retido. São antecipação, não custo.</li>
+          <li>Não considera: ITBI, regime de caixa × competência, permuta e incorporação fora do patrimônio de afetação.</li>
+        </ul>
+      </details>
+    </div>
+  </section>
+</section>
+
+<section class="co-aba" id="aba-venda" role="tabpanel" hidden>
+  <form class="painel" id="form-venda" autocomplete="off">
+    <h2>Venda de imóveis — PF × PJ</h2>
+    <div class="grupo">
+      <h3>Operação</h3>
+      <div class="linha2">
+        <div><label for="v-data">Mês da venda</label><input id="v-data" type="month" value="2027-06"></div>
+        <div><label for="v-socios">Sócios da PJ</label><input id="v-socios" type="number" min="1" step="1" value="1"></div>
+      </div>
+      <div class="linha2">
+        <div><label for="v-cbs">CBS de referência (%)</label><input id="v-cbs" type="number" min="0" max="30" step="0.01" value="11.3"></div>
+        <div><label for="v-ibs">IBS de referência (%)</label><input id="v-ibs" type="number" min="0" max="30" step="0.01" value="18.7"></div>
+      </div>
+      <label for="v-class">Na PJ, o imóvel está</label>
+      <select id="v-class">
+        <option value="estoque">No estoque — atividade imobiliária (presunção 8%/12%)</option>
+        <option value="ativo">No ativo não circulante — imobilizado, investimento ou aluguel (ganho de capital)</option>
+      </select>
+      <div class="linha2">
+        <div><label for="v-vista">PF: % do preço recebido no mês da venda</label><input id="v-vista" type="number" min="0" max="100" step="5" value="100"></div>
+        <div><label for="v-prej">PJ Real: prejuízo fiscal a compensar (R$)</label><input id="v-prej" type="number" min="0" step="1000" value="0"></div>
+      </div>
+      <label for="v-mun">Município dos imóveis vendidos ou dados (ITBI, informativo)</label>
+      <select id="v-mun"><option value="">Não calcular</option></select>
+      <label class="co-check"><input id="v-trim" type="checkbox" checked> Venda concentrada num único trimestre (adicional de IRPJ acima de R$ 60 mil)</label>
+      <label class="co-check"><input id="v-dist" type="checkbox" checked> Distribuir o lucro aos sócios no mês (IRRF de 10% — Lei 15.270/2025)</label>
+      <label class="co-check"><input id="v-comtrib" type="checkbox"> O preço já inclui a CBS/IBS (tributo extraído do preço)</label>
+      <label class="co-check"><input id="v-pfcontrib" type="checkbox"> A PF é contribuinte de CBS/IBS (LC 214, art. 251)</label>
+      <label class="co-check"><input id="v-risco" type="checkbox"> Permuta: simular o cenário de risco (imóvel recebido como receita da PJ no Presumido)</label>
+      <label class="co-check"><input id="v-unico" type="checkbox"> PF: único imóvel, sem outra venda em 5 anos (isenção até R$ 440 mil)</label>
+    </div>
+    <div class="grupo">
+      <h3>Imóveis vendidos</h3>
+      <div id="v-imoveis"></div>
+      <button class="co-btn" type="button" id="v-add">+ Adicionar imóvel</button>
+      <div class="dica">Custo = valor de aquisição mais benfeitorias (o da declaração da PF). Custo contábil: só para a PJ com imóvel no ativo (custo menos depreciação). Valor de referência: opcional, se a PJ optar por ele no redutor (art. 258, I, b). Art. 488: custos de 2027–2032 com ICMS/ISS, para vendas a partir de 2029.</div>
+    </div>
+  </form>
+  <section>
+    <div class="co-cartoes" id="v-cartoes" style="grid-template-columns:repeat(3,1fr)"></div>
+    <div class="co-avisos" id="v-avisos"></div>
+    <div class="co-secao painel"><h2 id="v-titulo">Tributos por cenário</h2><div class="tabela-wrap"><table id="v-tabela"></table></div></div>
+    <div class="co-secao painel"><h2>Por imóvel</h2><div class="tabela-wrap"><table id="v-porimovel"></table></div></div>
+    <div class="co-secao">
+      <h2>Memória de cálculo</h2>
+      <div id="v-memoria"></div>
+      <details><summary>Como o módulo trabalha</summary><ul>
+        <li>PF: ganho = venda − custo; redução da Lei 7.713/1988 para aquisição até 1988; FR1 (até 11/2005) e FR2 (a partir de 12/2005) da Lei 11.196/2005; isenções do único imóvel até R$ 440 mil e do reinvestimento em 180 dias; alíquotas de 15% a 22,5% por imóvel.</li>
+        <li>PJ no estoque: Presumido com 8%/12% sobre a receita e, até 2026, PIS/COFINS de 3,65%; Real sobre o lucro da venda. PJ com imóvel no ativo: IRPJ e CSLL sobre o ganho de capital e, até 2026, sem PIS/COFINS (Lei 9.718/1998, art. 3º, parágrafo 2º, IV).</li>
+        <li>A partir de 2027 (PJ e PF contribuinte): CBS/IBS com redução de 50%, redutor de ajuste (custo × IPCA mensal desde a aquisição, ou valor de referência), redutor social de R$ 100 mil por residencial novo e R$ 30 mil por lote corrigidos pelo IPCA, e dedução do art. 488 no IBS a partir de 2029.</li>
+        <li>IPCA mensal oficial do IBGE (série 433 do Banco Central), publicado até <span id="v-ipca"></span>.</li>
+        <li>Corretagem paga pelo vendedor: reduz o valor de alienação da PF (IN SRF 84/2001, art. 19, parágrafo 4º) e é despesa no Lucro Real. Venda a prazo da PF: IR proporcional ao recebido (art. 31). Prejuízo fiscal no Real: até 30% do lucro (Lei 9.065/1995). ITBI do comprador: informativo, pelo valor declarado.</li>
+        <li>Permuta: na PF e na PJ tributa-se só a torna, com custo proporcional (IN SRF 84/2001, arts. 23 e 29, IV; IN SRF 107/1988; STJ e SC COSIT 99/2024 para o Presumido); CBS/IBS só sobre a torna (LC 214, art. 252). No campo Valor de venda da permuta, informe o valor do imóvel dado.</li>
+        <li>Não considera: outras despesas da venda, crédito de CBS/IBS sobre a corretagem e a trava do art. 258, parágrafo 5º.</li>
+      </ul></details>
+    </div>
+  </section>
+</section>
+
+<section class="co-aba" id="aba-gcap" role="tabpanel" hidden>
+  <form class="painel" id="form-gcap" autocomplete="off">
+    <h2>Ganho de capital — pessoa física</h2>
+    <div class="grupo">
+      <h3>Venda</h3>
+      <div class="linha2">
+        <div><label for="g-data">Mês da venda</label><input id="g-data" type="month" value="2026-11"></div>
+        <div><label for="g-valor">Valor de venda (R$)</label><input id="g-valor" type="number" min="0" step="1000" value="900000"></div>
+      </div>
+      <label for="g-corr">Corretagem paga pelo vendedor (R$)</label>
+      <input id="g-corr" type="number" min="0" step="1000" value="0">
+    </div>
+    <div class="grupo">
+      <h3>Aquisição</h3>
+      <label for="g-orig">Como o imóvel foi adquirido</label>
+      <select id="g-orig"><option value="compra">Compra</option><option value="heranca">Herança</option><option value="doacao">Doação</option></select>
+      <div class="linha2">
+        <div><label for="g-aqdata" id="g-aqrot">Mês da aquisição</label><input id="g-aqdata" type="month" value="2015-06"></div>
+        <div><label for="g-aqvalor">Custo declarado no IR (R$)</label><input id="g-aqvalor" type="number" min="0" step="1000" value="400000"></div>
+      </div>
+      <div class="dica">Use o valor da ficha de Bens e Direitos da declaração. Herança: data do óbito; doação: data da doação.</div>
+    </div>
+    <div class="grupo">
+      <h3>Benfeitorias e reformas</h3>
+      <div id="g-benf"></div>
+      <button class="co-btn" type="button" id="g-addb">+ Adicionar benfeitoria</button>
+      <div class="dica">Só as declaradas no IR e comprovadas com notas fiscais e recibos (IN SRF 84/2001, art. 17). Cada uma tem os fatores de redução pela sua data.</div>
+    </div>
+    <div class="grupo">
+      <h3>Proprietários</h3>
+      <div id="g-props"></div>
+      <button class="co-btn" type="button" id="g-addp">+ Adicionar proprietário</button>
+      <div class="dica">Em condomínio cada um apura a sua parte e o limite de R$ 440 mil é por parte. Casal em comunhão: o bem comum pode ser declarado por um só (100%) ou por cada um na sua metade, conforme as declarações.</div>
+    </div>
+    <div class="grupo">
+      <h3>Recebimentos e pagamento</h3>
+      <label class="co-check"><input id="g-prazo" type="checkbox"> Venda a prazo (informar parcelas)</label>
+      <div id="g-receb" hidden></div>
+      <button class="co-btn" type="button" id="g-addr" hidden>+ Adicionar recebimento</button>
+      <div class="linha2">
+        <div><label for="g-pag">Data do pagamento, se em atraso</label><input id="g-pag" type="date"></div>
+        <div><label for="g-selic">Selic acumulada (%)</label><input id="g-selic" type="number" min="0" step="0.01" value="0"></div>
+      </div>
+      <div class="dica">Selic acumulada do mês seguinte ao vencimento até o mês anterior ao pagamento (tabela da Receita). Para o valor exato, use o Sicalc.</div>
+    </div>
+  </form>
+  <section>
+    <div class="co-cartoes" id="g-cartoes" style="grid-template-columns:repeat(3,1fr)"></div>
+    <div class="co-avisos" id="g-avisos"></div>
+    <div class="co-secao painel"><h2>Por proprietário</h2><div class="tabela-wrap"><table id="g-tprop"></table></div></div>
+    <div class="co-secao painel"><h2>DARF (código 4600)</h2><div class="tabela-wrap"><table id="g-tdarf"></table></div></div>
+    <div class="co-secao painel" id="g-tparc-wrap"><h2>Custo e fatores de redução</h2><div class="tabela-wrap"><table id="g-tparc"></table></div></div>
+    <div class="co-secao">
+      <button class="co-btn primario" type="button" id="g-copiar">Copiar resumo</button>
+      <h2 style="margin-top:14px">Memória e fundamentos</h2>
+      <details open><summary>Cálculo</summary><ul id="g-memoria"></ul></details>
+      <details><summary>Regras aplicadas</summary><ul>
+        <li>Ganho = valor de alienação (menos corretagem paga pelo vendedor) − custo de aquisição e benfeitorias, em valores históricos (IN SRF 84/2001, arts. 17 e 19).</li>
+        <li>Redução de 5% por ano de posse para imóvel adquirido até 1988 — 100% até 1969 (Lei 7.713/1988, art. 18) — e fatores FR1 (1/1,0060 por mês de 01/1996 a 11/2005) e FR2 (1/1,0035 por mês desde 12/2005) (Lei 11.196/2005, art. 40).</li>
+        <li>Isenções: único imóvel vendido por até R$ 440 mil, sem outra venda em 5 anos (Lei 9.250/1995, art. 23); reinvestimento em imóvel residencial no país em 180 dias, proporcional e uma vez a cada 5 anos (Lei 11.196/2005, art. 39).</li>
+        <li>Alíquotas de 15% a 22,5% (Lei 8.981/1995, art. 21, com a Lei 13.259/2016). DARF 4600 até o último dia útil do mês seguinte ao recebimento; venda a prazo paga proporcionalmente (IN SRF 84/2001, arts. 31 e 32). Declare no GCAP e importe na declaração anual.</li>
+        <li>Atraso: multa de 0,33% ao dia, até 20%, e juros Selic (Lei 9.430/1996, art. 61). A Lei 15.270/2025 (IRPFM e dividendos) não alterou o ganho de capital de imóveis.</li>
+        <li>Imóvel atualizado pela Lei 14.973/2024 (imposto definitivo de 4% pago em 2024): o custo atualizado só vale por inteiro depois do prazo da lei; vendas antes disso seguem regra de proporção, não calculada aqui.</li>
+      </ul></details>
+    </div>
+  </section>
+</section>
+
+<section class="co-aba" id="aba-icms" role="tabpanel" hidden>
+  <form class="painel" id="form-icms" autocomplete="off">
+    <h2>ICMS por estado</h2>
+    <div class="grupo">
+      <h3>Operação</h3>
+      <div class="linha2">
+        <div><label for="m-ori">Estado de origem</label><select id="m-ori"></select></div>
+        <div><label for="m-des">Estado de destino</label><select id="m-des"></select></div>
+      </div>
+      <label for="m-dest">Destinatário</label>
+      <select id="m-dest">
+        <option value="revenda">Contribuinte — revenda ou industrialização</option>
+        <option value="consumo">Contribuinte — uso, consumo ou ativo imobilizado</option>
+        <option value="naocontrib">Não contribuinte (consumidor final pessoa física ou PJ sem IE)</option>
+      </select>
+      <label class="co-check"><input id="m-imp" type="checkbox"> Mercadoria importada ou com conteúdo de importação acima de 40% (4%)</label>
+    </div>
+    <div class="grupo">
+      <h3>Valores da nota</h3>
+      <label class="co-check"><input id="m-com" type="checkbox" checked> Os valores já incluem o ICMS (preço normal da nota)</label>
+      <div class="linha2">
+        <div><label for="m-prod">Produtos (R$)</label><input id="m-prod" type="number" min="0" step="100" value="10000"></div>
+        <div><label for="m-ipi">IPI (R$)</label><input id="m-ipi" type="number" min="0" step="10" value="0"></div>
+      </div>
+      <div class="linha2">
+        <div><label for="m-frete">Frete (R$)</label><input id="m-frete" type="number" min="0" step="10" value="0"></div>
+        <div><label for="m-desp">Seguro e outras despesas (R$)</label><input id="m-desp" type="number" min="0" step="10" value="0"></div>
+      </div>
+      <div class="linha2">
+        <div><label for="m-desc">Desconto incondicional (R$)</label><input id="m-desc" type="number" min="0" step="10" value="0"></div>
+        <div><label for="m-red">Redução da base (%)</label><input id="m-red" type="number" min="0" max="100" step="0.01" value="0"></div>
+      </div>
+      <div class="dica">Desmarque a primeira opção se quiser saber o preço com o ICMS embutido a partir do valor líquido.</div>
+    </div>
+    <div class="grupo">
+      <h3>Alíquotas do destino (editáveis)</h3>
+      <div class="linha2">
+        <div><label for="m-aint">Alíquota interna (%)</label><input id="m-aint" type="number" min="0" max="40" step="0.01"></div>
+        <div><label for="m-fcp">FCP (%)</label><input id="m-fcp" type="number" min="0" max="4" step="0.01"></div>
+      </div>
+      <div data-m="consumo" hidden><label for="m-bd">Base do DIFAL do contribuinte</label><select id="m-bd"><option value="dupla">Base dupla (maioria dos estados)</option><option value="unica">Base única</option></select></div>
+      <div class="dica">Preenchidas com a alíquota geral do estado. Para produto com alíquota própria (cesta básica, bebidas, energia, cosméticos etc.), informe a do RICMS.</div>
+    </div>
+    <div class="grupo">
+      <h3>Substituição tributária</h3>
+      <label class="co-check"><input id="m-st" type="checkbox"> Mercadoria sujeita a ICMS-ST (remetente substituto)</label>
+      <div data-m="st" hidden class="linha2">
+        <div><label for="m-mva">MVA original (%)</label><input id="m-mva" type="number" min="0" step="0.01" value="40"></div>
+        <div><label for="m-aist">Alíquota interna da ST (%)</label><input id="m-aist" type="number" min="0" max="40" step="0.01" placeholder="igual à do destino"></div>
+      </div>
+    </div>
+    <div class="grupo">
+      <h3>Previsão com a reforma (2026–2033)</h3>
+      <div class="linha2">
+        <div><label for="m-cbs">CBS de referência (%)</label><input id="m-cbs" type="number" min="0" max="30" step="0.01" value="11.3"></div>
+        <div><label for="m-ibs">IBS de referência (%)</label><input id="m-ibs" type="number" min="0" max="40" step="0.01" value="18.7"></div>
+      </div>
+      <div class="linha2">
+        <div><label for="m-redr">Redução de CBS/IBS do produto</label><select id="m-redr"><option value="0">Sem redução</option><option value="0.3">30%</option><option value="0.6">60% (alimentos, saúde, insumos agro etc.)</option><option value="1">100% (cesta básica, alíquota zero)</option></select></div>
+        <div><label for="m-pc">PIS/COFINS em 2026</label><select id="m-pc"><option value="0.0925">Não cumulativo (Lucro Real) 9,25%</option><option value="0.0365">Cumulativo (Presumido) 3,65%</option><option value="0">Simples ou sem PIS/COFINS</option></select></div>
+      </div>
+      <div class="dica">CBS 11,3%: cálculo do TCU para 2027, ainda sem a resolução do Senado. IBS 18,7%: referência metodológica do Comitê Gestor. Ajuste quando sair o número oficial.</div>
+    </div>
+  </form>
+  <section>
+    <div class="co-cartoes" id="m-cartoes" style="grid-template-columns:repeat(3,1fr)"></div>
+    <div class="co-avisos" id="m-avisos"></div>
+    <div class="co-secao painel"><h2>Resumo da nota</h2><div class="tabela-wrap"><table id="m-res"></table></div></div>
+    <div class="co-secao painel"><h2>Previsão com a reforma — 2026 a 2033</h2><div class="tabela-wrap"><table id="m-proj"></table></div>
+      <div class="dica">Mesma operação ano a ano, com o preço da mercadoria sem tributos constante. ICMS (com FCP, DIFAL e ST) a 100% até 2028, 90%, 80%, 70% e 60% em 2029–2032 e extinto em 2033 (EC 132/2023, ADCT, art. 128). PIS/COFINS até 2026. CBS e IBS por fora, sobre o valor sem ICMS e sem PIS/COFINS: 2026 é teste (0,9% + 0,1%, compensados, não é custo); 2027–2028 CBS = referência − 0,1 ponto e IBS 0,1%; IBS sobe para 10%, 20%, 30% e 40% da referência em 2029–2032 e 100% em 2033 (EC 132/2023, ADCT, arts. 125 a 130). Valores de débito na saída: na CBS e no IBS o comprador contribuinte toma crédito integral.</div></div>
+    <div class="co-secao">
+      <h2>Memória e fundamentos</h2>
+      <details open><summary>Cálculo</summary><ul id="m-memoria"></ul></details>
+      <details><summary>Alíquotas gerais por estado — 2026 (saindo de <span id="m-orinome"></span>)</summary><div class="tabela-wrap"><table id="m-tab"></table></div>
+        <div class="dica">Alíquota geral (modal) de cada estado, conferida em 06/11/2026. Alagoas passou a 20,5% em 01/04/2026. Interestaduais: 12%; 7% de Sul e Sudeste (exceto ES) para Norte, Nordeste, Centro-Oeste e ES; 4% para importados (Res. Senado 22/1989 e 13/2012).</div></details>
+      <details><summary>Regras aplicadas</summary><ul>
+        <li>ICMS calculado por dentro: o imposto integra a própria base (LC 87/1996, art. 13, parágrafo 1º, I). Frete, seguro e despesas cobradas entram; desconto incondicional sai.</li>
+        <li>IPI entra na base quando o destinatário é consumidor final (uso, consumo, ativo ou não contribuinte) e fica fora na revenda ou industrialização (LC 87/1996, art. 13, parágrafo 2º).</li>
+        <li>DIFAL: diferença entre a alíquota interna do destino e a interestadual, devido ao destino (CF, art. 155, parágrafo 2º, VII e VIII; LC 190/2022). Não contribuinte: recolhido pelo remetente, com base dupla (Convênio ICMS 236/2021).</li>
+        <li>ICMS-ST: base = valor da operação com IPI, frete e despesas × (1 + MVA); interestadual usa a MVA ajustada (Convênio ICMS 142/2018, cláusula 9ª). ST devida = base × alíquota interna − ICMS próprio.</li>
+        <li>Não cobre: benefícios fiscais e regimes especiais, alíquotas por produto, ICMS monofásico de combustíveis, Simples Nacional (o ICMS vai no DAS) e diferimento.</li>
+      </ul></details>
+    </div>
+  </section>
+</section>
+
+<section class="co-aba" id="aba-itcmd" role="tabpanel" hidden>
+  <form class="painel" id="form-itcmd" autocomplete="off">
+    <h2>ITCMD — herança e doação</h2>
+    <div class="grupo">
+      <h3>Operação</h3>
+      <div class="linha2">
+        <div><label for="t-op">Operação</label><select id="t-op"><option value="doacao">Doação</option><option value="heranca">Herança (causa mortis)</option></select></div>
+        <div><label for="t-est">Estado</label><select id="t-est"><option value="SP">São Paulo</option><option value="outro">Outro estado (informar)</option></select></div>
+      </div>
+      <div class="linha2">
+        <div><label for="t-ben">Beneficiários (donatários ou herdeiros, partes iguais)</label><input id="t-ben" type="number" min="1" step="1" value="1"></div>
+        <div data-t="doacao"><label for="t-ant">Já doado no ano a cada donatário pelo mesmo doador (R$)</label><input id="t-ant" type="number" min="0" step="1000" value="0"></div>
+      </div>
+      <div data-t="outro" hidden>
+        <div class="linha2">
+          <div><label for="t-aliq">Alíquota (%), se for fixa</label><input id="t-aliq" type="number" min="0" max="8" step="0.5" value="4"></div>
+          <div><label for="t-faixas">Ou tabela progressiva: limite:alíquota; ...</label><input id="t-faixas" type="text" placeholder="ex.: 100000:2; 500000:4; :8"></div>
+        </div>
+        <div class="dica">Tabela em R$ por faixa (marginal); a última faixa sem limite. Confira a lei do estado.</div>
+      </div>
+    </div>
+    <div class="grupo">
+      <h3>Bens transmitidos</h3>
+      <div id="t-bens"></div>
+      <button class="co-btn" type="button" id="t-add">+ Adicionar bem</button>
+      <div class="dica">Imóvel: valor de mercado declarado e, em SP, o valor venal do IPTU (base mínima). Quotas: patrimônio líquido contábil e ajustado a valor de mercado da parte transmitida (% das quotas).</div>
+    </div>
+  </form>
+  <section>
+    <div class="co-cartoes" id="t-cartoes" style="grid-template-columns:repeat(3,1fr)"></div>
+    <div class="co-avisos" id="t-avisos"></div>
+    <div class="co-secao painel"><h2>Por bem</h2><div class="tabela-wrap"><table id="t-tabela"></table></div></div>
+    <div class="co-secao">
+      <h2>Memória e fundamentos</h2>
+      <details open><summary>Cálculo</summary><ul id="t-memoria"></ul></details>
+      <details><summary>Regras aplicadas</summary><ul>
+        <li>Normas gerais: LC 227/2026 — base é o valor de mercado (art. 152); quotas não negociadas, no mínimo o patrimônio líquido ajustado a valor de mercado (art. 154, II); alíquotas progressivas por quinhão, legado ou doação, até o teto do Senado (8%).</li>
+        <li>São Paulo (Lei 10.705/2000): 4% fixo em 2026 (art. 16); imóvel urbano não inferior ao valor venal do IPTU (art. 13); nua-propriedade 2/3 e usufruto 1/3 (art. 9º, parágrafo 2º); isenções do art. 6º em UFESPs (R$ 38,42 em 2026).</li>
+        <li>Projeção: PL 409/2025 (1% a 4% por faixas de 10 mil, 85 mil e 280 mil UFESPs) — não aprovado; mostrado só para planejamento.</li>
+        <li>Não considera: bens no exterior, previdência privada, doação a entidades, multa e juros por atraso, e o ITCMD de outros estados com regras próprias de isenção.</li>
+      </ul></details>
+    </div>
+  </section>
+</section>
+
+<section class="co-aba" id="aba-itbi" role="tabpanel" hidden>
+  <form class="painel" id="form-itbi" autocomplete="off">
+    <h2>ITBI</h2>
+    <div class="grupo">
+      <h3>Operação e município</h3>
+      <label for="i-op">Operação</label>
+      <select id="i-op">
+        <option value="compra">Compra e venda, dação, arrematação</option>
+        <option value="integralizacao">Integralização de capital (holding / conferência de bens)</option>
+        <option value="reorganizacao">Fusão, incorporação, cisão ou extinção de sociedade</option>
+      </select>
+      <label for="i-mun">Município</label>
+      <select id="i-mun"></select>
+      <div data-mun="outro" hidden>
+        <label for="i-nome">Nome do município</label>
+        <input id="i-nome" type="text" placeholder="Cidade/UF">
+        <div class="linha2">
+          <div><label for="i-aliq">Alíquota geral (%)</label><input id="i-aliq" type="number" min="0" max="10" step="0.1" value="2"></div>
+          <div><label for="i-aliqsfh">Alíquota SFH (%)</label><input id="i-aliqsfh" type="number" min="0" max="10" step="0.1" value="0"></div>
+        </div>
+        <div class="linha2">
+          <div><label for="i-limfin">Limite financiado SFH (R$)</label><input id="i-limfin" type="number" min="0" step="1000" value="0"></div>
+          <div><label for="i-limimo">Limite do imóvel SFH (R$)</label><input id="i-limimo" type="number" min="0" step="1000" value="0"></div>
+        </div>
+        <div class="dica">Deixe a alíquota SFH em 0 se o município não tiver redução. Limites em 0 = sem limite.</div>
+      </div>
+    </div>
+    <div class="grupo">
+      <h3>Documentos do imóvel (opcional)</h3>
+      <label for="i-docmat">Matrícula atualizada (PDF ou foto)</label>
+      <input id="i-docmat" type="file" accept=".pdf,application/pdf,image/*">
+      <label for="i-docven">Certidão de valor venal (PDF ou foto)</label>
+      <input id="i-docven" type="file" accept=".pdf,application/pdf,image/*">
+      <div class="dica">PDF com texto é lido no seu navegador, sem enviar o arquivo. PDF digitalizado ou foto: na versão do Claude, o Claude lê o documento; no site público, preencha os valores à mão. Confira sempre com o documento original.</div>
+    </div>
+    <div class="grupo" data-op="compra">
+      <h3>Transação</h3>
+      <label for="i-decl">Valor da transação declarado (R$)</label>
+      <input id="i-decl" type="number" min="0" step="1000" value="500000">
+      <label for="i-fin">Valor financiado pelo SFH (R$)</label>
+      <input id="i-fin" type="number" min="0" step="1000" value="0">
+      <label for="i-ref">Valor venal de referência da prefeitura (R$, opcional)</label>
+      <input id="i-ref" type="number" min="0" step="1000" value="0">
+      <div class="dica">Usado só para mostrar o risco, se a prefeitura exigir esse valor.</div>
+    </div>
+    <div class="grupo" data-op="integralizacao reorganizacao" hidden>
+      <h3>Imóveis transmitidos</h3>
+      <div id="i-imoveis"></div>
+      <button class="co-btn" type="button" id="i-add">+ Adicionar imóvel</button>
+      <div class="dica">Valor ao capital = quanto do capital social o imóvel integraliza. Valor transferido = valor pelo qual o imóvel entra na PJ (maior que o capital se houver reserva de capital). Mercado = avaliação ou valor de referência. Venal = valor venal do IPTU, usado na faixa das custas de cartório.</div>
+    </div>
+    <div class="grupo" data-op="integralizacao reorganizacao" hidden>
+      <h3>Análise da atividade (imunidade)</h3>
+      <div class="linha2">
+        <div><label for="p-ano">Ano da aquisição pela PJ</label><input id="p-ano" type="number" min="1990" max="2100" step="1" value="2026"></div>
+        <div><label for="p-nova">Início da atividade</label><select id="p-nova"><option value="0">2 anos ou mais antes da aquisição</option><option value="1">Depois da aquisição ou há menos de 2 anos</option></select></div>
+      </div>
+      <label class="co-check" data-op="reorganizacao"><input id="p-tot" type="checkbox"> Transmissão da totalidade do patrimônio da PJ alienante (art. 37, parágrafo 4º)</label>
+      <div id="p-anos"></div>
+      <div class="dica">Receita operacional de cada ano (DRE) e a parte vinda de venda, locação ou arrendamento de imóveis. Deixe em branco os anos que ainda não terminaram.</div>
+    </div>
+    <div class="grupo">
+      <h3>Custas de cartório</h3>
+      <label for="c-tab">Tabela</label>
+      <select id="c-tab"><option value="SP2026">Estado de São Paulo — 2026</option><option value="manual">Outro estado (informar valores)</option></select>
+      <label class="co-check"><input id="c-esc" type="checkbox" checked> Lavrar escritura pública</label>
+      <div data-c="manual" hidden class="linha2">
+        <div><label for="c-mesc">Escritura (R$)</label><input id="c-mesc" type="number" min="0" step="10" value="0"></div>
+        <div><label for="c-mreg">Registro por imóvel (R$)</label><input id="c-mreg" type="number" min="0" step="10" value="0"></div>
+      </div>
+      <div class="linha2">
+        <div><label for="c-iss">ISS sobre emolumentos (%)</label><input id="c-iss" type="number" min="0" max="5" step="0.5" value="2"></div>
+        <div><label for="c-cert">Certidões e despesas (R$)</label><input id="c-cert" type="number" min="0" step="10" value="0"></div>
+      </div>
+      <div data-op="compra">
+        <div class="linha2">
+          <div><label for="c-venal">Valor venal do IPTU (R$)</label><input id="c-venal" type="number" min="0" step="1000" value="0"></div>
+          <div><label for="c-gar">Financiamento com garantia (R$)</label><input id="c-gar" type="number" min="0" step="1000" value="0"></div>
+        </div>
+      </div>
+      <div class="dica">Faixa pelo maior entre o valor do título e o valor venal. ISS: 2% em São Paulo capital; confira a lei do município do cartório. Financiamento bancário: o contrato tem força de escritura (desmarque a escritura) e a garantia é registrada à parte.</div>
+    </div>
+  </form>
+  <section>
+    <div class="co-cartoes" id="i-cartoes" style="grid-template-columns:repeat(3,1fr)"></div>
+    <div class="co-avisos" id="i-avisos"></div>
+    <div class="co-secao painel" id="i-doc-wrap" hidden><h2>Dados lidos dos documentos — conferir</h2><div id="i-doc"></div></div>
+    <div class="co-secao painel" id="i-prep-wrap" hidden><h2>Análise da atividade — imunidade</h2><div id="i-prep"></div></div>
+    <div class="co-secao painel" id="i-cus-wrap"><h2>Custas de cartório (estimativa)</h2><div class="tabela-wrap"><table id="i-cus"></table></div><div class="dica" id="i-cus-fonte"></div></div>
+    <div class="co-secao painel" id="i-tab-wrap" hidden><h2>Por imóvel</h2><div class="tabela-wrap"><table id="i-tabela"></table></div></div>
+    <div class="co-secao">
+      <h2>Memória e fundamentos</h2>
+      <details open><summary>Cálculo</summary><ul id="i-memoria"></ul></details>
+      <details><summary>Regras nacionais aplicadas</summary><ul>
+        <li>Incidência sobre transmissões onerosas de imóveis entre vivos (CF, art. 156, II; CTN, art. 35). O fato gerador é o registro do título; a LC 227/2026 permite à lei municipal antecipar o pagamento.</li>
+        <li>Base de cálculo: valor da transação declarado, presumido verdadeiro; a prefeitura só pode afastá-lo em processo administrativo próprio (STJ, Tema 1.113). A LC 227/2026 alterou o art. 38 do CTN para prever valor de referência, mas o TJSP tem mantido o valor declarado sem esse processo.</li>
+        <li>Integralização de capital: imune (CF, art. 156, parágrafo 2º, I), inclusive para empresa de atividade imobiliária preponderante (STF, Tema 1.348, julgado em 19/10/2026), até o valor destinado ao capital (STF, Tema 796).</li>
+        <li>Atividade preponderante (CTN, art. 37): mais de 50% da receita operacional com venda, locação ou arrendamento de imóveis nos 2 anos anteriores e 2 seguintes à aquisição, ou nos 3 seguintes se a atividade começou depois ou há menos de 2 anos. Desde o Tema 1.348, só afasta a imunidade em fusão, incorporação, cisão e extinção. A transmissão com a totalidade do patrimônio fica fora do teste (parágrafo 4º).</li>
+        <li>Custas em SP: Lei Estadual 11.331/2002, tabelas de 2026 do CNB/SP (notas) e da ARISP (registro). Na integralização, o título é a certidão da JUCESP (Lei 8.934/1994, art. 64), sem escritura. Primeira aquisição pelo SFH tem redução de 50% nos emolumentos (Lei 6.015/1973, art. 290), não aplicada aqui.</li>
+        <li>Municípios com regras conferidas: Guarulhos, São Paulo e São José dos Campos. Para os demais, informe as alíquotas da lei municipal vigente.</li>
+      </ul></details>
+    </div>
+  </section>
+</section>
+
+<footer>
+  Estimativa para apoio ao estudo tributário; não substitui o parecer. Parâmetros conferidos em <span id="versao"></span>. Controller & Oraculu's — Rua Antônio Abude, 14, Jd. Barbosa, Guarulhos/SP · (11) 2087-6740 · www.controller-oraculus.com.br
+</footer>
+<p class="co-rodape">Estimativa para apoio ao estudo tributário; não substitui o parecer. Módulos do Departamento Societário e de Legalização, parâmetros conferidos em 05/11/2026.</p>
+</main>
+<!-- CO:FIM -->

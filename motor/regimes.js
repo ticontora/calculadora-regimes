@@ -5,7 +5,7 @@
  *
  * Entrada (valores mensais, frações em decimal):
  *  {receita, atividade, folha, fatorR, margem, compras, icms, iss, ano, meses,
- *   referencia: {cbs, ibs}, comprador,
+ *   referencia: {cbs, ibs}, comprador, reducaoCbsIbs (0 a 1),
  *   socios: {quantidade, distribuir, percentual, proLabore, outrasRendasAnuais, irOutrasRendas, aplicarNoSimples}}
  */
 (function (raiz, fabrica) {
@@ -71,7 +71,14 @@
     const icmsCredito = C * icmsAliq;
     const icmsLiquido = Math.max(0, icmsDebito - icmsCredito);
     const issValor = R * issAliq;
-    const cpp = P.CPP * folha;
+    // Encargos além da CPP de 20% (RAT/FAP e terceiros), informados pelo usuário. Só no Presumido, no Real e no RET:
+    // no Simples a CPP do Anexo IV fica nos 20% (PREMISSA: terceiros dispensados, LC 123/2006, art. 13, § 3º).
+    const encargos = Math.max(0, e.encargos || 0);
+    const cppSimples = P.CPP * folha;
+    const cpp = (P.CPP + encargos) * folha;
+    const rotCpp = encargos ? 'CPP 20% + encargos ' + pct(encargos) : 'CPP patronal 20%';
+    const formCpp = brl(folha) + ' × ' + (encargos ? pct(P.CPP + encargos) : '20%');
+    const fundEnc = encargos ? '; RAT/FAP e terceiros informados' : '';
     const ali = aliquotasCbsIbs(ano, e.referencia);
     const t = ali.cbs + ali.ibs;
     const reforma = ano >= P.INICIO_OPCAO_FORA_DAS;
@@ -79,9 +86,15 @@
     const notaTransicao = trans > 0 ? ' (alíquota reduzida a ' + Math.round(fatorIcmsIss * 100) + '% em ' + ano + ')' : '';
 
     // CBS/IBS no regime regular: mesmo preço total cobrado; base sem ICMS/ISS; crédito das compras
+    // Redução da alíquota da atividade (LC 214/2025: 30% art. 127; 60% arts. 128 a 138; 50% e 70% art. 261).
+    // Vale para o débito das vendas; o crédito das compras segue a alíquota cheia (PREMISSA: fornecedores sem redução).
+    const reducao = Math.min(1, Math.max(0, e.reducaoCbsIbs || 0));
+    const tv = t * (1 - reducao);
+    const notaRed = reducao ? ' (alíquota com redução de ' + Math.round(reducao * 100) + '%)' : '';
+    const fundRed = reducao ? '; LC 214/2025, arts. 127 a 138 e 261 (redução da atividade)' : '';
     function cbsIbsRegular(baseExtraExclusao) {
       const baseVenda = Math.max(0, R - (baseExtraExclusao || 0));
-      const debito = t * baseVenda / (1 + t);
+      const debito = tv * baseVenda / (1 + tv);
       const credito = t * C * (1 - icmsAliq) / (1 + t);
       const cbs = Math.max(0, (debito - credito) * ali.cbs / t);
       const ibs = Math.max(0, (debito - credito) * ali.ibs / t);
@@ -112,7 +125,7 @@
       const sexta = efe.indice === 5;
       const icmsFora = sexta && cfg.icms ? icmsLiquido : 0;
       const issFora = sexta && cfg.iss ? issValor : 0;
-      const cppFora = tabela === 'servicos4' ? cpp : 0;
+      const cppFora = tabela === 'servicos4' ? cppSimples : 0;
       const cab = [
         linha('Receita dos últimos 12 meses (RBT12)', 'faturamento mensal × 12', rbt12, 'LC 123/2006, art. 18, § 1º'),
         linha('Alíquota nominal da ' + efe.faixa + 'ª faixa (' + out.anexo + ')', pct(efe.nominal) + (sexta && reforma && ano <= 2028 ? ' (−0,1 p.p. em 2027–2028)' : ''), efe.nominal, 'LC 123/2006, Anexos I a V; LC 214/2025, Anexos XVIII a XXII'),
@@ -158,7 +171,7 @@
         linhasF.push(linha('Receita para o DAS', brl(R) + ' − CBS/IBS contidos no preço (' + brl(reg.debito) + ')', baseDas, 'LC 214/2025, art. 41, § 3º; PREMISSA'));
         linhasF.push(linha('DAS sem a fatia de CBS/IBS', brl(baseDas) + ' × ' + pct(efe.efetiva) + ' × (1 − ' + fatiaTirada.toLocaleString('pt-BR', {maximumFractionDigits: 2}) + '%)', dasFora, 'LC 214/2025, art. 41, § 3º'));
         partesF.forEach(p => linhasF.push(linha('  ' + p.codigo + ' dentro do DAS', 'DAS × ' + p.fatia.toLocaleString('pt-BR', {maximumFractionDigits: 2}) + '%', p.valor, 'Partilha do DAS (LC 123/2006 e LC 214/2025, anexos)', p.codigo)));
-        linhasF.push(linha('CBS/IBS sobre as vendas (débito)', pct(t) + ' × ' + brl(reg.baseVenda) + ' ÷ (1 + ' + pct(t) + ')', reg.debito, 'LC 214/2025, arts. 12 e 41'));
+        linhasF.push(linha('CBS/IBS sobre as vendas (débito)' + notaRed, pct(tv) + ' × ' + brl(reg.baseVenda) + ' ÷ (1 + ' + pct(tv) + ')', reg.debito, 'LC 214/2025, arts. 12 e 41' + fundRed));
         linhasF.push(linha('(−) Crédito de CBS/IBS das compras', pct(t) + ' × compras ÷ (1 + ' + pct(t) + ')', -reg.credito, 'LC 214/2025, art. 47; PREMISSA: fornecedores do regime regular'));
         linhasF.push(linha('CBS a recolher', '(débito − crédito) × ' + pct(ali.cbs) + ' ÷ ' + pct(t), reg.cbs, 'LC 214/2025, arts. 41 e 47', 'CBS'));
         linhasF.push(linha('IBS a recolher', '(débito − crédito) × ' + pct(ali.ibs) + ' ÷ ' + pct(t), reg.ibs, 'LC 214/2025, arts. 41 e 47', 'IBS'));
@@ -197,14 +210,14 @@
       linhasP.push(linha('COFINS 3%', '(' + brl(R) + ' − ICMS) × 3%', basePC * P.PIS_COFINS_CUMULATIVO.cofins, 'Lei 9.718/1998, art. 8º; STF, Tema 69', 'COFINS'));
       linhasP.push(linha('CBS 0,9% e IBS 0,1% (teste)', 'apurados e compensados com PIS/COFINS', 0, fundTransicao));
     } else {
-      linhasP.push(linha('CBS/IBS sobre as vendas (débito)', pct(t) + ' × ' + brl(regP.baseVenda) + ' ÷ (1 + ' + pct(t) + ')', regP.debito, 'LC 214/2025, art. 12'));
+      linhasP.push(linha('CBS/IBS sobre as vendas (débito)' + notaRed, pct(tv) + ' × ' + brl(regP.baseVenda) + ' ÷ (1 + ' + pct(tv) + ')', regP.debito, 'LC 214/2025, art. 12' + fundRed));
       linhasP.push(linha('(−) Crédito de CBS/IBS das compras', pct(t) + ' × compras ÷ (1 + ' + pct(t) + ')', -regP.credito, 'LC 214/2025, art. 47; PREMISSA: fornecedores do regime regular'));
       linhasP.push(linha('CBS a recolher', '(débito − crédito) × parte da CBS', regP.cbs, fundTransicao, 'CBS'));
       linhasP.push(linha('IBS a recolher', '(débito − crédito) × parte do IBS', regP.ibs, fundTransicao, 'IBS'));
     }
     if (cfg.iss && trans < 1) linhasP.push(linha('ISS', brl(R) + ' × ' + pct(issAliq) + notaTransicao, issValor, 'LC 116/2003', 'ISS'));
     if (cfg.icms && trans < 1) linhasP.push(linha('ICMS a recolher', brl(icmsDebito) + ' − ' + brl(icmsCredito) + notaTransicao, icmsLiquido, 'LC 87/1996; RICMS do estado', 'ICMS'));
-    linhasP.push(linha('CPP patronal 20%', brl(folha) + ' × 20%', cpp, 'Lei 8.212/1991, art. 22', 'CPP'));
+    linhasP.push(linha(rotCpp, formCpp, cpp, 'Lei 8.212/1991, art. 22' + fundEnc, 'CPP'));
     const presumido = montar('presumido', linhasP, antes, R);
     presumido.irpjCsll = irpjP + adicP + csllP;
     presumido.creditoComprador = reforma ? regP.debito : 0;
@@ -223,7 +236,7 @@
       linhasR.push(linha('CBS 0,9% e IBS 0,1% (teste)', 'apurados e compensados com PIS/COFINS', 0, fundTransicao));
       consumoReal = pis + cof;
     } else {
-      linhasR.push(linha('CBS/IBS sobre as vendas (débito)', pct(t) + ' × ' + brl(regP.baseVenda) + ' ÷ (1 + ' + pct(t) + ')', regP.debito, 'LC 214/2025, art. 12'));
+      linhasR.push(linha('CBS/IBS sobre as vendas (débito)' + notaRed, pct(tv) + ' × ' + brl(regP.baseVenda) + ' ÷ (1 + ' + pct(tv) + ')', regP.debito, 'LC 214/2025, art. 12' + fundRed));
       linhasR.push(linha('(−) Crédito de CBS/IBS das compras', pct(t) + ' × compras ÷ (1 + ' + pct(t) + ')', -regP.credito, 'LC 214/2025, art. 47; PREMISSA: fornecedores do regime regular'));
       linhasR.push(linha('CBS a recolher', '(débito − crédito) × parte da CBS', regP.cbs, fundTransicao, 'CBS'));
       linhasR.push(linha('IBS a recolher', '(débito − crédito) × parte do IBS', regP.ibs, fundTransicao, 'IBS'));
@@ -231,7 +244,7 @@
     }
     if (cfg.iss && trans < 1) linhasR.push(linha('ISS', brl(R) + ' × ' + pct(issAliq) + notaTransicao, issValor, 'LC 116/2003', 'ISS'));
     if (cfg.icms && trans < 1) linhasR.push(linha('ICMS a recolher', brl(icmsDebito) + ' − ' + brl(icmsCredito) + notaTransicao, icmsLiquido, 'LC 87/1996; RICMS do estado', 'ICMS'));
-    linhasR.push(linha('CPP patronal 20%', brl(folha) + ' × 20%', cpp, 'Lei 8.212/1991, art. 22', 'CPP'));
+    linhasR.push(linha(rotCpp, formCpp, cpp, 'Lei 8.212/1991, art. 22' + fundEnc, 'CPP'));
     const lucroTrib = antes - cpp - issValor - icmsLiquido - consumoReal;
     linhasR.push(linha('Lucro tributável', 'lucro antes dos impostos − CPP − ISS − ICMS − ' + (reforma ? 'CBS/IBS' : 'PIS/COFINS'), lucroTrib, 'Decreto-Lei 1.598/1977, art. 6º; PREMISSA: sem adições, exclusões nem prejuízo a compensar'));
     const irpjR = lucroTrib > 0 ? P.IRPJ.aliquota * lucroTrib : 0;
@@ -260,7 +273,7 @@
       } else {
         linhasT.push(linha('CBS/IBS no RET de transição', brl(R) + ' × 2,08%', R * P.RET.cbsIbsTransicao, 'LC 214/2025, art. 485; PREMISSA', 'CBS/IBS (RET)'));
       }
-      linhasT.push(linha('CPP patronal 20%', brl(folha) + ' × 20%', cpp, 'Lei 8.212/1991, art. 22 (fora do RET)', 'CPP'));
+      linhasT.push(linha(rotCpp, formCpp, cpp, 'Lei 8.212/1991, art. 22 (fora do RET)' + fundEnc, 'CPP'));
       const ret = montar('ret', linhasT, antes, R);
       ret.irpjCsll = R * (P.RET.irpj + P.RET.csll);
       ret.creditoComprador = 0;

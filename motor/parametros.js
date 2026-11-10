@@ -144,9 +144,10 @@
 
   /* ---------- CBS e IBS ---------- */
 
-  // Alíquotas de referência (editáveis na tela). Estimativa do CGIBS, Resolução CGIBS nº 14/2026 (31/7/2026):
-  // CBS 9,21% e IBS 18,7%. PREMISSA: a CBS de 2027 só será fixada pelo Senado até 15/12/2026.
-  const REFERENCIA_CBS_IBS = {cbs: 0.0921, ibs: 0.187};
+  // Alíquotas de referência (editáveis na tela).
+  // CBS 11,3%: cálculo do TCU de 28/10/2026; o Senado fixa a definitiva até 15/12/2026. PREMISSA.
+  // IBS 18,7%: estimativa do CGIBS, Resolução CGIBS nº 14/2026 (31/7/2026). PREMISSA.
+  const REFERENCIA_CBS_IBS = {cbs: 0.113, ibs: 0.187};
 
   // Cronograma. Fonte: EC 132/2023, ADCT, arts. 125 a 129; LC 214/2025, arts. 343 a 348.
   // 2026: CBS 0,9% e IBS 0,1% de teste, compensados com PIS/COFINS (custo zero se cumpridas as obrigações acessórias).

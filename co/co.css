@@ -1,0 +1,118 @@
+/* Abas do Societário (portadas de societario-cmd/calculadora-regimes-co). Gerado por co/portar.py. */
+#main-co {
+  --navy: var(--ink); --navy-2: var(--ink2); --gold: #c9a227;
+  --surface: #ffffff; --surface-2: #faf8f3; --line: #e3ddcf;
+  --text: var(--ink); --text-2: var(--ink2); --muted: var(--mut);
+  --s1: #2a5bd7; --s2: #c2410c; --s3: #157148; --s4: #a16207;
+  --ok-bg: #e5f2ea; --ok: #157148; --warn-bg: #fcefe2; --warn: #a84b06;
+  font-size: 14px; line-height: 1.45; padding-top: 8px;
+}
+#main-co .co-cab { max-width: 1280px; margin: 0 auto; padding: 8px 20px 0; }
+#main-co .co-cab h2 { margin: 0; font-size: 20px; color: var(--ink); }
+#main-co .co-cab p { margin: 4px 0 0; color: var(--mut); font-size: 13px; }
+#main-co .co-abas { flex-wrap: wrap; border-bottom: 1px solid var(--navy); }
+#main-co .co-abas button { min-height: 40px; }
+#main-co .co-aba > * { min-width: 0; }
+#main-co .co-rodape { max-width: 1280px; margin: 0 auto; padding: 0 20px 30px; color: var(--muted); font-size: 12px; }
+@media (max-width: 700px) {
+  #main-co .co-abas { flex-wrap: nowrap; overflow-x: auto; padding: 10px 12px 0; }
+  #main-co .co-abas button { white-space: nowrap; padding: 8px 12px; }
+  #main-co .co-cartoes, #main-co .faixa-box { grid-template-columns: 1fr; }
+  #main-co .linha2 { grid-template-columns: 1fr; }
+  #main-co [id$="cartoes"] { grid-template-columns: 1fr !important; }
+  #main-co .co-aba table { display: block; overflow-x: auto; max-width: 100%; }
+  #main-co .co-aba { padding: 12px; }
+}
+@media (prefers-color-scheme: dark) {
+  #main-co :root:where(:not([data-theme="light"])) {color-scheme: dark;
+      --navy: #a9bce6; --navy-2: #8ea6dc; --gold: #d4b062;
+      --bg: #121418; --surface: #1a1a19; --surface-2: #22252b; --line: #33373f;
+      --text: #f0efec; --text-2: #c3c2b7; --muted: #959aa5;
+      --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+      --ok-bg: #143224; --ok: #6fd3a4; --warn-bg: #3a2e12; --warn: #f0c46a;}
+}
+#main-co [hidden] {display: none !important;}
+#main-co .co-aba {max-width: 1280px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: 360px 1fr; gap: 20px;}
+@media (max-width: 900px) {
+  #main-co .co-aba {grid-template-columns: 1fr; padding: 12px;}
+}
+#main-co .painel {background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px;}
+#main-co .painel h2 {margin: 0 0 12px; font-size: 15px; color: var(--navy);}
+#main-co .grupo {border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px;}
+#main-co .grupo:first-of-type {border-top: 0; padding-top: 0; margin-top: 0;}
+#main-co .grupo h3 {margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);}
+#main-co label {display: block; font-size: 13px; color: var(--text-2); margin: 8px 0 4px;}
+#main-co input, #main-co select {width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; font: inherit; background: var(--surface); color: var(--text);}
+#main-co input:focus, #main-co select:focus {outline: 2px solid var(--navy-2); outline-offset: 0;}
+#main-co .linha2 {display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}
+#main-co .dica {font-size: 12px; color: var(--muted); margin-top: 3px;}
+#main-co .co-check {display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--text-2); margin-top: 10px;}
+#main-co .co-check input {width: auto; margin-top: 2px;}
+#main-co .anos {display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px;}
+#main-co .anos button {border: 1px solid var(--line); background: var(--surface); color: var(--text-2); padding: 7px 14px; border-radius: 20px; cursor: pointer; font: inherit;}
+#main-co .anos button[aria-pressed="true"] {background: var(--navy); border-color: var(--navy); color: var(--surface); font-weight: bold;}
+#main-co .co-cartoes {display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;}
+@media (max-width: 1100px) {
+  #main-co .co-cartoes {grid-template-columns: repeat(2, 1fr);}
+}
+#main-co .co-cartao {background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; position: relative;}
+#main-co .co-cartao .nome {display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-2); font-weight: bold;}
+#main-co .co-cartao .ponto {width: 10px; height: 10px; border-radius: 50%; flex: none;}
+#main-co .co-cartao .valor {font-size: 22px; font-weight: bold; margin: 8px 0 2px; color: var(--text);}
+#main-co .co-cartao .sub {font-size: 12px; color: var(--muted);}
+#main-co .co-cartao.melhor {border: 2px solid var(--ok);}
+#main-co .co-selo {display: inline-block; margin-bottom: 6px; background: var(--ok-bg); color: var(--ok); font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 10px;}
+#main-co .co-cartao.ne .valor {font-size: 14px; color: var(--muted); font-weight: normal;}
+#main-co .co-avisos {margin: 16px 0 0; display: grid; gap: 8px;}
+#main-co .co-aviso {background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 9px 12px; font-size: 13px;}
+#main-co .co-secao {margin-top: 20px;}
+#main-co .co-secao h2 {font-size: 15px; color: var(--navy); margin: 0 0 10px;}
+#main-co table {width: 100%; border-collapse: collapse; font-size: 13px;}
+#main-co th, #main-co td {padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap;}
+#main-co th:first-child, #main-co td:first-child {text-align: left; white-space: normal;}
+#main-co thead th {color: var(--text-2); font-weight: bold; background: var(--surface-2);}
+#main-co tr.total td {font-weight: bold; border-top: 2px solid var(--navy);}
+#main-co tr.info td {color: var(--muted); font-size: 12px;}
+#main-co .tabela-wrap {overflow-x: auto;}
+#main-co .graf-top {display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;}
+#main-co .legenda {display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text-2);}
+#main-co .legenda span {display: inline-flex; align-items: center; gap: 6px;}
+#main-co .legenda i {width: 14px; height: 3px; border-radius: 2px; display: inline-block;}
+#main-co .co-btn {border: 1px solid var(--line); background: var(--surface); color: var(--text-2); padding: 6px 12px; border-radius: 6px; cursor: pointer; font: inherit; font-size: 12px;}
+#main-co .co-btn.primario {background: var(--navy); color: var(--surface); border-color: var(--navy); font-weight: bold;}
+#main-co .graf {position: relative; margin-top: 10px;}
+#main-co .graf svg {width: 100%; height: auto; display: block;}
+#main-co .tip {position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.12); min-width: 180px; display: none;}
+#main-co .tip b {display: block; margin-bottom: 4px; color: var(--text);}
+#main-co .tip div {display: flex; justify-content: space-between; gap: 12px; color: var(--text-2);}
+#main-co details {background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; margin-top: 8px;}
+#main-co summary {cursor: pointer; font-weight: bold; color: var(--text-2);}
+#main-co details ul {margin: 8px 0 0; padding-left: 18px; color: var(--text-2); font-size: 13px;}
+#main-co details li {margin: 3px 0;}
+#main-co .co-acoes {display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px;}
+#main-co .busca {display: flex; gap: 6px;}
+#main-co .busca input {flex: 1;}
+#main-co .enq {margin-top: 10px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font-size: 12.5px; color: var(--text-2);}
+#main-co .enq b {color: var(--text);}
+#main-co .enq .t {font-weight: bold; color: var(--text); font-size: 13px; margin-bottom: 4px;}
+#main-co .enq .erro {color: var(--warn);}
+#main-co .enq ul {margin: 6px 0 0; padding-left: 16px;}
+#main-co .enq li {margin: 2px 0;}
+#main-co .enq .nota {margin-top: 6px; color: var(--warn);}
+#main-co .co-tag {display: inline-block; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0 7px; font-size: 11px; margin-left: 4px;}
+#main-co .faixa-box {display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px;}
+@media (max-width: 1100px) {
+  #main-co .faixa-box {grid-template-columns: repeat(2, 1fr);}
+}
+#main-co .faixa-box div {background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;}
+#main-co .faixa-box small {display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em;}
+#main-co .faixa-box b {font-size: 16px;}
+#main-co .abas {max-width: 1280px; margin: 0 auto; padding: 14px 20px 0; display: flex; gap: 6px;}
+#main-co .abas button {border: 1px solid var(--line); border-bottom: 0; background: var(--surface-2); color: var(--text-2); padding: 9px 18px; border-radius: 8px 8px 0 0; cursor: pointer; font: inherit; font-weight: bold;}
+#main-co .abas button[aria-selected="true"] {background: var(--surface); color: var(--navy); border-color: var(--navy);}
+#main-co .ok-msg {color: var(--ok); font-size: 12px; align-self: center;}
+
+/* Campos com contraste e foco iguais ao resto da calculadora */
+#main-co input, #main-co select, #main-co textarea { border-color: var(--campo); }
+#main-co input:focus, #main-co select:focus { outline: 3px solid var(--foco); outline-offset: 1px; }
+#main-co .co-check input { min-height: 0; width: 18px; height: 18px; }

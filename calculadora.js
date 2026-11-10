@@ -202,6 +202,21 @@ function mostrarAtividade(texto){
   caixa.hidden = !texto;
   $('cnae-atividade').textContent = texto || '';
 }
+/* Redução de CBS/IBS sugerida pelo CNAE (prefixo mais longo vence). Tabela da calculadora do Societário;
+   LC 214/2025, arts. 127 a 138 e 261. É sugestão: conferir o caso concreto. */
+const REDUCOES_CNAE = [
+  ['41', .5, 'construção'], ['42', .5, 'construção'], ['43', .5, 'construção'],
+  ['6810201', .5, 'venda de imóveis'], ['6810202', .7, 'locação de imóveis'], ['682', .5, 'intermediação/administração de imóveis'], ['4110700', .5, 'incorporação'],
+  ['85', .6, 'educação'], ['86', .6, 'saúde'],
+  ['69117', .3, 'advocacia (profissão regulamentada)'], ['692', .3, 'contabilidade (profissão regulamentada)'],
+  ['711', .3, 'engenharia e arquitetura (profissão regulamentada)'], ['75', .3, 'medicina veterinária (profissão regulamentada)'],
+  ['7020', .3, 'administração/economia, se exercida por profissional habilitado'], ['9313', .3, 'educação física (profissão regulamentada)']
+];
+function reducaoDoCnae(d){
+  let m = null;
+  REDUCOES_CNAE.forEach(r => { if (d.startsWith(r[0]) && (!m || r[0].length > m[0].length)) m = r; });
+  return m;
+}
 function aplicarCnae(descApi){
   const d = ($('cnae').value || '').replace(/\D/g, '');
   const info = $('cnae-info');
@@ -220,8 +235,11 @@ function aplicarCnae(descApi){
   travarEnquadramento(true);
   mostrarAtividade(c.desc);
   const destino = c.vedado ? 'Não pode optar pelo Simples.' : (c.fatorR ? 'Sujeito ao Fator R: Anexo III ou V, conforme a folha.' : 'Anexo ' + c.anexos + '.');
+  const red = reducaoDoCnae(d);
+  $('reducao').value = red ? String(red[1]) : '0';
+  const notaRed = red ? ' Redução de CBS/IBS sugerida: ' + Math.round(red[1] * 100) + '% (' + red[2] + ').' : '';
   info.className = 'status ok';
-  info.textContent = destino + (c.aviso ? ' ' + c.aviso : '');
+  info.textContent = destino + (c.aviso ? ' ' + c.aviso : '') + notaRed;
   atualizar();
 }
 $('cnae').addEventListener('input', () => { $('cnae').value = mascaraCnae($('cnae').value); aplicarCnae(); });
@@ -243,6 +261,8 @@ function entradas(){
     ano: parseInt($('ano').value, 10) || 2026,
     meses: parseInt($('periodo').value, 10) || 1,
     referencia: {cbs: lerNum('refcbs') / 100, ibs: lerNum('refibs') / 100},
+    reducaoCbsIbs: parseFloat($('reducao').value) || 0,
+    encargos: lerNum('encargos') / 100,
     comprador: radio('comprador') || 'pf',
     distribuir,
     socios: {
@@ -527,7 +547,7 @@ document.querySelectorAll('.segmentado button').forEach(b => b.addEventListener(
 
 /* ===== Rascunho, histórico e compartilhamento ===== */
 const IDS_CAMPOS = ['cnpj', 'nome', 'cnae', 'atividade', 'fatorr', 'receita', 'folha', 'margem', 'compras', 'semcompras', 'icms', 'iss',
-  'socios', 'percentual', 'prolabore', 'outras', 'irOutras', 'divsimples', 'refcbs', 'refibs', 'periodo', 'ano'];
+  'socios', 'percentual', 'prolabore', 'outras', 'irOutras', 'divsimples', 'reducao', 'encargos', 'refcbs', 'refibs', 'periodo', 'ano'];
 function coletarCampos(semIdentificacao){
   const d = {};
   IDS_CAMPOS.forEach(id => {
@@ -598,12 +618,15 @@ function mostrarModo(m){
   $('main-regimes').hidden = m !== 'regimes';
   $('main-imob').hidden = m !== 'imob';
   if ($('main-apuracao')) $('main-apuracao').hidden = m !== 'apuracao';
+  if ($('main-co')) $('main-co').hidden = m !== 'co';
   $('btn-trocar').hidden = !m;
   $('rascunho').textContent = '';
   document.querySelector('.topo .sub').textContent = m === 'imob'
     ? 'Calculadora Imobiliária: venda e locação por pessoa física ou empresa, de 2026 a 2033.'
     : m === 'apuracao'
     ? 'Gestor de Apuração Assistida: crédito e débito de CBS/IBS por nota, da carteira de clientes.'
+    : m === 'co'
+    ? 'Calculadora Societária: obras, venda de imóveis, ganho de capital, ITBI, ITCMD e ICMS.'
     : 'Simples, Simples Híbrido, Presumido e Real, com a transição da reforma de 2026 a 2033.';
   if (m) window.Armazenamento.salvarModo(m);
   window.scrollTo(0, 0);

@@ -1,4 +1,4 @@
-/* Abas do Societário (portadas de societario-cmd/calculadora-regimes-co). Gerado por co/portar.py. */
+/* Abas do Societário (societario-cmd/calculadora-regimes-co). Gerado por co/sincronizar.py: não edite à mão. */
 #main-co {
   --navy: var(--ink); --navy-2: var(--ink2); --gold: #c9a227;
   --surface: #ffffff; --surface-2: #faf8f3; --line: #e3ddcf;
@@ -14,23 +14,6 @@
 #main-co .co-abas button { min-height: 40px; }
 #main-co .co-aba > * { min-width: 0; }
 #main-co .co-rodape { max-width: 1280px; margin: 0 auto; padding: 0 20px 30px; color: var(--muted); font-size: 12px; }
-@media (max-width: 700px) {
-  #main-co .co-abas { flex-wrap: nowrap; overflow-x: auto; padding: 10px 12px 0; }
-  #main-co .co-abas button { white-space: nowrap; padding: 8px 12px; }
-  #main-co .co-cartoes, #main-co .faixa-box { grid-template-columns: 1fr; }
-  #main-co .linha2 { grid-template-columns: 1fr; }
-  #main-co [id$="cartoes"] { grid-template-columns: 1fr !important; }
-  #main-co .co-aba table { display: block; overflow-x: auto; max-width: 100%; }
-  #main-co .co-aba { padding: 12px; }
-}
-@media (prefers-color-scheme: dark) {
-  #main-co :root:where(:not([data-theme="light"])) {color-scheme: dark;
-      --navy: #a9bce6; --navy-2: #8ea6dc; --gold: #d4b062;
-      --bg: #121418; --surface: #1a1a19; --surface-2: #22252b; --line: #33373f;
-      --text: #f0efec; --text-2: #c3c2b7; --muted: #959aa5;
-      --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
-      --ok-bg: #143224; --ok: #6fd3a4; --warn-bg: #3a2e12; --warn: #f0c46a;}
-}
 #main-co [hidden] {display: none !important;}
 #main-co .co-aba {max-width: 1280px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: 360px 1fr; gap: 20px;}
 @media (max-width: 900px) {
@@ -112,7 +95,16 @@
 #main-co .abas button[aria-selected="true"] {background: var(--surface); color: var(--navy); border-color: var(--navy);}
 #main-co .ok-msg {color: var(--ok); font-size: 12px; align-self: center;}
 
-/* Campos com contraste e foco iguais ao resto da calculadora */
+/* Ajustes desta calculadora (contraste dos campos e celular) */
 #main-co input, #main-co select, #main-co textarea { border-color: var(--campo); }
 #main-co input:focus, #main-co select:focus { outline: 3px solid var(--foco); outline-offset: 1px; }
 #main-co .co-check input { min-height: 0; width: 18px; height: 18px; }
+@media (max-width: 700px) {
+  #main-co .co-abas { flex-wrap: nowrap; overflow-x: auto; padding: 10px 12px 0; }
+  #main-co .co-abas button { white-space: nowrap; padding: 8px 12px; }
+  #main-co .co-cartoes, #main-co .faixa-box { grid-template-columns: 1fr; }
+  #main-co .linha2 { grid-template-columns: 1fr; }
+  #main-co [id$="cartoes"] { grid-template-columns: 1fr !important; }
+  #main-co .co-aba table { display: block; overflow-x: auto; max-width: 100%; }
+  #main-co .co-aba { padding: 12px; }
+}

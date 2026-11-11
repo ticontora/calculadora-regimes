@@ -1,0 +1,11 @@
+const C = require('../co/cnae.js'); const M = require('../co/motor.js'); const assert = require('assert');
+const casos = {'4751201':'comercio','6920601':'servicos3','8630503':'servicos5','8650004':'servicos3','6911701':'servicos4','6810202':'locacao','6462000':'holding','4110700':'incorporacao','4120400':'construcao','4399103':'servicos4','6201501':'servicos5','6203100':'servicos3','5611201':'comercio','7112000':'servicos5','8121400':'servicos4','1091101':'industria','4618499':'servicos5'};
+for (const [c, a] of Object.entries(casos)) assert.strictEqual(C.enquadrar(c).atividade, a, c);
+assert.strictEqual(C.enquadrar('6810202').reducao, .7);
+assert.strictEqual(C.enquadrar('8630503').reducao, .6);
+assert.ok(C.validarCnpj('00.000.000/0001-91')); assert.ok(!C.validarCnpj('00.000.000/0001-92'));
+const n = C.normalizar({razao_social:'X', cnae_fiscal: 4751201, cnae_fiscal_descricao:'Comércio', cnaes_secundarios:[{codigo:0, descricao:''}], opcao_pelo_simples:true, regime_tributario:[]});
+assert.strictEqual(n.secundarios.length, 0); assert.strictEqual(n.principal.codigo, '4751201');
+const r = M.calcular({atividade:'locacao', receita:50000, margem:.6, reducao:.7, cbsRef:.113, ibsRef:.187, socios:1, distribuicao:1}, 2027);
+assert.strictEqual(r.regimes.simples.elegivel, false); assert.ok(r.regimes.presumido.total > 0);
+console.log('CNAE OK');

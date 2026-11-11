@@ -6,7 +6,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%2314213D%22/><rect x=%2212%22 y=%2232%22 width=%2210%22 height=%2220%22 rx=%223%22 fill=%22%23E9DDB8%22/><rect x=%2227%22 y=%2218%22 width=%2210%22 height=%2234%22 rx=%223%22 fill=%22%23C9A227%22/><rect x=%2242%22 y=%2226%22 width=%2210%22 height=%2226%22 rx=%223%22 fill=%22%23E9DDB8%22/></svg>">
 <title>Calculadora de Regimes Tributários</title>
 <link rel="stylesheet" href="estilo.css?v=2026-11-10.1">
-<link rel="stylesheet" href="co/co.css?v=2026-11-10.1">
+<link rel="stylesheet" href="co/co.css?v=ed9c1ce">
 <script>
 /* Atualização automática: se houver versão nova publicada, recarrega sem precisar de Ctrl+F5 */
 (function(){
@@ -618,9 +618,9 @@
   </aside>
   <dialog id="aa-dlg" class="aa-dlg"><div id="aa-dlg-in"></div></dialog>
 </main>
-<!-- CO:INICIO (gerado por co/portar.py) -->
+<!-- CO:INICIO (gerado por co/sincronizar.py a partir de societario-cmd/calculadora-regimes-co@ed9c1ce) -->
 <main id="main-co" hidden>
-<div class="co-cab"><h2>Calculadora Societária</h2><p>Construção e incorporação, venda de imóveis, ganho de capital, ITBI, ITCMD e ICMS.</p></div>
+<div class="co-cab"><h2>Calculadora Societária</h2><p>Construção e Incorporação, Venda de imóveis, Ganho de capital PF, ITBI, ITCMD, ICMS.</p></div>
 <nav class="abas co-abas" role="tablist" aria-label="Áreas da calculadora societária">
   <button type="button" role="tab" data-aba="obra" aria-selected="true">Construção e Incorporação</button>
   <button type="button" role="tab" data-aba="venda" aria-selected="false">Venda de imóveis</button>
@@ -757,7 +757,6 @@
     </div>
   </section>
 </section>
-
 <section class="co-aba" id="aba-venda" role="tabpanel" hidden>
   <form class="painel" id="form-venda" autocomplete="off">
     <h2>Venda de imóveis — PF × PJ</h2>
@@ -816,7 +815,6 @@
     </div>
   </section>
 </section>
-
 <section class="co-aba" id="aba-gcap" role="tabpanel" hidden>
   <form class="painel" id="form-gcap" autocomplete="off">
     <h2>Ganho de capital — pessoa física</h2>
@@ -884,138 +882,6 @@
     </div>
   </section>
 </section>
-
-<section class="co-aba" id="aba-icms" role="tabpanel" hidden>
-  <form class="painel" id="form-icms" autocomplete="off">
-    <h2>ICMS por estado</h2>
-    <div class="grupo">
-      <h3>Operação</h3>
-      <div class="linha2">
-        <div><label for="m-ori">Estado de origem</label><select id="m-ori"></select></div>
-        <div><label for="m-des">Estado de destino</label><select id="m-des"></select></div>
-      </div>
-      <label for="m-dest">Destinatário</label>
-      <select id="m-dest">
-        <option value="revenda">Contribuinte — revenda ou industrialização</option>
-        <option value="consumo">Contribuinte — uso, consumo ou ativo imobilizado</option>
-        <option value="naocontrib">Não contribuinte (consumidor final pessoa física ou PJ sem IE)</option>
-      </select>
-      <label class="co-check"><input id="m-imp" type="checkbox"> Mercadoria importada ou com conteúdo de importação acima de 40% (4%)</label>
-    </div>
-    <div class="grupo">
-      <h3>Valores da nota</h3>
-      <label class="co-check"><input id="m-com" type="checkbox" checked> Os valores já incluem o ICMS (preço normal da nota)</label>
-      <div class="linha2">
-        <div><label for="m-prod">Produtos (R$)</label><input id="m-prod" type="number" min="0" step="100" value="10000"></div>
-        <div><label for="m-ipi">IPI (R$)</label><input id="m-ipi" type="number" min="0" step="10" value="0"></div>
-      </div>
-      <div class="linha2">
-        <div><label for="m-frete">Frete (R$)</label><input id="m-frete" type="number" min="0" step="10" value="0"></div>
-        <div><label for="m-desp">Seguro e outras despesas (R$)</label><input id="m-desp" type="number" min="0" step="10" value="0"></div>
-      </div>
-      <div class="linha2">
-        <div><label for="m-desc">Desconto incondicional (R$)</label><input id="m-desc" type="number" min="0" step="10" value="0"></div>
-        <div><label for="m-red">Redução da base (%)</label><input id="m-red" type="number" min="0" max="100" step="0.01" value="0"></div>
-      </div>
-      <div class="dica">Desmarque a primeira opção se quiser saber o preço com o ICMS embutido a partir do valor líquido.</div>
-    </div>
-    <div class="grupo">
-      <h3>Alíquotas do destino (editáveis)</h3>
-      <div class="linha2">
-        <div><label for="m-aint">Alíquota interna (%)</label><input id="m-aint" type="number" min="0" max="40" step="0.01"></div>
-        <div><label for="m-fcp">FCP (%)</label><input id="m-fcp" type="number" min="0" max="4" step="0.01"></div>
-      </div>
-      <div data-m="consumo" hidden><label for="m-bd">Base do DIFAL do contribuinte</label><select id="m-bd"><option value="dupla">Base dupla (maioria dos estados)</option><option value="unica">Base única</option></select></div>
-      <div class="dica">Preenchidas com a alíquota geral do estado. Para produto com alíquota própria (cesta básica, bebidas, energia, cosméticos etc.), informe a do RICMS.</div>
-    </div>
-    <div class="grupo">
-      <h3>Substituição tributária</h3>
-      <label class="co-check"><input id="m-st" type="checkbox"> Mercadoria sujeita a ICMS-ST (remetente substituto)</label>
-      <div data-m="st" hidden class="linha2">
-        <div><label for="m-mva">MVA original (%)</label><input id="m-mva" type="number" min="0" step="0.01" value="40"></div>
-        <div><label for="m-aist">Alíquota interna da ST (%)</label><input id="m-aist" type="number" min="0" max="40" step="0.01" placeholder="igual à do destino"></div>
-      </div>
-    </div>
-    <div class="grupo">
-      <h3>Previsão com a reforma (2026–2033)</h3>
-      <div class="linha2">
-        <div><label for="m-cbs">CBS de referência (%)</label><input id="m-cbs" type="number" min="0" max="30" step="0.01" value="11.3"></div>
-        <div><label for="m-ibs">IBS de referência (%)</label><input id="m-ibs" type="number" min="0" max="40" step="0.01" value="18.7"></div>
-      </div>
-      <div class="linha2">
-        <div><label for="m-redr">Redução de CBS/IBS do produto</label><select id="m-redr"><option value="0">Sem redução</option><option value="0.3">30%</option><option value="0.6">60% (alimentos, saúde, insumos agro etc.)</option><option value="1">100% (cesta básica, alíquota zero)</option></select></div>
-        <div><label for="m-pc">PIS/COFINS em 2026</label><select id="m-pc"><option value="0.0925">Não cumulativo (Lucro Real) 9,25%</option><option value="0.0365">Cumulativo (Presumido) 3,65%</option><option value="0">Simples ou sem PIS/COFINS</option></select></div>
-      </div>
-      <div class="dica">CBS 11,3%: cálculo do TCU para 2027, ainda sem a resolução do Senado. IBS 18,7%: referência metodológica do Comitê Gestor. Ajuste quando sair o número oficial.</div>
-    </div>
-  </form>
-  <section>
-    <div class="co-cartoes" id="m-cartoes" style="grid-template-columns:repeat(3,1fr)"></div>
-    <div class="co-avisos" id="m-avisos"></div>
-    <div class="co-secao painel"><h2>Resumo da nota</h2><div class="tabela-wrap"><table id="m-res"></table></div></div>
-    <div class="co-secao painel"><h2>Previsão com a reforma — 2026 a 2033</h2><div class="tabela-wrap"><table id="m-proj"></table></div>
-      <div class="dica">Mesma operação ano a ano, com o preço da mercadoria sem tributos constante. ICMS (com FCP, DIFAL e ST) a 100% até 2028, 90%, 80%, 70% e 60% em 2029–2032 e extinto em 2033 (EC 132/2023, ADCT, art. 128). PIS/COFINS até 2026. CBS e IBS por fora, sobre o valor sem ICMS e sem PIS/COFINS: 2026 é teste (0,9% + 0,1%, compensados, não é custo); 2027–2028 CBS = referência − 0,1 ponto e IBS 0,1%; IBS sobe para 10%, 20%, 30% e 40% da referência em 2029–2032 e 100% em 2033 (EC 132/2023, ADCT, arts. 125 a 130). Valores de débito na saída: na CBS e no IBS o comprador contribuinte toma crédito integral.</div></div>
-    <div class="co-secao">
-      <h2>Memória e fundamentos</h2>
-      <details open><summary>Cálculo</summary><ul id="m-memoria"></ul></details>
-      <details><summary>Alíquotas gerais por estado — 2026 (saindo de <span id="m-orinome"></span>)</summary><div class="tabela-wrap"><table id="m-tab"></table></div>
-        <div class="dica">Alíquota geral (modal) de cada estado, conferida em 06/11/2026. Alagoas passou a 20,5% em 01/04/2026. Interestaduais: 12%; 7% de Sul e Sudeste (exceto ES) para Norte, Nordeste, Centro-Oeste e ES; 4% para importados (Res. Senado 22/1989 e 13/2012).</div></details>
-      <details><summary>Regras aplicadas</summary><ul>
-        <li>ICMS calculado por dentro: o imposto integra a própria base (LC 87/1996, art. 13, parágrafo 1º, I). Frete, seguro e despesas cobradas entram; desconto incondicional sai.</li>
-        <li>IPI entra na base quando o destinatário é consumidor final (uso, consumo, ativo ou não contribuinte) e fica fora na revenda ou industrialização (LC 87/1996, art. 13, parágrafo 2º).</li>
-        <li>DIFAL: diferença entre a alíquota interna do destino e a interestadual, devido ao destino (CF, art. 155, parágrafo 2º, VII e VIII; LC 190/2022). Não contribuinte: recolhido pelo remetente, com base dupla (Convênio ICMS 236/2021).</li>
-        <li>ICMS-ST: base = valor da operação com IPI, frete e despesas × (1 + MVA); interestadual usa a MVA ajustada (Convênio ICMS 142/2018, cláusula 9ª). ST devida = base × alíquota interna − ICMS próprio.</li>
-        <li>Não cobre: benefícios fiscais e regimes especiais, alíquotas por produto, ICMS monofásico de combustíveis, Simples Nacional (o ICMS vai no DAS) e diferimento.</li>
-      </ul></details>
-    </div>
-  </section>
-</section>
-
-<section class="co-aba" id="aba-itcmd" role="tabpanel" hidden>
-  <form class="painel" id="form-itcmd" autocomplete="off">
-    <h2>ITCMD — herança e doação</h2>
-    <div class="grupo">
-      <h3>Operação</h3>
-      <div class="linha2">
-        <div><label for="t-op">Operação</label><select id="t-op"><option value="doacao">Doação</option><option value="heranca">Herança (causa mortis)</option></select></div>
-        <div><label for="t-est">Estado</label><select id="t-est"><option value="SP">São Paulo</option><option value="outro">Outro estado (informar)</option></select></div>
-      </div>
-      <div class="linha2">
-        <div><label for="t-ben">Beneficiários (donatários ou herdeiros, partes iguais)</label><input id="t-ben" type="number" min="1" step="1" value="1"></div>
-        <div data-t="doacao"><label for="t-ant">Já doado no ano a cada donatário pelo mesmo doador (R$)</label><input id="t-ant" type="number" min="0" step="1000" value="0"></div>
-      </div>
-      <div data-t="outro" hidden>
-        <div class="linha2">
-          <div><label for="t-aliq">Alíquota (%), se for fixa</label><input id="t-aliq" type="number" min="0" max="8" step="0.5" value="4"></div>
-          <div><label for="t-faixas">Ou tabela progressiva: limite:alíquota; ...</label><input id="t-faixas" type="text" placeholder="ex.: 100000:2; 500000:4; :8"></div>
-        </div>
-        <div class="dica">Tabela em R$ por faixa (marginal); a última faixa sem limite. Confira a lei do estado.</div>
-      </div>
-    </div>
-    <div class="grupo">
-      <h3>Bens transmitidos</h3>
-      <div id="t-bens"></div>
-      <button class="co-btn" type="button" id="t-add">+ Adicionar bem</button>
-      <div class="dica">Imóvel: valor de mercado declarado e, em SP, o valor venal do IPTU (base mínima). Quotas: patrimônio líquido contábil e ajustado a valor de mercado da parte transmitida (% das quotas).</div>
-    </div>
-  </form>
-  <section>
-    <div class="co-cartoes" id="t-cartoes" style="grid-template-columns:repeat(3,1fr)"></div>
-    <div class="co-avisos" id="t-avisos"></div>
-    <div class="co-secao painel"><h2>Por bem</h2><div class="tabela-wrap"><table id="t-tabela"></table></div></div>
-    <div class="co-secao">
-      <h2>Memória e fundamentos</h2>
-      <details open><summary>Cálculo</summary><ul id="t-memoria"></ul></details>
-      <details><summary>Regras aplicadas</summary><ul>
-        <li>Normas gerais: LC 227/2026 — base é o valor de mercado (art. 152); quotas não negociadas, no mínimo o patrimônio líquido ajustado a valor de mercado (art. 154, II); alíquotas progressivas por quinhão, legado ou doação, até o teto do Senado (8%).</li>
-        <li>São Paulo (Lei 10.705/2000): 4% fixo em 2026 (art. 16); imóvel urbano não inferior ao valor venal do IPTU (art. 13); nua-propriedade 2/3 e usufruto 1/3 (art. 9º, parágrafo 2º); isenções do art. 6º em UFESPs (R$ 38,42 em 2026).</li>
-        <li>Projeção: PL 409/2025 (1% a 4% por faixas de 10 mil, 85 mil e 280 mil UFESPs) — não aprovado; mostrado só para planejamento.</li>
-        <li>Não considera: bens no exterior, previdência privada, doação a entidades, multa e juros por atraso, e o ITCMD de outros estados com regras próprias de isenção.</li>
-      </ul></details>
-    </div>
-  </section>
-</section>
-
 <section class="co-aba" id="aba-itbi" role="tabpanel" hidden>
   <form class="painel" id="form-itbi" autocomplete="off">
     <h2>ITBI</h2>
@@ -1120,11 +986,136 @@
     </div>
   </section>
 </section>
-
-<footer>
-  Estimativa para apoio ao estudo tributário; não substitui o parecer. Parâmetros conferidos em <span id="versao"></span>. Controller & Oraculu's — Rua Antônio Abude, 14, Jd. Barbosa, Guarulhos/SP · (11) 2087-6740 · www.controller-oraculus.com.br
-</footer>
-<p class="co-rodape">Estimativa para apoio ao estudo tributário; não substitui o parecer. Módulos do Departamento Societário e de Legalização, parâmetros conferidos em 05/11/2026.</p>
+<section class="co-aba" id="aba-itcmd" role="tabpanel" hidden>
+  <form class="painel" id="form-itcmd" autocomplete="off">
+    <h2>ITCMD — herança e doação</h2>
+    <div class="grupo">
+      <h3>Operação</h3>
+      <div class="linha2">
+        <div><label for="t-op">Operação</label><select id="t-op"><option value="doacao">Doação</option><option value="heranca">Herança (causa mortis)</option></select></div>
+        <div><label for="t-est">Estado</label><select id="t-est"><option value="SP">São Paulo</option><option value="outro">Outro estado (informar)</option></select></div>
+      </div>
+      <div class="linha2">
+        <div><label for="t-ben">Beneficiários (donatários ou herdeiros, partes iguais)</label><input id="t-ben" type="number" min="1" step="1" value="1"></div>
+        <div data-t="doacao"><label for="t-ant">Já doado no ano a cada donatário pelo mesmo doador (R$)</label><input id="t-ant" type="number" min="0" step="1000" value="0"></div>
+      </div>
+      <div data-t="outro" hidden>
+        <div class="linha2">
+          <div><label for="t-aliq">Alíquota (%), se for fixa</label><input id="t-aliq" type="number" min="0" max="8" step="0.5" value="4"></div>
+          <div><label for="t-faixas">Ou tabela progressiva: limite:alíquota; ...</label><input id="t-faixas" type="text" placeholder="ex.: 100000:2; 500000:4; :8"></div>
+        </div>
+        <div class="dica">Tabela em R$ por faixa (marginal); a última faixa sem limite. Confira a lei do estado.</div>
+      </div>
+    </div>
+    <div class="grupo">
+      <h3>Bens transmitidos</h3>
+      <div id="t-bens"></div>
+      <button class="co-btn" type="button" id="t-add">+ Adicionar bem</button>
+      <div class="dica">Imóvel: valor de mercado declarado e, em SP, o valor venal do IPTU (base mínima). Quotas: patrimônio líquido contábil e ajustado a valor de mercado da parte transmitida (% das quotas).</div>
+    </div>
+  </form>
+  <section>
+    <div class="co-cartoes" id="t-cartoes" style="grid-template-columns:repeat(3,1fr)"></div>
+    <div class="co-avisos" id="t-avisos"></div>
+    <div class="co-secao painel"><h2>Por bem</h2><div class="tabela-wrap"><table id="t-tabela"></table></div></div>
+    <div class="co-secao">
+      <h2>Memória e fundamentos</h2>
+      <details open><summary>Cálculo</summary><ul id="t-memoria"></ul></details>
+      <details><summary>Regras aplicadas</summary><ul>
+        <li>Normas gerais: LC 227/2026 — base é o valor de mercado (art. 152); quotas não negociadas, no mínimo o patrimônio líquido ajustado a valor de mercado (art. 154, II); alíquotas progressivas por quinhão, legado ou doação, até o teto do Senado (8%).</li>
+        <li>São Paulo (Lei 10.705/2000): 4% fixo em 2026 (art. 16); imóvel urbano não inferior ao valor venal do IPTU (art. 13); nua-propriedade 2/3 e usufruto 1/3 (art. 9º, parágrafo 2º); isenções do art. 6º em UFESPs (R$ 38,42 em 2026).</li>
+        <li>Projeção: PL 409/2025 (1% a 4% por faixas de 10 mil, 85 mil e 280 mil UFESPs) — não aprovado; mostrado só para planejamento.</li>
+        <li>Não considera: bens no exterior, previdência privada, doação a entidades, multa e juros por atraso, e o ITCMD de outros estados com regras próprias de isenção.</li>
+      </ul></details>
+    </div>
+  </section>
+</section>
+<section class="co-aba" id="aba-icms" role="tabpanel" hidden>
+  <form class="painel" id="form-icms" autocomplete="off">
+    <h2>ICMS por estado</h2>
+    <div class="grupo">
+      <h3>Operação</h3>
+      <div class="linha2">
+        <div><label for="m-ori">Estado de origem</label><select id="m-ori"></select></div>
+        <div><label for="m-des">Estado de destino</label><select id="m-des"></select></div>
+      </div>
+      <label for="m-dest">Destinatário</label>
+      <select id="m-dest">
+        <option value="revenda">Contribuinte — revenda ou industrialização</option>
+        <option value="consumo">Contribuinte — uso, consumo ou ativo imobilizado</option>
+        <option value="naocontrib">Não contribuinte (consumidor final pessoa física ou PJ sem IE)</option>
+      </select>
+      <label class="co-check"><input id="m-imp" type="checkbox"> Mercadoria importada ou com conteúdo de importação acima de 40% (4%)</label>
+    </div>
+    <div class="grupo">
+      <h3>Valores da nota</h3>
+      <label class="co-check"><input id="m-com" type="checkbox" checked> Os valores já incluem o ICMS (preço normal da nota)</label>
+      <div class="linha2">
+        <div><label for="m-prod">Produtos (R$)</label><input id="m-prod" type="number" min="0" step="100" value="10000"></div>
+        <div><label for="m-ipi">IPI (R$)</label><input id="m-ipi" type="number" min="0" step="10" value="0"></div>
+      </div>
+      <div class="linha2">
+        <div><label for="m-frete">Frete (R$)</label><input id="m-frete" type="number" min="0" step="10" value="0"></div>
+        <div><label for="m-desp">Seguro e outras despesas (R$)</label><input id="m-desp" type="number" min="0" step="10" value="0"></div>
+      </div>
+      <div class="linha2">
+        <div><label for="m-desc">Desconto incondicional (R$)</label><input id="m-desc" type="number" min="0" step="10" value="0"></div>
+        <div><label for="m-red">Redução da base (%)</label><input id="m-red" type="number" min="0" max="100" step="0.01" value="0"></div>
+      </div>
+      <div class="dica">Desmarque a primeira opção se quiser saber o preço com o ICMS embutido a partir do valor líquido.</div>
+    </div>
+    <div class="grupo">
+      <h3>Alíquotas do destino (editáveis)</h3>
+      <div class="linha2">
+        <div><label for="m-aint">Alíquota interna (%)</label><input id="m-aint" type="number" min="0" max="40" step="0.01"></div>
+        <div><label for="m-fcp">FCP (%)</label><input id="m-fcp" type="number" min="0" max="4" step="0.01"></div>
+      </div>
+      <div data-m="consumo" hidden><label for="m-bd">Base do DIFAL do contribuinte</label><select id="m-bd"><option value="dupla">Base dupla (maioria dos estados)</option><option value="unica">Base única</option></select></div>
+      <div class="dica">Preenchidas com a alíquota geral do estado. Para produto com alíquota própria (cesta básica, bebidas, energia, cosméticos etc.), informe a do RICMS.</div>
+    </div>
+    <div class="grupo">
+      <h3>Substituição tributária</h3>
+      <label class="co-check"><input id="m-st" type="checkbox"> Mercadoria sujeita a ICMS-ST (remetente substituto)</label>
+      <div data-m="st" hidden class="linha2">
+        <div><label for="m-mva">MVA original (%)</label><input id="m-mva" type="number" min="0" step="0.01" value="40"></div>
+        <div><label for="m-aist">Alíquota interna da ST (%)</label><input id="m-aist" type="number" min="0" max="40" step="0.01" placeholder="igual à do destino"></div>
+      </div>
+    </div>
+    <div class="grupo">
+      <h3>Previsão com a reforma (2026–2033)</h3>
+      <div class="linha2">
+        <div><label for="m-cbs">CBS de referência (%)</label><input id="m-cbs" type="number" min="0" max="30" step="0.01" value="11.3"></div>
+        <div><label for="m-ibs">IBS de referência (%)</label><input id="m-ibs" type="number" min="0" max="40" step="0.01" value="18.7"></div>
+      </div>
+      <div class="linha2">
+        <div><label for="m-redr">Redução de CBS/IBS do produto</label><select id="m-redr"><option value="0">Sem redução</option><option value="0.3">30%</option><option value="0.6">60% (alimentos, saúde, insumos agro etc.)</option><option value="1">100% (cesta básica, alíquota zero)</option></select></div>
+        <div><label for="m-pc">PIS/COFINS em 2026</label><select id="m-pc"><option value="0.0925">Não cumulativo (Lucro Real) 9,25%</option><option value="0.0365">Cumulativo (Presumido) 3,65%</option><option value="0">Simples ou sem PIS/COFINS</option></select></div>
+      </div>
+      <div class="dica">CBS 11,3%: cálculo do TCU para 2027, ainda sem a resolução do Senado. IBS 18,7%: referência metodológica do Comitê Gestor. Ajuste quando sair o número oficial.</div>
+    </div>
+  </form>
+  <section>
+    <div class="co-cartoes" id="m-cartoes" style="grid-template-columns:repeat(3,1fr)"></div>
+    <div class="co-avisos" id="m-avisos"></div>
+    <div class="co-secao painel"><h2>Resumo da nota</h2><div class="tabela-wrap"><table id="m-res"></table></div></div>
+    <div class="co-secao painel"><h2>Previsão com a reforma — 2026 a 2033</h2><div class="tabela-wrap"><table id="m-proj"></table></div>
+      <div class="dica">Mesma operação ano a ano, com o preço da mercadoria sem tributos constante. ICMS (com FCP, DIFAL e ST) a 100% até 2028, 90%, 80%, 70% e 60% em 2029–2032 e extinto em 2033 (EC 132/2023, ADCT, art. 128). PIS/COFINS até 2026. CBS e IBS por fora, sobre o valor sem ICMS e sem PIS/COFINS: 2026 é teste (0,9% + 0,1%, compensados, não é custo); 2027–2028 CBS = referência − 0,1 ponto e IBS 0,1%; IBS sobe para 10%, 20%, 30% e 40% da referência em 2029–2032 e 100% em 2033 (EC 132/2023, ADCT, arts. 125 a 130). Valores de débito na saída: na CBS e no IBS o comprador contribuinte toma crédito integral.</div></div>
+    <div class="co-secao">
+      <h2>Memória e fundamentos</h2>
+      <details open><summary>Cálculo</summary><ul id="m-memoria"></ul></details>
+      <details><summary>Alíquotas gerais por estado — 2026 (saindo de <span id="m-orinome"></span>)</summary><div class="tabela-wrap"><table id="m-tab"></table></div>
+        <div class="dica">Alíquota geral (modal) de cada estado, conferida em 06/11/2026. Alagoas passou a 20,5% em 01/04/2026. Interestaduais: 12%; 7% de Sul e Sudeste (exceto ES) para Norte, Nordeste, Centro-Oeste e ES; 4% para importados (Res. Senado 22/1989 e 13/2012).</div></details>
+      <details><summary>Regras aplicadas</summary><ul>
+        <li>ICMS calculado por dentro: o imposto integra a própria base (LC 87/1996, art. 13, parágrafo 1º, I). Frete, seguro e despesas cobradas entram; desconto incondicional sai.</li>
+        <li>IPI entra na base quando o destinatário é consumidor final (uso, consumo, ativo ou não contribuinte) e fica fora na revenda ou industrialização (LC 87/1996, art. 13, parágrafo 2º).</li>
+        <li>DIFAL: diferença entre a alíquota interna do destino e a interestadual, devido ao destino (CF, art. 155, parágrafo 2º, VII e VIII; LC 190/2022). Não contribuinte: recolhido pelo remetente, com base dupla (Convênio ICMS 236/2021).</li>
+        <li>ICMS-ST: base = valor da operação com IPI, frete e despesas × (1 + MVA); interestadual usa a MVA ajustada (Convênio ICMS 142/2018, cláusula 9ª). ST devida = base × alíquota interna − ICMS próprio.</li>
+        <li>Não cobre: benefícios fiscais e regimes especiais, alíquotas por produto, ICMS monofásico de combustíveis, Simples Nacional (o ICMS vai no DAS) e diferimento.</li>
+      </ul></details>
+    </div>
+  </section>
+</section>
+<p class="co-rodape">Estimativa para apoio ao estudo tributário; não substitui o parecer. Módulos do Departamento Societário e de Legalização.</p>
 </main>
 <!-- CO:FIM -->
 
@@ -1148,15 +1139,18 @@
 <script src="imobiliario-ui.js?v=2026-11-10.1"></script>
 <script src="motor/apuracao.js?v=2026-11-10.1"></script>
 <script src="apuracao-ui.js?v=2026-11-10.1"></script>
-<script src="co/motor.js?v=2026-11-10.1"></script>
-<script src="co/ipca.js?v=2026-11-10.1"></script>
-<script src="co/construcao.js?v=2026-11-10.1"></script>
-<script src="co/itbi.js?v=2026-11-10.1"></script>
-<script src="co/docs.js?v=2026-11-10.1"></script>
-<script src="co/itcmd.js?v=2026-11-10.1"></script>
-<script src="co/venda.js?v=2026-11-10.1"></script>
-<script src="co/icms.js?v=2026-11-10.1"></script>
-<script src="co/gcap.js?v=2026-11-10.1"></script>
-<script src="co/co-ui.js?v=2026-11-10.1"></script>
+<!-- CO-SCRIPTS:INICIO -->
+<script src="co/motor.js?v=ed9c1ce"></script>
+<script src="co/cnae.js?v=ed9c1ce"></script>
+<script src="co/construcao.js?v=ed9c1ce"></script>
+<script src="co/itbi.js?v=ed9c1ce"></script>
+<script src="co/docs.js?v=ed9c1ce"></script>
+<script src="co/ipca.js?v=ed9c1ce"></script>
+<script src="co/itcmd.js?v=ed9c1ce"></script>
+<script src="co/venda.js?v=ed9c1ce"></script>
+<script src="co/icms.js?v=ed9c1ce"></script>
+<script src="co/gcap.js?v=ed9c1ce"></script>
+<script src="co/co-ui.js?v=ed9c1ce"></script>
+<!-- CO-SCRIPTS:FIM -->
 </body>
 </html>

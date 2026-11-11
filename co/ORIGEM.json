@@ -1,0 +1,27 @@
+{
+  "repositorio": "https://github.com/societario-cmd/calculadora-regimes-co",
+  "commit": "ed9c1ce552e0ecaacd5913c78f9cb37ffd704517",
+  "sincronizado_em": "2026-11-11T21:19Z",
+  "abas": [
+    "obra",
+    "venda",
+    "gcap",
+    "itbi",
+    "itcmd",
+    "icms"
+  ],
+  "motores": [
+    "motor.js",
+    "cnae.js",
+    "construcao.js",
+    "itbi.js",
+    "docs.js",
+    "ipca.js",
+    "itcmd.js",
+    "venda.js",
+    "icms.js",
+    "gcap.js"
+  ],
+  "hash_geral": "05d67d3b45f32d51",
+  "avisos": []
+}

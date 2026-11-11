@@ -80,6 +80,19 @@ Abas trazidas da calculadora do Departamento Societário e de Legalização (rep
 - **ITCMD** (`co/itcmd.js`): doação e herança, SP e outros estados, usufruto, quotas e projeção do PL 409/2025.
 - **ICMS** (`co/icms.js`): 27 estados, interestadual, DIFAL, FCP, ST com MVA ajustada e previsão com a reforma até 2033.
 
-Os motores ficam em `co/` com os nomes globais `MotorCO` e `IpcaCO`, para não colidir com o motor desta calculadora. `co/portar.py` gerou `co/co.css`, `co/co-ui.js` e o bloco entre `CO:INICIO` e `CO:FIM` do `index.html`. Testes: `testes/co-*.test.js`.
+Os motores ficam em `co/` com os nomes globais `MotorCO` e `IpcaCO`, para não colidir com o motor desta calculadora.
+
+### Sincronização automática
+
+O repositório do Societário é a referência da Calculadora Societária. O workflow `.github/workflows/sincronizar-societario.yml` roda a cada 3 horas (ou à mão, em Actions → "Sincronizar com a calculadora do Societário" → Run workflow):
+
+1. baixa `societario-cmd/calculadora-regimes-co` e compara o último commit com o de `co/ORIGEM.json`;
+2. se mudou, roda `co/sincronizar.py`, que regenera os motores, as abas (inclusive abas novas), o CSS, a tela e os testes `testes/co-*.test.js`;
+3. roda todos os testes e `testes/paridade-co.js`, que abre as duas páginas e exige o mesmo resultado em cada aba;
+4. se tudo passar, publica no `main`; se falhar, nada vai para o ar: as mudanças ficam no branch `sincronizacao-falhou/<commit>` e abre uma issue.
+
+A aba "Regimes gerais" deles não é copiada (aqui ela é a Calculadora Geral Tributária, com motor próprio). Quando ela muda, o workflow abre uma issue para revisão.
+
+Não edite à mão `co/*.js`, `co/co.css`, `co/co-ui.js` nem o bloco entre `CO:INICIO` e `CO:FIM` do `index.html`: a próxima sincronização sobrescreve. Ajustes desta calculadora vão em `co/sincronizar.py`.
 
 Na Calculadora Geral Tributária entraram também: redução de CBS/IBS da atividade (30%, 50%, 60% ou 70%, sugerida pelo CNAE), encargos além da CPP de 20% e a CBS de referência de 11,3% (cálculo do TCU de 28/10/2026).

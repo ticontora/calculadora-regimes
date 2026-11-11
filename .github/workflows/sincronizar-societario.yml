@@ -1,0 +1,107 @@
+name: Sincronizar com a calculadora do Societário
+
+# Usa societario-cmd/calculadora-regimes-co como referência da Calculadora Societária.
+# A cada 3 horas: se houver commit novo lá, regenera as abas, roda os testes e a paridade
+# e publica no main. Se algo falhar, nada vai para o ar: as mudanças ficam num branch e abre-se uma issue.
+
+on:
+  schedule:
+    - cron: '17 */3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: sincronizar-societario
+  cancel-in-progress: false
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Baixar a referência
+        run: |
+          git clone --quiet https://github.com/societario-cmd/calculadora-regimes-co.git ../ref
+          (cd ../ref && python3 build.py >/dev/null)
+
+      - name: Verificar se há commit novo
+        id: ver
+        run: |
+          novo=$(git -C ../ref rev-parse HEAD)
+          atual=$(python3 -c "import json;print(json.load(open('co/ORIGEM.json'))['commit'])" 2>/dev/null || echo nenhum)
+          echo "novo=$novo" >> "$GITHUB_OUTPUT"
+          echo "curto=${novo:0:7}" >> "$GITHUB_OUTPUT"
+          echo "atual=$atual" >> "$GITHUB_OUTPUT"
+          if [ "$novo" = "$atual" ]; then echo "mudou=nao" >> "$GITHUB_OUTPUT"; echo "Sem mudanças (${novo:0:7})."; else echo "mudou=sim" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Sincronizar
+        if: steps.ver.outputs.mudou == 'sim'
+        id: sync
+        run: |
+          python3 co/sincronizar.py ../ref | tee sync.log
+          if grep -q '^GERAL_MUDOU' sync.log; then echo "geral=sim" >> "$GITHUB_OUTPUT"; fi
+          # nova versão do site, para os navegadores recarregarem sozinhos
+          python3 - <<'EOF'
+          import json, re, datetime
+          v_antiga = json.load(open('version.json'))['v']
+          v_nova = datetime.date.today().isoformat() + '.co' + '${{ steps.ver.outputs.curto }}'
+          for f in ('index.html', 'version.json'):
+              s = open(f, encoding='utf-8').read().replace(v_antiga, v_nova)
+              open(f, 'w', encoding='utf-8').write(s)
+          print('versão', v_antiga, '->', v_nova)
+          EOF
+
+      - uses: actions/setup-node@v4
+        if: steps.ver.outputs.mudou == 'sim'
+        with:
+          node-version: '22'
+
+      - name: Testes
+        if: steps.ver.outputs.mudou == 'sim'
+        run: node --test testes/*.test.js
+
+      - name: Paridade com a página de referência
+        if: steps.ver.outputs.mudou == 'sim'
+        run: |
+          npm install --no-save --no-package-lock playwright@1.48.2
+          npx playwright install --with-deps chromium
+          node testes/paridade-co.js ../ref
+
+      - name: Publicar
+        if: steps.ver.outputs.mudou == 'sim'
+        run: |
+          rm -f sync.log
+          git config user.name "sincronizador-societario"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A co testes index.html version.json
+          git commit -m "Sincroniza a Calculadora Societária com societario-cmd/calculadora-regimes-co@${{ steps.ver.outputs.curto }}" \
+                     -m "$(git -C ../ref log --format='- %s' ${{ steps.ver.outputs.atual }}..${{ steps.ver.outputs.novo }} 2>/dev/null | head -30)"
+          git push origin HEAD:main
+
+      - name: Avisar mudança na aba de regimes deles
+        if: steps.sync.outputs.geral == 'sim' && success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create --title "Societário mudou a aba Regimes gerais (${{ steps.ver.outputs.curto }}): revisar a Calculadora Geral Tributária" \
+            --body "As abas da Calculadora Societária foram sincronizadas, mas a aba de regimes deles não é copiada automaticamente: aqui ela é a Calculadora Geral Tributária, com motor próprio. Commits: $(git -C ../ref log --format='%h %s' ${{ steps.ver.outputs.atual }}..${{ steps.ver.outputs.novo }} -- motor.js template.html | head -20 | sed 's/^/\n- /' | tr -d '\r')"
+
+      - name: Falhou - guardar num branch e abrir issue
+        if: failure() && steps.ver.outputs.mudou == 'sim'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ramo="sincronizacao-falhou/${{ steps.ver.outputs.curto }}"
+          rm -f sync.log
+          git config user.name "sincronizador-societario"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$ramo"
+          git add -A co testes index.html version.json
+          git commit -m "Tentativa de sincronização com o Societário @${{ steps.ver.outputs.curto }} (falhou)" || true
+          git push origin "$ramo" --force
+          gh issue create --title "Sincronização com o Societário falhou (${{ steps.ver.outputs.curto }})" \
+            --body "Nada foi publicado. As mudanças estão no branch $ramo. Veja o log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

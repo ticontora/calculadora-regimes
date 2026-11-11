@@ -1,4 +1,4 @@
-/* Interação das abas do Societário. Gerado por co/portar.py a partir de template.html. */
+/* Interação das abas do Societário. Gerado por co/sincronizar.py: não edite à mão. */
 (function () {
   'use strict';
   const C = window.ICMS;
@@ -55,8 +55,6 @@
   $('form-icms').addEventListener('submit', ev => ev.preventDefault());
   render();
 })();
-
-
 (function () {
   'use strict';
   const G = window.GCAP;
@@ -131,8 +129,6 @@
   $('form-gcap').addEventListener('submit', ev => ev.preventDefault());
   render();
 })();
-
-
 (function () {
   'use strict';
   const K = window.Construcao, M = window.MotorCO;
@@ -222,9 +218,6 @@
 
   // CNAE de construção/incorporação na aba geral leva ao módulo
 })();
-
-
-
 (function () {
   'use strict';
   const I = window.ITBI;
@@ -395,8 +388,6 @@ const ANOS = {};
   $('form-itbi').addEventListener('submit', ev => ev.preventDefault());
   render();
 })();
-
-
 (function () {
   'use strict';
   const V = window.Venda, IP = window.IpcaCO;
@@ -481,8 +472,6 @@ const ANOS = {};
   $('form-venda').addEventListener('submit', ev => ev.preventDefault());
   render();
 })();
-
-
 (function () {
   'use strict';
   const T = window.ITCMD;

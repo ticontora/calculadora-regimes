@@ -23,9 +23,11 @@ test('PF, imóvel de 06/2010 vendido em 06/2026: IRPF de R$ 61.354,28', () => {
   assert.equal(cod(r.perfis.pf, 'IRPF'), 61354.28);
 });
 
-test('redutor de ajuste: R$ 200 mil de 01/2015 corrigidos pelo IPCA viram R$ 379.117,35', () => {
+// IPCA publicado até 10/2026: R$ 379.117,35 até 09/2026 × (1 + 0,14% de outubro)
+const AJUSTE_2015 = 379648.11;
+test('redutor de ajuste: R$ 200 mil de 01/2015 corrigidos pelo IPCA viram R$ 379.648,11 (IPCA até 10/2026)', () => {
   const r = IM.redutorAjuste({custo: 200000, aquisicao: {ano: 2015, mes: 1}}, {ano: 2027, mes: 6});
-  assert.ok(perto(r.valor, 379117.35));
+  assert.ok(perto(r.valor, AJUSTE_2015));
 });
 
 test('PJ no Presumido vende R$ 1 mi em 2027: IRPJ + adicional + CSLL = R$ 24.800', () => {
@@ -39,14 +41,14 @@ test('PJ vende em 2027: CBS = base × (9,21% − 0,1) × 50% e IBS = base × 0,1
   const e = venda({ano: 2027, venda: {valor: 1000000, custo: 200000, aquisicao: {ano: 2015, mes: 1}, mes: 6, tipo: 'residencial_novo', natureza: 'estoque'}});
   const r = IM.calcular(e);
   const social = 100000 * IPCA.fator({ano: 2025, mes: 2}, {ano: 2027, mes: 5});
-  const base = 1000000 - 379117.35 - social;
+  const base = 1000000 - AJUSTE_2015 - social;
   assert.ok(perto(cod(r.perfis.pjPresumido, 'CBS'), base * 0.0911 * 0.5, 0.05));
   assert.ok(perto(cod(r.perfis.pjPresumido, 'IBS'), base * 0.001 * 0.5, 0.05));
 });
 
 test('mesma venda em 2033: CBS 4,605% e IBS 9,35% sobre a base', () => {
   const r = IM.calcular(venda({ano: 2033, venda: {valor: 1000000, custo: 200000, aquisicao: {ano: 2015, mes: 1}, mes: 6, tipo: 'comercial', natureza: 'estoque'}}));
-  const base = 1000000 - 379117.35;
+  const base = 1000000 - AJUSTE_2015;
   assert.ok(perto(cod(r.perfis.pjPresumido, 'CBS'), base * 0.04605, 0.05));
   assert.ok(perto(cod(r.perfis.pjPresumido, 'IBS'), base * 0.0935, 0.05));
 });

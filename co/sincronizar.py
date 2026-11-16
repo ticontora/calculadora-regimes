@@ -223,6 +223,7 @@ idx_p.write_text(idx, encoding='utf-8')
 # ---------- Aba de regimes deles (não é portada automaticamente) ----------
 import hashlib
 geral = (REF / 'motor.js').read_text(encoding='utf-8') if (REF / 'motor.js').exists() else ''
+geral = re.sub(r"versao:\s*'[^']*'", '', geral)  # a data de versão muda em todo commit e não é regra
 mg = re.search(r'<main id="aba-geral".*?</main>', t, re.S)
 geral += mg.group(0) if mg else ''
 geral += ''.join(m.group(1) for m in re.finditer(r'<script>(.*?)</script>', t, re.S) if "$('form')" in m.group(1))

@@ -1,5 +1,5 @@
 /*
- * IPCA mensal, em %, de 07/1994 a 09/2026. Fonte: Banco Central do Brasil, SGS série 433
+ * IPCA mensal, em %, de 07/1994 a 10/2026 (10/2026 = 0,14%, IBGE, divulgado em 12/11/2026). Fonte: Banco Central do Brasil, SGS série 433
  * (api.bcb.gov.br/dados/serie/bcdata.sgs.433), consultada em 16/10/2026.
  * Usado para corrigir o redutor de ajuste (LC 214/2025, arts. 257, § 3º, e 258, § 4º), o redutor social
  * (arts. 259, § 3º, e 260, parágrafo único) e o limite de R$ 240 mil da PF (art. 251, § 5º).
@@ -44,10 +44,10 @@
     0.12, 0.23, 0.26, 0.24, 0.28, 0.56, 0.42, 0.83, 0.16, 0.38, 0.46, 0.21,
     0.38, -0.02, 0.44, 0.56, 0.39, 0.52, 0.16, 1.31, 0.56, 0.43, 0.26, 0.24,
     0.26, -0.11, 0.48, 0.09, 0.18, 0.33, 0.33, 0.70, 0.88, 0.67, 0.58, 0.16,
-    0.07, -0.32, 0.82
+    0.07, -0.32, 0.82, 0.14
   ];
   const idx = (ano, mes) => (ano - INICIO.ano) * 12 + (mes - INICIO.mes);
-  const ULTIMO = {ano: 2026, mes: 9};
+  const ULTIMO = {ano: 2026, mes: 10};
 
   // Fator acumulado do mês "de" (inclusive) ao mês "ate" (inclusive), limitado ao último índice publicado
   function fator(de, ate) {

@@ -4,6 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const IM = require('../motor/imobiliario.js');
 const GC = require('../motor/ganho-capital.js');
+const IPCA = require('../motor/ipca.js');
 
 const ref = {cbs: 0.0921, ibs: 0.187};
 const soma = (p, ...c) => p.tributos.filter(t => c.includes(t.codigo)).reduce((s, t) => s + t.valor, 0);
@@ -25,8 +26,10 @@ test('ganho de capital, imóvel de 06/1980: segue a lei (R$ 13.712,28), não a r
   assert.strictEqual(cent(r.imposto), 13712.28);
 });
 
-test('redutor de ajuste: R$ 200 mil de 01/2015 corrigidos = R$ 379.117,35 (igual à referência)', () => {
-  assert.strictEqual(cent(venda(2027).redutores.ajuste.valor), 379117.35);
+test('redutor de ajuste: R$ 200 mil de 01/2015 corrigidos até 09/2026 = R$ 379.117,35 (igual à referência)', () => {
+  // a referência foi conferida com IPCA publicado até 09/2026; com outubro (0,14%) o valor sobe
+  assert.strictEqual(cent(200000 * IPCA.fator({ano: 2015, mes: 1}, {ano: 2026, mes: 9})), 379117.35);
+  assert.strictEqual(cent(venda(2027).redutores.ajuste.valor), cent(379117.35 * 1.0014));
 });
 
 test('venda PJ Presumido: alíquotas iguais à referência (2027: 4,555% + 0,05%; 2033: 4,605% + 9,35%) e IRPJ+CSLL R$ 24.800', () => {

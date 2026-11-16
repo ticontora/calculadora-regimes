@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Política de segurança · Calculadora de Regimes Tributários</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%2314213D%22/><rect x=%2212%22 y=%2232%22 width=%2210%22 height=%2220%22 rx=%223%22 fill=%22%23E9DDB8%22/><rect x=%2227%22 y=%2218%22 width=%2210%22 height=%2234%22 rx=%223%22 fill=%22%23C9A227%22/><rect x=%2242%22 y=%2226%22 width=%2210%22 height=%2226%22 rx=%223%22 fill=%22%23E9DDB8%22/></svg>">
+<link rel="stylesheet" href="estilo.css?v=2026-11-16.1">
+<link rel="stylesheet" href="legal.css?v=2026-11-16.1">
+<script src="dados/privacidade-config.js?v=2026-11-16.1"></script>
+<script src="dados/privacidade.js?v=2026-11-16.1"></script>
+</head>
+<body>
+<header class="topo"><div class="topo-in">
+  <div class="titulo"><p class="sub" style="margin:0">Calculadora de Regimes Tributários</p></div>
+  <a class="voltar" href="./">← Voltar à calculadora</a>
+</div></header>
+<main class="wrap legal" id="conteudo">
+<h1>Política de segurança</h1>
+<p class="meta">Versão <span data-cfg="versao">1.0</span> · vigente desde <span data-cfg="vigencia">16/11/2026</span></p>
+
+<h2>1. Princípio: o dado que não sai não vaza</h2>
+<p>A calculadora foi feita para processar no navegador de quem usa. Sem cadastro, sem senhas, sem servidor próprio e sem banco de dados central, não existe um repositório único de dados de clientes para ser invadido. Isso aplica os princípios de necessidade e de segurança da LGPD (art. 6º, III e VII, e art. 46).</p>
+
+<h2>2. Medidas técnicas</h2>
+<ul>
+<li><b>Conexão protegida:</b> a página é servida por HTTPS.</li>
+<li><b>Política de segurança de conteúdo (CSP):</b> o navegador só executa scripts da própria calculadora e do cdnjs e só se conecta aos serviços de consulta de CNPJ listados. Isso limita o estrago de uma eventual injeção de código.</li>
+<li><b>Nenhum script de terceiros na abertura:</b> sem analytics, anúncios ou widgets. O leitor de PDF só é baixado quando alguém envia um documento.</li>
+<li><b>Bibliotecas com versão fixa</b>, guardadas no próprio repositório quando possível.</li>
+<li><b>Sem segredos no código:</b> nenhuma senha, chave de API ou certificado digital fica no repositório, que é público e pode ser auditado.</li>
+<li><b>Mudanças testadas:</b> cada atualização passa por testes automatizados de cálculo. A sincronização automática com os módulos do Societário só publica se os testes e a conferência com a página de origem passarem.</li>
+<li><b>Dados de documentos lidos em memória:</b> matrículas e certidões não são enviadas nem gravadas como arquivo pela calculadora.</li>
+<li><b>Referer restrito:</b> ao sair da calculadora por um link, o endereço completo (com dados de simulação) não é repassado ao site de destino.</li>
+</ul>
+
+<h2>3. Recomendações para quem usa</h2>
+<ul>
+<li>Em computador compartilhado, escolha "Não salvar" nas <button type="button" class="btn-legal sec" style="min-height:0;padding:2px 10px" data-pv-abrir>preferências de privacidade</button> ou apague os dados ao terminar.</li>
+<li>Mantenha o sistema, o navegador e o antivírus atualizados: os dados ficam no seu computador.</li>
+<li>Não envie links de compartilhamento por canais abertos: eles carregam os dados da simulação.</li>
+<li>Importe no Gestor só os arquivos necessários e apague-os quando a apuração terminar.</li>
+</ul>
+
+<h2>4. Incidentes</h2>
+<p>Ao saber de falha na ferramenta, o fornecedor corrige, publica a correção e avisa as contabilidades usuárias. A contabilidade controladora avalia o risco e, se houver risco ou dano relevante aos titulares, comunica a ANPD e os titulares em até 3 dias úteis do conhecimento, prazo contado em dobro para agente de pequeno porte (LGPD, art. 48; Resolução CD/ANPD nº 15/2024).</p>
+
+<h2>5. Como relatar uma vulnerabilidade</h2>
+<p>Escreva para <a data-email="contatoFornecedor" href="mailto:ti@controller-oraculus.com.br">ti@controller-oraculus.com.br</a> com a descrição e os passos para reproduzir. Não faça testes que derrubem o serviço, acessem dados de outras pessoas ou ataquem os serviços de consulta de CNPJ. Respondemos o recebimento e mantemos você informado da correção.</p>
+
+</main>
+<footer class="rodape-legal"><nav class="links-legais" aria-label="Documentos legais"><a href="privacidade.html">Privacidade</a> · <a href="cookies.html">Cookies e armazenamento</a> · <a href="meus-dados.html">Seus dados e exclusão</a> · <a href="termos.html">Termos de uso</a> · <a href="seguranca.html" aria-current="page">Segurança</a> · <button type="button" data-pv-abrir>Preferências de privacidade</button></nav></footer>
+</body>
+</html>

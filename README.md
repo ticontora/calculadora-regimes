@@ -96,3 +96,12 @@ A aba "Regimes gerais" deles não é copiada (aqui ela é a Calculadora Geral Tr
 Não edite à mão `co/*.js`, `co/co.css`, `co/co-ui.js` nem o bloco entre `CO:INICIO` e `CO:FIM` do `index.html`: a próxima sincronização sobrescreve. Ajustes desta calculadora vão em `co/sincronizar.py`.
 
 Na Calculadora Geral Tributária entraram também: redução de CBS/IBS da atividade (30%, 50%, 60% ou 70%, sugerida pelo CNAE), encargos além da CPP de 20% e a CBS de referência de 11,3% (cálculo do TCU de 28/10/2026).
+
+## Privacidade e LGPD
+
+- Páginas: `privacidade.html`, `cookies.html`, `meus-dados.html` (exclusão, cópia dos dados e direitos), `termos.html` e `seguranca.html`, com links no rodapé.
+- Controlador dos dados é a contabilidade que usa a calculadora. Para uma contabilidade específica, preencha nome, CNPJ e e-mail do encarregado em `dados/privacidade-config.js`: as páginas passam a mostrar esses dados.
+- `dados/privacidade.js`: aviso na primeira visita, preferências ("Salvar neste navegador" ou "Não salvar") e exclusão. Quem escolhe não salvar tem os dados apagados ao sair da página. Só mexe nas chaves desta calculadora (`calc-regimes:` e `co-calc-`), porque o endereço `ticontora.github.io` é compartilhado com outros projetos.
+- Nova chave no armazenamento local? Use um desses prefixos e acrescente-a na tabela de `cookies.html` e em `dados/meus-dados.js`.
+- Segurança: CSP sem scripts embutidos (`inicio.js` substitui o script de atualização e o `onsubmit` dos formulários) e `referrer` restrito. Novo serviço externo precisa entrar na CSP do `index.html`.
+- Se a página de pré-venda (branch `pre-venda`) for ao ar coletando nome, e-mail e WhatsApp, a política de privacidade precisa ganhar essa finalidade, a base legal (consentimento) e o prazo de guarda.

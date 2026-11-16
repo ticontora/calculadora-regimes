@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Política de privacidade · Calculadora de Regimes Tributários</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%2314213D%22/><rect x=%2212%22 y=%2232%22 width=%2210%22 height=%2220%22 rx=%223%22 fill=%22%23E9DDB8%22/><rect x=%2227%22 y=%2218%22 width=%2210%22 height=%2234%22 rx=%223%22 fill=%22%23C9A227%22/><rect x=%2242%22 y=%2226%22 width=%2210%22 height=%2226%22 rx=%223%22 fill=%22%23E9DDB8%22/></svg>">
+<link rel="stylesheet" href="estilo.css?v=2026-11-16.1">
+<link rel="stylesheet" href="legal.css?v=2026-11-16.1">
+<script src="dados/privacidade-config.js?v=2026-11-16.1"></script>
+<script src="dados/privacidade.js?v=2026-11-16.1"></script>
+</head>
+<body>
+<header class="topo"><div class="topo-in">
+  <div class="titulo"><p class="sub" style="margin:0">Calculadora de Regimes Tributários</p></div>
+  <a class="voltar" href="./">← Voltar à calculadora</a>
+</div></header>
+<main class="wrap legal" id="conteudo">
+<h1>Política de privacidade</h1>
+<p class="meta">Versão <span data-cfg="versao">1.0</span> · vigente desde <span data-cfg="vigencia">16/11/2026</span></p>
+
+<div class="destaque"><p style="margin:0"><b>Resumo:</b> os cálculos rodam no seu navegador. Não há cadastro, login, cookies nem ferramentas de rastreamento, e o que você digita não é enviado a servidor nosso. Saem do seu computador só o CNPJ que você pede para consultar e os registros técnicos que todo site gera ao ser acessado.</p></div>
+
+<h2>1. Quem é responsável pelos dados</h2>
+<p><b>Controlador</b> (LGPD, art. 5º, VI): <span data-cfg="controlador">a contabilidade que utiliza esta calculadora com os dados dos clientes dela</span><span data-se-cfg="cnpjControlador" hidden> (CNPJ <span data-cfg="cnpjControlador"></span>)</span>. É ela quem decide quais dados de clientes inserir, para quê e por quanto tempo, e quem responde aos pedidos dos titulares desses dados.</p>
+<p data-se-cfg="contatoControlador" hidden><b>Encarregado (DPO) do controlador:</b> <a data-email="contatoControlador" href="#"></a></p>
+<p><b>Fornecedor da ferramenta:</b> <span data-cfg="fornecedor">Italo Govêa</span>, que desenvolve e mantém a calculadora. Como os dados ficam no navegador de quem usa, o fornecedor não recebe, não armazena e não acessa o que é digitado ou importado.</p>
+<p><b>Canal de privacidade da ferramenta:</b> <a data-email="contatoFornecedor" href="mailto:ti@controller-oraculus.com.br">ti@controller-oraculus.com.br</a>, para dúvidas sobre esta política, sobre o funcionamento da calculadora ou para comunicar um problema de segurança. Pedidos sobre dados de clientes de uma contabilidade devem ir à própria contabilidade; se chegarem a este canal, orientamos o titular a procurá-la.</p>
+
+<h2>2. Como a calculadora funciona</h2>
+<p>É uma página estática hospedada no GitHub Pages. Todo cálculo, a geração de PDF, a leitura de arquivos XML e CSV e a leitura de PDFs de imóveis são feitos pelo próprio navegador, no seu computador. Não existe servidor próprio nem banco de dados da calculadora.</p>
+
+<h2>3. Quais dados são tratados</h2>
+<div class="tabela"><table>
+<thead><tr><th>Dado</th><th>Onde fica</th><th>Para quê</th></tr></thead>
+<tbody>
+<tr><td>O que você digita nas simulações: faturamento, folha, margens, CNAE, CNPJ, razão social, nome do cliente, dados de sócios e pró-labore, valores de imóveis</td><td>Só no seu navegador (armazenamento local), se você permitir salvar</td><td>Fazer o cálculo e guardar rascunho e histórico</td></tr>
+<tr><td>Arquivos importados no Gestor de Apuração (XML de NF-e, extratos CSV, ERP). Podem conter CPF, CNPJ, nomes e endereços de terceiros</td><td>Só no seu navegador</td><td>Conciliar créditos e débitos de CBS/IBS</td></tr>
+<tr><td>Matrícula e certidão de valor venal enviadas na aba ITBI. Podem conter nomes, CPF, estado civil e ônus</td><td>Lidas na memória do navegador; não são enviadas nem guardadas como arquivo</td><td>Preencher a simulação com os valores do documento</td></tr>
+<tr><td>CNPJ que você pede para consultar</td><td>Enviado pelo seu navegador à BrasilAPI e, se ela falhar, à CNPJ.ws</td><td>Buscar razão social, situação e CNAE na base pública da Receita Federal</td></tr>
+<tr><td>Registros técnicos de acesso: endereço IP, navegador, data e hora</td><td>Na hospedagem (GitHub) e, quando o leitor de PDF é baixado, no cdnjs (Cloudflare)</td><td>Entregar a página e protegê-la contra abuso, conforme a política de cada empresa</td></tr>
+</tbody></table></div>
+<p><b>Links de compartilhamento:</b> o botão "Compartilhar" coloca os dados da simulação no próprio endereço, depois do sinal <code>#</code>. Essa parte do endereço não é enviada ao servidor, mas quem receber o link vê os dados. Só compartilhe com quem pode vê-los.</p>
+<p><b>Dados sensíveis</b> (saúde, religião, origem racial, biometria e os demais do art. 5º, II): a calculadora não precisa deles. Não os digite.</p>
+<p><b>Crianças e adolescentes:</b> a ferramenta é destinada a profissionais e empresas, não a menores de 18 anos.</p>
+
+<h2>4. Finalidades e bases legais (art. 7º)</h2>
+<ul>
+<li><b>Simulações e planejamento tributário</b> pedidos pelo cliente ou feitos pela contabilidade para ele: execução de contrato ou de procedimentos preliminares a pedido do titular (art. 7º, V) e legítimo interesse (art. 7º, IX).</li>
+<li><b>Apuração e conferência de documentos fiscais</b> no Gestor: cumprimento de obrigação legal ou regulatória (art. 7º, II) e execução do contrato de serviços contábeis (art. 7º, V), conforme definido pela contabilidade controladora.</li>
+<li><b>Consulta de CNPJ:</b> dados tornados públicos pela Receita Federal, usados para a mesma finalidade de identificação da empresa (art. 7º, §§ 3º e 4º).</li>
+<li><b>Guardar rascunho e histórico no navegador:</b> legítimo interesse de não perder o trabalho (art. 7º, IX), com opção de recusar a qualquer momento.</li>
+<li><b>Registros técnicos de acesso:</b> tratados pelos provedores de hospedagem e de distribuição, para segurança e funcionamento do serviço.</li>
+</ul>
+
+<h2>5. Compartilhamento e transferência internacional</h2>
+<p>Não vendemos nem cedemos dados. Os únicos terceiros envolvidos são:</p>
+<ul>
+<li><b>BrasilAPI</b> e <b>CNPJ.ws</b>: recebem o CNPJ consultado.</li>
+<li><b>GitHub</b> (Microsoft): hospeda a página e registra os acessos.</li>
+<li><b>cdnjs</b> (Cloudflare): entrega o leitor de PDF, baixado só quando você envia um documento na aba ITBI.</li>
+</ul>
+<p>Cada um segue a própria política de privacidade. Esses serviços podem processar dados fora do Brasil; a transferência ocorre nas hipóteses do art. 33 da LGPD e da Resolução CD/ANPD nº 19/2024.</p>
+
+<h2>6. Por quanto tempo os dados ficam</h2>
+<p>No navegador, até você apagar: o histórico guarda no máximo as 30 simulações mais recentes. Quem escolhe "Não salvar" tem os dados apagados ao sair da página. A contabilidade controladora define por quanto tempo guarda os dados dos clientes nos sistemas dela, respeitando os prazos legais de guarda de documentos fiscais. Veja como apagar em <a href="meus-dados.html">Seus dados e exclusão</a>.</p>
+
+<h2>7. Seus direitos (art. 18)</h2>
+<p>Você, como titular, pode pedir ao controlador: confirmação de que há tratamento; acesso aos dados; correção de dados incompletos, inexatos ou desatualizados; anonimização, bloqueio ou eliminação de dados desnecessários ou tratados em desconformidade; portabilidade; eliminação dos dados tratados com consentimento; informação sobre com quem os dados foram compartilhados; informação sobre a possibilidade de não consentir e suas consequências; e revogação do consentimento. Também pode se opor a tratamento feito com base no legítimo interesse.</p>
+<p>A confirmação e o acesso são respondidos de forma simplificada imediatamente ou, em declaração completa, em até 15 dias (art. 19). Se o pedido não for atendido, você pode reclamar à Autoridade Nacional de Proteção de Dados (ANPD), em <a href="https://www.gov.br/anpd" rel="noopener">gov.br/anpd</a>.</p>
+<p>Os dados guardados neste navegador você mesmo vê e apaga, a qualquer momento, em <a href="meus-dados.html">Seus dados e exclusão</a>.</p>
+
+<h2>8. Segurança e incidentes</h2>
+<p>As medidas técnicas estão na <a href="seguranca.html">Política de segurança</a>. Se houver incidente que possa causar risco ou dano relevante, o controlador comunica a ANPD e os titulares em até 3 dias úteis do conhecimento (LGPD, art. 48; Resolução CD/ANPD nº 15/2024). O fornecedor avisa as contabilidades usuárias sem demora quando souber de falha na ferramenta.</p>
+
+<h2>9. Alterações</h2>
+<p>Esta política pode mudar quando a calculadora ou a lei mudarem. A versão e a data de vigência ficam no topo da página. Mudanças relevantes são avisadas na própria calculadora.</p>
+
+</main>
+<footer class="rodape-legal"><nav class="links-legais" aria-label="Documentos legais"><a href="privacidade.html" aria-current="page">Privacidade</a> · <a href="cookies.html">Cookies e armazenamento</a> · <a href="meus-dados.html">Seus dados e exclusão</a> · <a href="termos.html">Termos de uso</a> · <a href="seguranca.html">Segurança</a> · <button type="button" data-pv-abrir>Preferências de privacidade</button></nav></footer>
+</body>
+</html>

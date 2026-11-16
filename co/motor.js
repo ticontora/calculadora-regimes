@@ -5,7 +5,7 @@
   'use strict';
 
   const PARAM = {
-    versao: '2026-11-05',
+    versao: '2026-11-16',
     limiteSimples: 4800000,
     fatorR: 0.28,
     // Faixas: [teto RBT12, alíquota nominal, parcela a deduzir] — LC 123/2006, Anexos I a V

@@ -5,25 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22%2314213D%22/><rect x=%2212%22 y=%2232%22 width=%2210%22 height=%2220%22 rx=%223%22 fill=%22%23E9DDB8%22/><rect x=%2227%22 y=%2218%22 width=%2210%22 height=%2234%22 rx=%223%22 fill=%22%23C9A227%22/><rect x=%2242%22 y=%2226%22 width=%2210%22 height=%2226%22 rx=%223%22 fill=%22%23E9DDB8%22/></svg>">
 <title>Calculadora de Regimes Tributários</title>
-<link rel="stylesheet" href="estilo.css?v=2026-11-10.1">
-<link rel="stylesheet" href="co/co.css?v=ed9c1ce">
-<script>
-/* Atualização automática: se houver versão nova publicada, recarrega sem precisar de Ctrl+F5 */
-(function(){
-  var VERSAO = '2026-11-10.1';
-  if (location.protocol.indexOf('http') !== 0 || !window.fetch) return;
-  fetch('version.json?t=' + Date.now(), {cache: 'no-store'})
-    .then(function(r){ return r.ok ? r.json() : null; })
-    .then(function(j){
-      if (!j || !j.v || j.v === VERSAO) return;
-      var u = new URL(location.href);
-      if (u.searchParams.get('v') === j.v) return;
-      u.searchParams.set('v', j.v);
-      location.replace(u.toString());
-    })
-    .catch(function(){});
-})();
-</script>
+<link rel="stylesheet" href="estilo.css?v=2026-11-16.1">
+<link rel="stylesheet" href="legal.css?v=2026-11-16.1">
+<link rel="stylesheet" href="co/co.css?v=00c5505">
+<meta name="versao-site" content="2026-11-16.1">
+<!-- CSP: ao ativar o proxy de CNPJ (PROXY_CNPJ em calculadora.js), acrescente o endereço dele em connect-src -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; worker-src 'self' blob: https://cdnjs.cloudflare.com; connect-src 'self' https://brasilapi.com.br https://publica.cnpj.ws https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<script src="inicio.js?v=2026-11-16.1"></script>
+<script src="dados/privacidade-config.js?v=2026-11-16.1"></script>
+<script src="dados/privacidade.js?v=2026-11-16.1"></script>
 </head>
 <body>
 <section id="intro" class="intro" aria-labelledby="intro-title">
@@ -47,7 +38,7 @@
     <p class="intro-sub">Compare Simples, Simples Híbrido, Presumido e Real de 2026 a 2033, e simule a venda ou o aluguel de imóveis.</p>
     <button id="btn-entrar" class="btn-entrar" type="button">Entrar <span class="seta" aria-hidden="true">→</span></button>
   </div>
-  <div class="rodape-intro">By Italo Govêa</div>
+  <div class="rodape-intro">By Italo Govêa · <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></div>
 </section>
 
 <div id="app" hidden>
@@ -100,7 +91,7 @@
     </ol>
   </nav>
 
-  <form id="form" novalidate onsubmit="return false">
+  <form id="form" novalidate>
   <!-- 1. Empresa -->
   <section class="card etapa" data-etapa="1" aria-labelledby="t1">
     <h2 id="t1">Empresa</h2>
@@ -109,6 +100,7 @@
         <label for="cnpj">CNPJ <span class="opc">opcional</span></label>
         <input id="cnpj" aria-describedby="cnpj-msg" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="00.000.000/0000-00">
         <p class="status" id="cnpj-msg" role="status">Preenche razão social e atividade.</p>
+        <p class="hint">O CNPJ é consultado na base pública da Receita pela BrasilAPI e pela CNPJ.ws. <a href="privacidade.html">Privacidade</a></p>
       </div>
       <div>
         <label for="nome">Razão social <span class="opc">opcional</span></label>
@@ -388,7 +380,7 @@
     </ol>
   </nav>
 
-  <form id="im-form" novalidate onsubmit="return false">
+  <form id="im-form" novalidate>
   <section class="card etapa-im" data-etapa="1" aria-labelledby="im-t1">
     <h2 id="im-t1">Operação</h2>
     <fieldset class="cards-escolha">
@@ -618,7 +610,7 @@
   </aside>
   <dialog id="aa-dlg" class="aa-dlg"><div id="aa-dlg-in"></div></dialog>
 </main>
-<!-- CO:INICIO (gerado por co/sincronizar.py a partir de societario-cmd/calculadora-regimes-co@ed9c1ce) -->
+<!-- CO:INICIO (gerado por co/sincronizar.py a partir de societario-cmd/calculadora-regimes-co@00c5505) -->
 <main id="main-co" hidden>
 <div class="co-cab"><h2>Calculadora Societária</h2><p>Construção e Incorporação, Venda de imóveis, Ganho de capital PF, ITBI, ITCMD, ICMS.</p></div>
 <nav class="abas co-abas" role="tablist" aria-label="Áreas da calculadora societária">
@@ -664,11 +656,11 @@
       <div class="linha2">
         <div><label for="o-unidades">Unidades residenciais novas vendidas</label><input id="o-unidades" type="number" min="0" step="1" value="20"></div>
         <div><label for="o-lotes">Lotes residenciais vendidos</label><input id="o-lotes" type="number" min="0" step="1" value="0"></div>
-        <div><label for="o-rsun">Redutor social por imóvel novo (R$, valor do mês — art. 259, § 3º)</label><input id="o-rsun" type="number" min="0" step="0.01" value="108211.06"></div>
+        <div><label for="o-rsun">Redutor social por imóvel novo (R$, valor do mês — art. 259, § 3º)</label><input id="o-rsun" type="number" min="0" step="0.01" value="108362.56"></div>
         <div><label for="o-ded488">Custos de 2027–2032 com ICMS/ISS (R$/ano; deduz só o IBS a partir de 2029 — art. 488)</label><input id="o-ded488" type="number" min="0" step="1000" value="0"></div>
-        <div><label for="o-rslote">Redutor social por lote (R$, valor do mês)</label><input id="o-rslote" type="number" min="0" step="0.01" value="32463.32"></div>
+        <div><label for="o-rslote">Redutor social por lote (R$, valor do mês)</label><input id="o-rslote" type="number" min="0" step="0.01" value="32508.77"></div>
       </div>
-      <div class="dica">Redutor social de R$ 100 mil por unidade e R$ 30 mil por lote (LC 214, art. 259).</div>
+      <div class="dica">Redutor social de R$ 100 mil por unidade e R$ 30 mil por lote (LC 214, art. 259), corrigidos pelo IPCA (art. 259, § 3º): valores padrão com IPCA até 10/2026 (IBGE, 12/11/2026).</div>
       <label class="co-check"><input id="o-social" type="checkbox"> Empreendimento de interesse social (RET 1% / 0,53% de CBS/IBS)</label>
  <label class="co-check"><input id="o-semtrib" type="checkbox"> A receita/preço informado não inclui CBS/IBS (tributo cobrado por fora, além do preço)</label>
       <label class="co-check"><input id="o-loteamento" type="checkbox"> Loteamento com registro pedido até 31/12/2028 — comparar com a opção de 3,65% (LC 214, art. 486)</label>
@@ -1119,38 +1111,41 @@
 </main>
 <!-- CO:FIM -->
 
-<footer class="rodape-app">By Italo Govêa · versão 2026-11-10.1</footer>
+<footer class="rodape-app">
+  <nav class="links-legais" aria-label="Documentos legais"><a href="privacidade.html">Privacidade</a><a href="cookies.html">Cookies e armazenamento</a><a href="meus-dados.html">Seus dados e exclusão</a><a href="termos.html">Termos de uso</a><a href="seguranca.html">Segurança</a><button type="button" data-pv-abrir>Preferências de privacidade</button></nav>
+  <p>By Italo Govêa · versão 2026-11-16.1</p>
+</footer>
 </div>
 
-<script src="intro.js?v=2026-11-10.1"></script>
+<script src="intro.js?v=2026-11-16.1"></script>
 <script src="lib/jspdf.umd.min.js"></script>
-<script src="cnae.js?v=2026-11-10.1"></script>
-<script src="motor/parametros.js?v=2026-11-10.1"></script>
-<script src="motor/simples.js?v=2026-11-10.1"></script>
-<script src="motor/renda-pf.js?v=2026-11-10.1"></script>
-<script src="motor/regimes.js?v=2026-11-10.1"></script>
-<script src="motor/insights.js?v=2026-11-10.1"></script>
-<script src="motor/ganho-capital.js?v=2026-11-10.1"></script>
-<script src="motor/ipca.js?v=2026-11-10.1"></script>
-<script src="motor/imobiliario.js?v=2026-11-10.1"></script>
-<script src="dados/armazenamento.js?v=2026-11-10.1"></script>
-<script src="pdf-base.js?v=2026-11-10.1"></script>
-<script src="calculadora.js?v=2026-11-10.1"></script>
-<script src="imobiliario-ui.js?v=2026-11-10.1"></script>
-<script src="motor/apuracao.js?v=2026-11-10.1"></script>
-<script src="apuracao-ui.js?v=2026-11-10.1"></script>
+<script src="cnae.js?v=2026-11-16.1"></script>
+<script src="motor/parametros.js?v=2026-11-16.1"></script>
+<script src="motor/simples.js?v=2026-11-16.1"></script>
+<script src="motor/renda-pf.js?v=2026-11-16.1"></script>
+<script src="motor/regimes.js?v=2026-11-16.1"></script>
+<script src="motor/insights.js?v=2026-11-16.1"></script>
+<script src="motor/ganho-capital.js?v=2026-11-16.1"></script>
+<script src="motor/ipca.js?v=2026-11-16.1"></script>
+<script src="motor/imobiliario.js?v=2026-11-16.1"></script>
+<script src="dados/armazenamento.js?v=2026-11-16.1"></script>
+<script src="pdf-base.js?v=2026-11-16.1"></script>
+<script src="calculadora.js?v=2026-11-16.1"></script>
+<script src="imobiliario-ui.js?v=2026-11-16.1"></script>
+<script src="motor/apuracao.js?v=2026-11-16.1"></script>
+<script src="apuracao-ui.js?v=2026-11-16.1"></script>
 <!-- CO-SCRIPTS:INICIO -->
-<script src="co/motor.js?v=ed9c1ce"></script>
-<script src="co/cnae.js?v=ed9c1ce"></script>
-<script src="co/construcao.js?v=ed9c1ce"></script>
-<script src="co/itbi.js?v=ed9c1ce"></script>
-<script src="co/docs.js?v=ed9c1ce"></script>
-<script src="co/ipca.js?v=ed9c1ce"></script>
-<script src="co/itcmd.js?v=ed9c1ce"></script>
-<script src="co/venda.js?v=ed9c1ce"></script>
-<script src="co/icms.js?v=ed9c1ce"></script>
-<script src="co/gcap.js?v=ed9c1ce"></script>
-<script src="co/co-ui.js?v=ed9c1ce"></script>
+<script src="co/motor.js?v=00c5505"></script>
+<script src="co/cnae.js?v=00c5505"></script>
+<script src="co/construcao.js?v=00c5505"></script>
+<script src="co/itbi.js?v=00c5505"></script>
+<script src="co/docs.js?v=00c5505"></script>
+<script src="co/ipca.js?v=00c5505"></script>
+<script src="co/itcmd.js?v=00c5505"></script>
+<script src="co/venda.js?v=00c5505"></script>
+<script src="co/icms.js?v=00c5505"></script>
+<script src="co/gcap.js?v=00c5505"></script>
+<script src="co/co-ui.js?v=00c5505"></script>
 <!-- CO-SCRIPTS:FIM -->
 </body>
 </html>

@@ -14,8 +14,8 @@ const r = V.calcular(base);
 perto(r.cenarios.pf.total, 54417.71, 0.01, 'IR ganho de capital PF (FR2, 144 meses)');
 const p = r.cenarios.presumido, it = n => p.itens.find(i => i.nome === n).valor;
 perto(it('IRPJ'), 12000, .01, 'IRPJ presumido'); perto(it('Adicional de IRPJ'), 2000, .01, 'adicional trimestral');
-perto(it('CSLL'), 10800, .01, 'CSLL'); perto(it('IBS'), 85.99, .01, 'IBS 2027');
-perto(r.porImovel[0].baseCbsIbs, 171982.94, .02, 'base CBS/IBS');
+perto(it('CSLL'), 10800, .01, 'CSLL'); perto(it('IBS'), 85.41, .01, 'IBS 2027'); // IPCA até 10/2026 (IBGE, 12/11/2026): redutor 400.000 × 1,802034 + social 108.362,56
+perto(r.porImovel[0].baseCbsIbs, 170823.72, .02, 'base CBS/IBS'); // era 171.982,94 com IPCA até 09/2026
 // ano todo: adicional só acima de R$ 240 mil
 perto(V.calcular(Object.assign({}, base, {trimestral: false})).cenarios.presumido.itens.find(i => i.nome === 'Adicional de IRPJ').valor, 0, .01, 'adicional anual');
 // ativo não circulante em 2026: sem PIS/COFINS, IRPJ/CSLL sobre o ganho

@@ -207,8 +207,10 @@ idx = idx_p.read_text(encoding='utf-8')
 idx = re.sub(r'<!-- CO:INICIO.*?<!-- CO:FIM -->', lambda _: bloco_paineis, idx, count=1, flags=re.S)
 tags = []
 if not pdf_preguicoso:
+    # sem script embutido: a CSP do index.html não libera 'unsafe-inline'
     tags += ['<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>',
-             "<script>try { window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; } catch (e) {}</script>"]
+             '<script src="co/pdfjs-config.js"></script>']
+    (CO / 'pdfjs-config.js').write_text("try { window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; } catch (e) {}\n", encoding='utf-8')
 tags += ['<script src="co/%s?v=%s"></script>' % (f, curto) for f in motores + ['co-ui.js']]
 bloco_scripts = '<!-- CO-SCRIPTS:INICIO -->\n' + '\n'.join(tags) + '\n<!-- CO-SCRIPTS:FIM -->'
 if '<!-- CO-SCRIPTS:INICIO -->' in idx:
